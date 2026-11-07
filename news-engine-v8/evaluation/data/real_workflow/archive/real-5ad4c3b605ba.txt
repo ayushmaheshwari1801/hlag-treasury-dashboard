@@ -1,0 +1,41 @@
+Deal could lead to airlines facing higher prices and worse quality on-board wifi
+
+Deal would remove key competitor from market
+
+Viasat and Inmarsat are 2 of the largest satellite communications companies in the world, supplying businesses globally with mobile connectivity that enables services such as internet, email, and video calling. The 2 businesses agreed to merge in a $7.3 billion deal announced in November 2021.
+
+Demand for satellite connectivity is increasing rapidly, driven in large part by the ever-growing use of the internet by businesses and consumers, including through the increased use of data-intensive applications. Both companies are in the process of substantially expanding their offerings, sending more satellites into space and competing aggressively for new business opportunities. Other players, including Starlink (operated by SpaceX), OneWeb, and Telesat, are also entering the sector with a new generation of satellites.
+
+The investigation by the Competition and Markets Authority (CMA) found that Viasat and Inmarsat compete closely in the aviation sector, particularly for the supply of onboard wifi for passenger use. While only some airlines currently offer in-flight connectivity, the availability of these services is expected to grow significantly in coming years.
+
+The deal brings together 2 of the strongest suppliers in a market with few other established players. Although new players, such as Starlink, OneWeb, and Telesat, are seeking to target the aviation sector, this is one of the most difficult industries for satellite operators to enter, and the CMA’s initial investigation has found that there is significant uncertainty about when – if at all – these suppliers would be in a position to compete effectively with Viasat and Inmarsat.
+
+The CMA’s investigation also found that it can be very difficult for airlines to switch providers once they have installed a connectivity solution. The CMA is therefore concerned that the merged company could effectively lock in a large part of the customer base before emerging suppliers are able to compete.
+
+The CMA is concerned that the loss of competition brought about by the deal could have an adverse impact on UK businesses and consumers: airlines could face higher prices and be offered lower quality connectivity solutions, ultimately affecting the cost, quality and availability of services for airline passengers.
+
+Colin Raftery, CMA Senior Director, said:
+
+This is an evolving market, but the merging companies are currently 2 of the key players – and it remains uncertain whether the next generation of satellite operators will be able to compete against them effectively.
+
+Ultimately, airlines could be faced with a worse deal because of this merger, which could have knock-on effects for UK consumers as in-flight connectivity becomes more widespread.
+
+The firms now have 5 working days to submit proposals to address the CMA’s competition concerns. The CMA then has a further 5 working days to consider whether to accept any offer instead of referring the case for an in-depth Phase 2 investigation.
+
+For more information, visit the Viasat / Inmarsat merger inquiry page .
+
+For media enquiries, contact the CMA press office on 020 3738 6460 or press@cma.gov.uk .
+
+The Secretary of State for Business, Energy and Industrial Strategy carried out a separate investigation and made a final order pursuant to section 26 of the National Security and Investment Act 2021 to provide assurance that (i) controls are in place to protect information from unauthorised access and (ii) strategic capabilities continue to be provided by Inmarsat and Viasat to the UK government.
+
+Under the Enterprise Act 2002, the CMA has a duty to make a reference to Phase 2 if the CMA believes that it is or may be the case that a relevant merger situation has been created, or arrangements are in progress or contemplation which, if carried into effect, will result in the creation of a relevant merger situation; and the creation of that situation has resulted, or may be expected to result, in a substantial lessening of competition within any markets or market in the United Kingdom for goods or services.
+
+Viasat owns and operates a network of geo-stationary satellites and provides satellite connectivity services for use in consumer, commercial, and government applications. Viasat also provides communications and cybersecurity products and services, and manufactures and supplies equipment and network technology for satellite connectivity services.
+
+Inmarsat owns and operates a network of geo-stationary satellites and provides broadband and narrowband connectivity services for government and commercial applications.
+
+Viasat entered into a share purchase agreement with Inmarsat’s shareholders on 8 November 2021 pursuant to which Viasat agreed to indirectly acquire 100% of Inmarsat’s issued share capital.
+
+The CMA believes that the merger gives rise to a realistic prospect of a substantial lessening of competition in the supply of in-flight connectivity services to: (a) commercial aviation customers; and (b) business aviation customers.
+
+All enquiries from the general public should be directed to the CMA’s General Enquiries team on general.enquiries@cma.gov.uk or 020 3738 6000.

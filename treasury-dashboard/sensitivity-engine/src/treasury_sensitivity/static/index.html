@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Treasury Sensitivity Demo</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1b2430;--mute:#667085;--line:#e3e6eb;--navy:#14284b;--orange:#e8710a;
+--crit:#b42318;--high:#b54708;--low:#067647;--na:#475467;--critbg:#fee4e2;--highbg:#fef0c7;--lowbg:#d1fadf;--nabg:#eaecf0}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1520;--card:#182131;--ink:#e8ecf3;--mute:#98a2b3;--line:#2a3548;--navy:#9db8ee;
+--crit:#fda29b;--high:#fec84b;--low:#6ce9a6;--na:#c0c7d4;--critbg:#55160c;--highbg:#4e2d07;--lowbg:#073d27;--nabg:#2a3548}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{background:var(--navy);color:#fff;padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+@media (prefers-color-scheme:dark){header{color:#0f1520}}
+header h1{font-size:17px;margin:0;font-weight:650}.badge{background:var(--orange);color:#fff;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
+header .asof{margin-left:auto;font-size:12px;opacity:.9}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.card[aria-pressed=true]{outline:2px solid var(--orange)}
+.card h3{margin:0 0 4px;font-size:13px;color:var(--mute);font-weight:600}.big{font-size:22px;font-weight:700}
+.small{font-size:12px;color:var(--mute)}
+.st{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}
+.CRITICAL{background:var(--critbg);color:var(--crit)}.HIGH{background:var(--highbg);color:var(--high)}
+.LOW{background:var(--lowbg);color:var(--low)}.NA{background:var(--nabg);color:var(--na)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:12px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.panel h2{margin:0 0 8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+label{display:block;font-size:12px;color:var(--mute);margin:8px 0 2px}
+input,select,button,textarea{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+input,select,textarea{width:100%}button{cursor:pointer;width:auto}button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media (prefers-color-scheme:dark){button.primary{color:#0f1520}}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.row>div{flex:1;min-width:130px}
+.tag{font-size:10px;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--mute);margin-left:4px;white-space:nowrap}
+.warn{background:var(--highbg);color:var(--high);border-radius:6px;padding:6px 8px;margin:4px 0;font-size:12px}
+.err{background:var(--critbg);color:var(--crit);border-radius:6px;padding:6px 8px;margin:6px 0}
+.range button{padding:2px 8px;margin-right:4px}.range button[aria-pressed=true]{background:var(--orange);color:#fff;border-color:var(--orange)}
+ul{margin:4px 0;padding-left:18px}li{margin:3px 0}code{font-size:12px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute)}
+</style>
+</head>
+<body>
+<header><h1>Treasury Sensitivity Demo</h1><span class="badge" id="mode">PROTOTYPE: synthetic fixture data</span><span class="asof" id="asof"></span></header>
+<main>
+  <div class="cards" id="cards" role="group" aria-label="Risk modules"></div>
+  <div id="error"></div>
+  <div class="grid">
+    <div>
+      <section class="panel"><h2 id="title">Select a module</h2><div id="controls"></div></section>
+      <section class="panel"><h2>Sensitivity table <span class="small">(live from <code>/scenario</code>)</span></h2><div id="table"></div></section>
+      <section class="panel"><h2>Why this status</h2><div id="status"></div></section>
+    </div>
+    <div>
+      <section class="panel"><h2>History <span class="small" id="histnote"></span></h2>
+        <div class="range" id="ranges"></div><div id="chart"></div></section>
+      <section class="panel"><h2>Explanation <span class="small">(template; it restates numbers, never computes them)</span></h2><div id="explain"></div><div id="actions"></div></section>
+      <section class="panel"><h2>News context <span class="small">(never enters a formula)</span></h2><div id="news"></div></section>
+    </div>
+  </div>
+  <section class="panel"><h2>Compound stress</h2><div class="row"><button id="compoundBtn">Run compound (default scenarios)</button></div><div id="compound"></div></section>
+  <section class="panel"><h2>Review and audit log</h2>
+    <div class="row"><div><label for="who">Reviewer</label><input id="who" placeholder="Your name"></div>
+    <div style="flex:3"><label for="why">Comment</label><input id="why" placeholder="Optional"></div>
+    <button class="primary" id="reviewBtn">Mark module as reviewed</button></div>
+    <div id="auditmsg" class="small"></div><div id="audit"></div></section>
+</main>
+<script>
+const API="/api/v1/sensitivity";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cls=s=>s==="NOT ASSESSABLE"?"NA":s;
+const st=s=>`<span class="st ${cls(s)}">${esc(s)}</span>`;
+const tag=p=>`<span class="tag">${esc(p)}</span>`;
+const fmt=(v,d=3)=>v==null?"UNAVAILABLE":Number(v).toLocaleString(undefined,{maximumFractionDigits:d});
+const SHOCK={fx:"Selected FX shock (%)",interest:"Selected rate change (bps)",bunker:"Selected price change (USD/t)",freight:"Selected SCFI change (%)"};
+let module=null,dirty={},opts={},range="1Y",timer=null,lastResult=null;
+
+async function call(path,body){
+  const r=await fetch(API+path,body===undefined?{}:{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(typeof j.detail==="string"?j.detail:JSON.stringify(j.detail||j));
+  return j;
+}
+function showError(e){$("error").innerHTML=e?`<div class="err">${esc(e.message||e)}</div>`:""}
+
+async function loadOverview(){
+  const o=await call("/overview");
+  $("asof").textContent="As of "+new Date(o.as_of).toLocaleString();
+  $("cards").innerHTML=o.cards.map(c=>`<button class="card" data-m="${c.module}" aria-pressed="${c.module===module}">
+    <h3>${esc(c.title)}</h3><div class="big">${fmt(c.latest_value,4)} <span class="small">${esc(c.unit)}</span></div>
+    <div class="small">${c.change==null?"":"change "+fmt(c.change,4)+" "+esc(c.change_unit||"")} · ${esc(c.freshness)} · ${esc(c.source_kind)}</div>
+    <div style="margin:6px 0">${st(c.status)} <span class="small">selected</span> ${st(c.worst_case_status)} <span class="small">worst row</span></div>
+    <div class="small">Impact ${fmt(c.impact_value)} ${esc(c.impact_unit||"")} ${tag(c.impact_provenance)}</div>
+    <div class="small">Reliability ${esc(c.reliability)} · rule ${esc(c.rule_id)}</div></button>`).join("");
+  document.querySelectorAll(".card").forEach(b=>b.onclick=()=>select(b.dataset.m));
+}
+
+async function select(m){module=m;dirty={};opts={};showError();await loadOverview();await recalc(true);await Promise.all([loadHistory(),loadNews(),loadAudit()])}
+
+function request(){
+  const overrides={};for(const [k,v] of Object.entries(dirty)) if(v!=="") overrides[k]=Number(v);
+  const req={overrides,options:{}};
+  if($("shock")&&$("shock").value!=="") req.headline_shock=Number($("shock").value);
+  if($("modeSel")) req.mode=$("modeSel").value;
+  if($("bench")) req.benchmark=$("bench").value;
+  if($("ptype")) req.options.position_type=$("ptype").value;
+  return req;
+}
+
+async function recalc(first){
+  try{
+    const {result,explanation}=await call(`/modules/${module}/scenario`,first?{}:request());
+    lastResult=result;showError();
+    if(first) renderControls(result);
+    renderResult(result,explanation);
+  }catch(e){showError(e)}
+}
+
+function renderControls(r){
+  $("title").innerHTML=`${esc(r.title)} <span class="small">· ${esc(r.impact_type)}</span>`;
+  let h="";
+  const sh=r.headline;
+  h+=`<div class="row"><div><label for="shock">${SHOCK[module]}</label><input id="shock" type="number" step="any" placeholder="${sh?sh.shock:""} (default)"></div>`;
+  if(module==="interest")h+=`<div><label for="modeSel">Mode</label><select id="modeSel"><option value="A">A · earnings proxy</option><option value="B">B · cash interest</option></select></div>
+     <div><label for="bench">Benchmark</label><select id="bench"><option>ECB_DFR</option><option>ECB_ESTR</option></select></div>
+     <div><label for="ptype">Mode B position</label><select id="ptype"><option value="floating_debt">floating debt</option><option value="floating_deposit">floating deposit</option></select></div>`;
+  if(module==="fx")h+=`<div><label for="modeSel">Direction</label><select id="modeSel"><option>payable</option><option>receivable</option></select></div>`;
+  h+=`</div><label>Assumptions <span class="small">(blank = default; change a value and everything recalculates)</span></label><div class="row">`;
+  for(const i of r.inputs){
+    if(['shock_bps','price_shock','scfi_change_pct'].includes(i.key)) continue;   // already the selected-scenario field above
+    const q=i.quantity;
+    if(!i.editable){h+=`<div><label>${esc(q.label)}${tag(q.provenance)}</label><div>${fmt(q.value,6)} <span class="small">${esc(q.unit)}</span></div></div>`;continue}
+    h+=`<div><label for="in_${i.key}">${esc(q.label)} (${esc(q.unit)})${tag(q.provenance)}</label>
+      <input id="in_${i.key}" data-k="${i.key}" type="number" step="any" min="${i.minimum??""}" max="${i.maximum??""}" placeholder="${q.value==null?"UNAVAILABLE":q.value}"></div>`;
+  }
+  h+=`</div><div class="row" style="margin-top:10px"><button id="reset">Reset to default</button></div>`;
+  $("controls").innerHTML=h;
+  $("controls").querySelectorAll("input[data-k]").forEach(el=>el.oninput=()=>{dirty[el.dataset.k]=el.value;debounce()});
+  $("controls").querySelectorAll("#shock,select").forEach(el=>el.oninput=el.onchange=()=>{if(el.id==="bench")loadHistory();debounce()});
+  $("reset").onclick=async()=>{dirty={};const {result,explanation}=await call(`/modules/${module}/reset?actor=demo-ui`,{});renderControls(result);renderResult(result,explanation);loadAudit()};
+}
+function debounce(){clearTimeout(timer);timer=setTimeout(()=>recalc(false),250)}
+
+function renderResult(r,ex){
+  const rows=r.scenarios.map(s=>`<tr><td>${esc(s.label)}</td><td class="n">${fmt(s.impact.value)} ${tag(s.impact.provenance)}</td><td>${st(s.status)}</td><td class="n small">${s.liquidity_ratio==null?"–":(s.liquidity_ratio*100).toFixed(2)+"%"}</td></tr>`).join("");
+  const h=r.headline;
+  $("table").innerHTML=`<p class="small">${esc(r.labels.impact||"")}. Unit: ${esc(h?h.impact.unit:"")}</p>
+   <table><thead><tr><th>Scenario</th><th class="n">Impact</th><th>Status</th><th class="n">of liquidity</th></tr></thead><tbody>
+   <tr style="font-weight:700"><td>${esc(h?h.label:"–")}</td><td class="n">${fmt(h&&h.impact.value)}</td><td>${h?st(h.status):""}</td><td></td></tr>${rows}</tbody></table>
+   <details><summary>Formula and methodology</summary><p><code>${esc(r.formula)}</code></p><ol>${r.methodology.map(m=>`<li>${esc(m)}</li>`).join("")}</ol>
+   <table>${r.intermediate.map(q=>`<tr><td>${esc(q.label)}</td><td class="n">${fmt(q.value,6)} ${esc(q.unit)} ${tag(q.provenance)}</td></tr>`).join("")}</table></details>
+   ${r.disclosed_reference.length?`<details><summary>Disclosed reference (shown separately, never added)</summary><table>${r.disclosed_reference.map(q=>`<tr><td>${esc(q.label)}</td><td class="n">${fmt(q.value,2)} ${esc(q.unit)} ${tag(q.provenance)}</td></tr>`).join("")}</table></details>`:""}`;
+  const a=r.assessment;
+  $("status").innerHTML=`<p>${st(a.status)} under rule <b>${esc(a.rule_id)}</b> · reliability <b>${esc(r.reliability)}</b> · <span class="small">${esc(a.threshold_version)}</span></p>
+   <ul>${a.rule_trace.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+   ${a.missing.length?`<div class="warn"><b>Missing:</b> ${esc([...new Set(a.missing)].join("; "))}</div>`:""}
+   <p class="small">${esc(a.thresholds_note)}</p>
+   ${r.warnings.map(w=>`<div class="warn">${esc(w)}</div>`).join("")}
+   <details><summary>Why reliability is ${esc(r.reliability)}</summary><ul>${r.reliability_reasons.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`;
+  $("explain").innerHTML=`<p>${esc(ex.text)}</p><p class="small">source: ${esc(ex.source)} · guard passed: ${ex.guard.passed}</p>`;
+  $("actions").innerHTML=`<b>Treasury actions</b><ul>${r.treasury_actions.map(x=>`<li>${esc(x.action)} <span class="small">(${esc(x.rule_id)}; ${esc(x.condition)})</span></li>`).join("")}</ul>`;
+}
+
+async function loadHistory(){
+  const bench=$("bench")&&module==="interest"?"&benchmark="+$("bench").value:"";
+  try{
+    const h=await call(`/modules/${module}/history?range=${range}${bench}`);
+    $("ranges").innerHTML=["1M","3M","6M","1Y","All"].map(x=>`<button data-r="${x}" aria-pressed="${x===range}">${x}</button>`).join("");
+    $("ranges").querySelectorAll("button").forEach(b=>b.onclick=()=>{range=b.dataset.r;loadHistory()});
+    const m=h.market;
+    $("histnote").textContent=`${h.point_count} actual points · ${h.gaps.length} gap(s) · interpolated: ${h.interpolated} · ${m.freshness}`;
+    $("chart").innerHTML=spark(h.points)+`<p class="small">Source: ${esc(m.source)}<br>Observed ${esc(m.observation_timestamp)} · retrieved ${esc(new Date(m.retrieval_timestamp).toLocaleString())}<br>${esc(m.caveat)}</p>`+
+      (h.gaps.length?`<div class="warn">Missing dates stay missing: ${h.gaps.map(g=>`${g.after} → ${g.before}`).join(", ")}</div>`:"");
+  }catch(e){showError(e)}
+}
+function spark(pts){
+  if(pts.length<2) return `<p class="small">Not enough observations. Shown as UNAVAILABLE, not estimated.</p>`;
+  const W=520,H=150,p=8,xs=pts.map(q=>+new Date(q.date)),ys=pts.map(q=>q.value);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),dy=(y1-y0)||1;
+  const X=t=>p+(t-x0)/((x1-x0)||1)*(W-2*p),Y=v=>H-p-(v-y0)/dy*(H-2*p);
+  const d=pts.map((q,i)=>(i?"L":"M")+X(xs[i]).toFixed(1)+" "+Y(q.value).toFixed(1)).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="History chart"><path d="${d}" fill="none" stroke="var(--orange)" stroke-width="2"/>
+   <text x="${p}" y="12" font-size="11" fill="var(--mute)">${fmt(y1,4)}</text><text x="${p}" y="${H-2}" font-size="11" fill="var(--mute)">${fmt(y0,4)}</text></svg>`;
+}
+
+async function loadNews(){
+  try{
+    const n=await call(`/modules/${module}/news`);
+    if(!n.items.length){$("news").innerHTML=`<p class="small">${esc(n.message||"No matching articles.")}</p>`;return}
+    $("news").innerHTML=n.items.map(i=>`<div style="margin-bottom:8px"><b>${esc(i.title)}</b> ${i.unverified?'<span class="st HIGH">UNVERIFIED</span>':'<span class="st LOW">confirmed</span>'}
+      <div class="small">score ${esc(i.score)} · ${esc(i.category)} · matched: ${esc(i.matched_terms.join(", "))}</div>
+      ${i.candidate_assumptions.map(c=>`<div class="small">Candidate: <code>${esc(c.override_key)} = ${esc(c.suggested_value)}</code> (not applied)
+        <button data-k="${esc(c.override_key)}" data-v="${esc(c.suggested_value)}" class="use">Use as my assumption</button></div>`).join("")}</div>`).join("");
+    $("news").querySelectorAll(".use").forEach(b=>b.onclick=()=>{
+      const k=b.dataset.k,el=k==="shock_bps"||k==="price_shock"||k==="scfi_change_pct"?$("shock"):null;
+      if(el){el.value=b.dataset.v;debounce()}});
+  }catch(e){$("news").innerHTML=`<p class="small">${esc(e.message)}</p>`}
+}
+
+$("compoundBtn").onclick=async()=>{
+  try{
+    const {compound:c}=await call("/compound",{});
+    const line=l=>`<tr><td>${esc(l.label)}</td><td class="n">${fmt(l.amount_usd_m)}</td><td class="small">${esc(l.reason||"included")}</td></tr>`;
+    $("compound").innerHTML=`<p>Total <b>${fmt(c.total_usd_m)} USD m</b> over ${c.target_horizon_days} days ${st(c.assessment.status)} <span class="small">${esc(c.assessment.rule_id)}</span></p>
+     <table><thead><tr><th>Component</th><th class="n">USD m</th><th>Note</th></tr></thead><tbody>${c.included.map(line).join("")}${c.overlap_adjustment?line(c.overlap_adjustment):""}${c.excluded.map(line).join("")}</tbody></table>
+     <ul>${c.notes.map(n=>`<li class="small">${esc(n)}</li>`).join("")}</ul>`;
+  }catch(e){showError(e)}
+};
+$("reviewBtn").onclick=async()=>{
+  if(!module){showError("Select a module first");return}
+  try{
+    const r=await call(`/modules/${module}/reviews`,{reviewer:$("who").value,comment:$("why").value||null,request:request()});
+    $("auditmsg").textContent=`Saved snapshot ${r.snapshot_id.slice(0,8)} (audit #${r.audit_seq}, status ${r.status}). The server recomputed the numbers itself.`;
+    showError();loadAudit();
+  }catch(e){showError(e)}
+};
+async function loadAudit(){
+  const [a,v]=await Promise.all([call("/audit?limit=8"),call("/audit/verify")]);
+  $("audit").innerHTML=`<p class="small">Hash chain intact: <b>${v.intact}</b></p><table><tbody>${a.entries.map(e=>`<tr><td class="small">#${e.seq}</td><td>${esc(e.event_type)}</td><td>${esc(e.module||"")}</td><td>${esc(e.actor||"")}</td><td class="small">${esc(e.comment||"")}</td><td class="small">${esc(e.details.status||"")}</td></tr>`).join("")||'<tr><td class="small">No entries yet</td></tr>'}</tbody></table>`;
+}
+loadOverview().then(()=>select("bunker")).catch(showError);
+</script>
+</body>
+</html>

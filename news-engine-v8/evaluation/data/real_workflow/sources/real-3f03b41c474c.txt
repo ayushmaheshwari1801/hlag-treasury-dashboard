@@ -1,0 +1,5 @@
+A summary of the CMA’s report, which was sent to the Secretary of State (SoS) for the Department for Digital, Culture, Media and Sport (DCMS) on 20 July ahead of the set deadline, has now been published . The CMA has determined that an in-depth investigation into the deal between NVIDIA and Arm is warranted on competition grounds.
+
+Should the deal go ahead, the CMA is concerned that the merged business would have the ability and incentive to harm the competitiveness of NVIDIA’s rivals by restricting access to Arm’s intellectual property (IP). Arm’s IP is used by companies that produce semiconductor chips and related products, in competition with NVIDIA.
+
+Ultimately, the CMA is concerned this loss of competition could stifle innovation across a number of markets, including data centres, gaming, the ‘internet of things’, and self-driving cars. This could result in more expensive or lower quality products for businesses and consumers.

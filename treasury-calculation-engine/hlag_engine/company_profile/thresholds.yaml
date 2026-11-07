@@ -1,0 +1,45 @@
+# Thresholds (spec 12). Step 2 holds only the scenario policy ranges; Tier A rules and
+# Tier B levels are added in step 5.
+
+# Policy allowed ranges for scenario fields (2.7, decisions P2, P15).
+# Label ASSUMPTION, display tag PROPOSED ILLUSTRATIVE SETTINGS. Units follow P1:
+# *_pct whole percents, *_bp basis points. Bounds are inclusive.
+scenario_ranges:
+  label: ASSUMPTION
+  tag: PROPOSED ILLUSTRATIVE SETTINGS
+  freight_rate_shock_pct: [-80, 300]        # also each point of rate_shock_path
+  freight_volume_shock_pct: [-50, 50]
+  freight_transit_delay_days: [0, 60]
+  bunker_fuel_shock_pct: [-70, 200]         # vlsfo_shock_pct and hsfo_shock_pct
+  bunker_consumption_uplift_pct: [-50, 100] # P15: demand_slump uses -3%
+  rates_step_bp: [-200, 200]                # each dated step
+  rates_cumulative_bp: [-500, 500]          # running sum of steps per currency, at every date
+  rates_credit_spread_change_bp: [-200, 1000]
+  fx_move_pct: [-50, 100]
+  duration_days: [1, 730]                   # null (persistent) is allowed
+  hedge_coverage_pct: [0, 100]
+  hedge_tenor_months: [1, 36]
+  # Direct cash flows (deviation from spec 2.7, decisions_pending.md). USD million, signed.
+  direct_cash_flow_usd_m: [-2000, 2000]     # each dated entry
+  direct_cash_total_abs_usd_m: [0, 5000]    # sum of absolute amounts over all entries
+
+# Market data checks (3.6, 12, D31). Label ASSUMPTION.
+market_data:
+  label: ASSUMPTION
+  staleness_days:            # stale when days_since_print exceeds this
+    daily: 5
+    weekly: 10
+  plausibility_band_pct:     # week-on-week move that sends an agent-retrieved value to the confirm queue
+    fuel: 40
+    wci: 80
+
+# Tier B scenario status (4.6, D13, D55). Headroom consumed c in whole percent. Label ASSUMPTION,
+# display tag PROPOSED ILLUSTRATIVE SETTINGS. The desk exception level (25% of H_b*) is decided (D55).
+tier_b:
+  label: ASSUMPTION
+  tag: PROPOSED ILLUSTRATIVE SETTINGS
+  watch_pct: 10        # LOW below, WATCH from here
+  high_pct: 25
+  critical_pct: 50
+  opportunity_pct: -10 # OPPORTUNITY shown beside LOW when c <= this
+  desk_exception_pct: 25  # gross adverse delta G_d at or above this share of H_b*

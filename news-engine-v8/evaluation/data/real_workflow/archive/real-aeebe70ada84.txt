@@ -1,0 +1,17 @@
+The Federal Trade Commission is seeking to block IQVIA Holdings Inc. (IQVIA), the world’s largest health care data provider, from acquiring Propel Media, Inc. (PMI), alleging in an administrative complaint that the proposed acquisition would give IQVIA a market- leading position in programmatic advertising for health care products, namely prescription drugs, to doctors and other health care professionals. The merger would also increase IQVIA’s incentive to withhold key information to prevent rival companies and potential entrants from effectively competing, the complaint states.
+
+“Protecting competition in the emerging health care programmatic advertising market plays a critical role in lowering health care costs, including the cost of prescription drugs.” said FTC Bureau of Competition Director Holly Vedova. “Given the rampant consolidation across the pharmaceutical industry, it’s critical that the market for health care product advertising remains competitive to ensure that patients and their doctors have access to high quality, affordable products.”
+
+IQVIA’s Lasso Marketing and PMI’s DeepIntent are two of the top three providers of programmatic advertising, known as demand-side platforms, that specifically targets health care professionals with advertising for pharmaceutical drugs and other health care products. The FTC’s complaint alleges that the proposed transaction would eliminate head-to-head competition between Lasso and DeepIntent, driving up prices and reducing quality and choice.
+
+Competition in this market is necessary to protect patients from higher health care prices that could be passed on if the cost of marketing health care products increases due to reduced competition. The FTC contends the deal would also reduce innovation in this emerging industry, potentially harming patients by preventing doctors and other health care practitioners from learning about useful pharmaceutical products.
+
+As the largest health care data provider, IQVIA also plays a unique and critical role in programmatic advertising to health care professionals because it controls leading provider identity and prescribing behavior data that is essential for health care demand-side platforms to compete.
+
+Because IQVIA’s datasets are considered the “gold standard” among health care industry participants, health care advertisers frequently prefer that demand-side platforms use IQVIA data in their programmatic advertising campaigns to health care professionals. According to the complaint, if IQVIA and PMI merge, IQVIA will have the ability and incentive to leverage its control over these important datasets to foreclose or otherwise disadvantage current or emerging rivals to DeepIntent and Lasso, raising prices for its data, reducing data quality, or restricting advertisers from using its data.
+
+In addition to the FTC’s administrative complaint, the Commission has also authorized FTC staff to seek a temporary restraining order and preliminary injunction in federal district court to prevent IQVIA from consummating its acquisition of PMI, pending the agency’s administrative proceeding. The FTC’s administrative and federal court complaints will be made available at a later time.
+
+The Commission vote to issue an administrative complaint and authorize staff to seek a temporary restraining order and preliminary injunction in federal district court was 3-0.
+
+The Mergers I Division of the FTC’s Bureau of Competition was responsible for this matter.

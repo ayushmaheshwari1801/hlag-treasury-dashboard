@@ -1,0 +1,6 @@
+data/*.sqlite
+data/*.sqlite-journal
+data/market_cache/
+__pycache__/
+.pytest_cache/
+.env

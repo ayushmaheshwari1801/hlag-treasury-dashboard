@@ -1,0 +1,2 @@
+﻿include README.md SPEC.md
+recursive-include src/news_engine *.txt

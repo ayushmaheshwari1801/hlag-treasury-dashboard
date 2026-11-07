@@ -1,0 +1,22 @@
+[project]
+name = "treasury-gateway"
+version = "0.1.0"
+description = "Joins the news engine exports and the sensitivity engine behind one dashboard API"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.110", "uvicorn>=0.27", "pydantic>=2.6", "httpx>=0.27", "treasury-sensitivity"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+treasury_gateway = ["*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

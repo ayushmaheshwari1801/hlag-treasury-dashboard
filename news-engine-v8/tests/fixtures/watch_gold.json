@@ -1,0 +1,318 @@
+{
+  "dataset": "user_watch_synthetic_v3",
+  "independent": false,
+  "source_fixture": "tests/fixtures/article_gold.json, first 12 inputs",
+  "source_policy_fixture": "A09 uses an explicitly synthetic MPA-hosted fixture URL in demo_tracking; no HTTP retrieval.",
+  "event_labels": {
+    "general": "Fallback; no state tracking",
+    "port_delta_strike": "Track the October 2026 Port Delta strike duration and confirmed reopening; exclude later unrelated strikes.",
+    "bunker_prices": "Continuously monitor bunker fuel prices.",
+    "freight_rates": "Continuously monitor freight rates."
+  },
+  "cases": [
+    {
+      "case_id": "A01",
+      "category": "Industry",
+      "relevance": 4,
+      "group": "strike-original",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 24,
+          "unit": "hours",
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "new_development"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "monitoring"
+      }
+    },
+    {
+      "case_id": "A02",
+      "category": "Regulatory",
+      "relevance": 3,
+      "group": "proposal",
+      "signals": [
+        {
+          "indicator": "repatriation_rule_proposal",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "general"
+      ]
+    },
+    {
+      "case_id": "A03",
+      "category": "Macroeconomic",
+      "relevance": 4,
+      "group": "policy-rate",
+      "signals": [
+        {
+          "indicator": "policy_rate_adjustment",
+          "level": "numeric",
+          "value": 50,
+          "unit": "basis points",
+          "change": null,
+          "direction": "increase"
+        }
+      ],
+      "event_labels": [
+        "general"
+      ]
+    },
+    {
+      "case_id": "A04",
+      "category": "Industry",
+      "relevance": 2,
+      "group": "cooperation",
+      "signals": [
+        {
+          "indicator": "maritime_cooperation_agreement",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "general"
+      ]
+    },
+    {
+      "case_id": "A05",
+      "category": "Industry",
+      "relevance": 4,
+      "group": "strike-original",
+      "signals": [],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [],
+      "expected_state": {
+        "port_delta_strike": "monitoring"
+      }
+    },
+    {
+      "case_id": "A06",
+      "category": "Industry",
+      "relevance": 5,
+      "group": "extension-report",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "new_development"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "monitoring"
+      }
+    },
+    {
+      "case_id": "A07",
+      "category": "Regulatory",
+      "relevance": 3,
+      "group": "customs",
+      "signals": [
+        {
+          "indicator": "clearance_document_rule",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "general"
+      ]
+    },
+    {
+      "case_id": "A08",
+      "category": "Industry",
+      "relevance": 3,
+      "group": "unverified-post",
+      "signals": [],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "conflict"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "monitoring"
+      }
+    },
+    {
+      "case_id": "A09",
+      "category": "Industry",
+      "relevance": 5,
+      "group": "reopening-notice",
+      "signals": [
+        {
+          "indicator": "port_reopening_notice",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "resolution"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "resolved"
+      }
+    },
+    {
+      "case_id": "A10",
+      "category": "Industry",
+      "relevance": 5,
+      "group": "extension-report",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "new_development"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "resolved"
+      }
+    },
+    {
+      "case_id": "A11",
+      "category": "Industry",
+      "relevance": 5,
+      "group": "extension-report",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "evaluate": false,
+      "tracking_decisions": [
+        {
+          "event_label": "port_delta_strike",
+          "decision": "new_development"
+        }
+      ],
+      "expected_state": {
+        "port_delta_strike": "resolved"
+      }
+    },
+    {
+      "case_id": "A12",
+      "category": "Industry",
+      "relevance": 4,
+      "group": "fuel-freight",
+      "signals": [
+        {
+          "indicator": "bunker_fuel_price",
+          "level": "numeric",
+          "value": 600,
+          "unit": "USD per tonne",
+          "change": null,
+          "direction": null
+        },
+        {
+          "indicator": "freight_rate",
+          "level": "numeric",
+          "value": 1200,
+          "unit": "USD per TEU",
+          "change": null,
+          "direction": null
+        }
+      ],
+      "event_labels": [
+        "bunker_prices",
+        "freight_rates"
+      ],
+      "tracking_decisions": [
+        {
+          "event_label": "bunker_prices",
+          "decision": "new_development"
+        },
+        {
+          "event_label": "freight_rates",
+          "decision": "new_development"
+        }
+      ],
+      "expected_state": {
+        "bunker_prices": "monitoring",
+        "freight_rates": "monitoring"
+      }
+    }
+  ]
+}

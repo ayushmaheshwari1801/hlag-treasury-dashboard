@@ -1,0 +1,9 @@
+In the wake of the European Commission’s announcement that it is investigating Illumina’s $7.1 billion proposed acquisition of DNA sequencing provider Illumina, the Federal Trade Commission has authorized staff to dismiss its federal court complaint for Preliminary Injunction and Temporary Restraining Order. Acting Bureau of Competition Director Maribeth Petrizzi issued this statement on the Commission’s action:
+
+“The FTC sought preliminary relief in federal court to prevent Illumina and GRAIL from merging while the case is being decided on the merits in administrative court. At the time, a district court order was necessary to prevent the parties from consummating their merger. The administrative trial is scheduled to begin on August 24, 2021. Now that the European Commission is investigating, Illumina and GRAIL cannot implement the transaction without obtaining clearance from the European Commission.”
+
+Dismissing the complaint for Preliminary Injunction and Temporary Restraining Order when preliminary relief is no longer necessary would conserve FTC and judicial resources, Acting Director Petrizzi added.
+
+The FTC filed an administrative complaint to block Illumina’s $7.1 billion proposed acquisition of GRAIL on March 30, 2021.
+
+GRAIL is a maker of a non-invasive, early detection liquid biopsy test that can screen for multiple types of cancer in asymptomatic patients at very early stages using DNA sequencing. Illumina is the only provider of DNA sequencing that is a viable option for these multi-cancer early detection, or MCED, tests in the United States. The complaint alleges the proposed acquisition will diminish innovation in the U.S. market for MCED tests, which could be used to detect up to 50 types of cancer. Most of these types of cancer are not screened for at all today, and the MCED test could save millions of lives around the world.

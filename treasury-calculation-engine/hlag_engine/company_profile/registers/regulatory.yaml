@@ -1,0 +1,20 @@
+# Regulatory touchpoints (3.4, D27). Checked against AR 2025 pp. 23-24 (handoff, 2 Nov 2026):
+# regimes the AR identifies are DISCLOSED with their page; the rest stay ASSUMPTION.
+status: ok
+note: "Checked against AR 2025 pp. 23-24: EU ETS and FuelEU Maritime are described on p. 24; ISM/ISPS/MLC, advance manifest rules, embargo and sanctions regulations and CII on p. 23 (the handoff gives no separate page for CII; p. 23 is the row's page). Jurisdiction-specific sanctions, IMO rules in general and capital controls are not identified and stay ASSUMPTION."
+regimes:
+  - {id: EU_ETS, name: "EU Emissions Trading System", countries: [], currencies: [EUR], label: DISCLOSED, source: {report: "Annual Report 2025", page: "24"}}
+  - {id: FUELEU_MARITIME, name: "FuelEU Maritime", countries: [], currencies: [EUR], label: DISCLOSED, source: {report: "Annual Report 2025", page: "24"}}
+  - {id: ISM_CODE, name: "International Safety Management (ISM) Code", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: ISPS_CODE, name: "International Ship and Port Facility Security (ISPS) Code", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: MLC, name: "Maritime Labour Convention (MLC)", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: ADVANCE_MANIFEST, name: "Advance manifest rules", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: EMBARGO_SANCTIONS, name: "Embargo and sanctions regulations", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: IMO_CII, name: "Carbon Intensity Indicator (CII)", countries: [], currencies: [], label: DISCLOSED, source: {report: "Annual Report 2025", page: "23"}}
+  - {id: IMO_RULES, name: "IMO rules (including MARPOL Annex VI)", countries: [], currencies: [], label: ASSUMPTION}
+  - {id: EU_SANCTIONS, name: "EU sanctions", countries: [], currencies: [], label: ASSUMPTION}
+  - {id: US_SANCTIONS, name: "US sanctions", countries: [US], currencies: [USD], label: ASSUMPTION}
+  - {id: UN_SANCTIONS, name: "UN sanctions", countries: [], currencies: [], label: ASSUMPTION}
+  - {id: CAPITAL_CONTROLS_CNY, name: "Capital controls, China", countries: [CN], currencies: [CNY], label: ASSUMPTION}
+  - {id: CAPITAL_CONTROLS_INR, name: "Capital controls, India", countries: [IN], currencies: [INR], label: ASSUMPTION}
+  - {id: CAPITAL_CONTROLS_BRL, name: "Capital controls, Brazil", countries: [BR], currencies: [BRL], label: ASSUMPTION}

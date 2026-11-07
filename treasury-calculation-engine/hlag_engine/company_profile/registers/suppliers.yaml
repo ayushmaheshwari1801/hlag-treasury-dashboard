@@ -1,0 +1,9 @@
+# Suppliers register (3.4). ASSUMPTION. Generic names (P20).
+hubs:
+  - {id: SIN, name: Singapore, country: SG, label: ASSUMPTION}
+  - {id: RTM, name: Rotterdam, country: NL, label: ASSUMPTION}
+suppliers:
+  - {id: SUPPLIER_A, name: SUPPLIER_A, hubs: [SIN], aliases: []}
+  - {id: SUPPLIER_B, name: SUPPLIER_B, hubs: [SIN], aliases: []}
+  - {id: SUPPLIER_C, name: SUPPLIER_C, hubs: [RTM], aliases: []}
+  - {id: SUPPLIER_D, name: SUPPLIER_D, hubs: [SIN, RTM], aliases: []}

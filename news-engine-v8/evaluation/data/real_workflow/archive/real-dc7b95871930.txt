@@ -1,0 +1,51 @@
+The Competition and Markets Authority (CMA) provisionally finds that the $20bn deal would:
+
+eliminate competition between two main competitors in product design software
+
+reduce innovation and the development of new competitive products
+
+remove Figma as a threat to Adobe’s flagship Photoshop and Illustrator products
+
+Figma is currently the world’s leading provider of product design software which is used by designers, creative agencies and businesses to help deliver leading websites and apps that are used by millions of people.
+
+Adobe is one of Figma’s main competitors in product design software, and currently competes using its Adobe XD product. Adobe is also the largest supplier of image editing and illustration software, well known for its Photoshop and Illustrator applications.
+
+More UK businesses than ever rely on design software to help present their products and services via websites and apps, with the CMA’s investigation finding that around 80% of the professional product design market use Figma’s software.
+
+App development in the UK alone is worth £19.4 billion and grew faster than any other part of the tech sector last year. These apps help millions of people across the UK do everyday tasks such as ordering food to their doors, booking travel and managing their personal finances.
+
+Digital design is an important and growing industry in the UK and relies heavily on image editing and illustration software provided by Adobe’s Photoshop and Illustrator tools. The CMA’s investigation provisionally found that, without the merger, Figma would continue to take steps to develop or expand products that threatened Adobe’s position in image editing and illustration.
+
+In the course of a detailed Phase 2 investigation, led by an independent group, the CMA has provisionally found the deal will eliminate competition between these two key competitors in the following three software markets: product design; image editing; and illustration.
+
+Margot Daly, chair of the independent group conducting this investigation, said:
+
+The digital design sector is worth nearly £60 billion to the UK – representing 2.7% of the national economy – and employs over 850,000 people in highly skilled work. The software this sector uses is pivotal to its success, so the CMA has from the outset been very focused on ensuring this merger doesn’t adversely affect such an important part of the UK economy.
+
+Adobe and Figma are two of the world leading providers of software for app and web designers and our investigation so far has found that they are close competitors.
+
+This proposed deal, therefore, has the potential to impact the UK’s digital design industry by reducing choice, innovation and the development of new competitive products.
+
+Today’s decision is provisional, and we will now consult on our findings and listen to any further views before reaching a final decision.
+
+Figma’s products play a critical part in how companies design apps and websites to appear on people’s phones and tablets. Figma’s software is used by well-known firms in sectors, which are important to the success of the UK digital economy, including short-stay holidays (Airbnb), fashion (Patagonia) and telecommunications (Vodafone).
+
+The inquiry group has provisionally concluded that the deal would remove the constraint Adobe exerts on Figma through its existing product design software, Adobe XD. The inquiry group also provisionally concluded that Adobe abandoned development of new product design software which could have competed even more closely with Figma and, given the timing of the decision, did this as a consequence of the merger. This supports the CMA’s concern that this proposed deal would likely reduce innovation and the development of competitive new products.
+
+The inquiry group has also provisionally found that Figma is a credible future competitor to Adobe in image editing and illustration software – and that the threat posed by Figma has driven product development in Adobe’s Photoshop and Illustrator applications, including new web versions. The inquiry group considers that if the deal went ahead, it would eliminate Figma as a competitor which would otherwise have continued to seek to develop its capabilities in image editing and illustration, thereby fuelling innovation and product development by Adobe. This competition would be lost as a result of the transaction, harming designers and creative agencies who might have used these new tools or relied on future updates.
+
+Today’s findings are provisional, and the CMA will now consult on them, alongside potential remedies to the competition concerns identified, which could include blocking the deal outright. The CMA welcomes responses from interested parties by Tuesday 19 December 2023. These will be considered ahead of the inquiry group issuing its final decision by 25 February 2024.
+
+More information can be found on the CMA’s Adobe / Figma case page .
+
+According to the Design Council in 2022, the digital design sector employs over 866,000 people and is currently worth nearly £60 billion, equivalent to 2.7% of the UK economy. Digital design grew in the UK by 138% between 2010 and 2019, becoming the largest and fastest growing area of design.
+
+Market research specialists IBISWorld published statistics which show the app development industry in the UK was worth £19.4 billion in 2022 and grew faster than the wider technology sector overall.
+
+Product design (also referred to as user interface / user experience, UI/UX, design) is the process of designing an app or website that involves some degree of user interaction.
+
+Image editing, technically known as raster editing, is the process of compositing (eg adjusting and retouching) photos. Photoshop is Adobe’s raster editing tool.
+
+Illustration, technically known as vector editing, is the process of creating logos, icons and illustrations. Illustrator is Adobe’s vector editing tool.
+
+All media enquiries should be directed to the CMA press office by email on press@cma.gov.uk , or by phone on 020 3738 6460.

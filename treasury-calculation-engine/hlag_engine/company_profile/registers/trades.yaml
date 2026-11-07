@@ -1,0 +1,6 @@
+# Trades register (3.4). Trade names DISCLOSED (IR p. 10); WCI routes per 6.4; ports ASSUMPTION.
+trades:
+  - {trade: ASIA_EUROPE, name: "Asia-Europe", name_label: DISCLOSED, source: {report: "Investor Report H1 2026", page: "10"}, wci_route: WCI_SHA_RTM, route_label: MARKET, main_ports: [Shanghai, Ningbo, Singapore, Rotterdam, Hamburg], ports_label: ASSUMPTION}
+  - {trade: ASIA_AMERICA, name: "Asia-America", name_label: DISCLOSED, source: {report: "Investor Report H1 2026", page: "10"}, wci_route: WCI_SHA_LAX, route_label: MARKET, main_ports: [Shanghai, Busan, Los Angeles, Long Beach], ports_label: ASSUMPTION}
+  - {trade: EUROPE_AMERICA, name: "Europe-America", name_label: DISCLOSED, source: {report: "Investor Report H1 2026", page: "10"}, wci_route: WCI_RTM_NYC, route_label: MARKET, main_ports: [Rotterdam, Hamburg, Antwerp, New York, Houston], ports_label: ASSUMPTION}
+  - {trade: AFRICA_INTRA, name: "Africa & Intraregional", name_label: DISCLOSED, source: {report: "Investor Report H1 2026", page: "10"}, wci_route: WCI_COMPOSITE, route_label: PROXY, main_ports: [Tanger Med, Lagos, Durban, Jebel Ali], ports_label: ASSUMPTION}

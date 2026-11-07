@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "changes": [
+    {
+      "description": "Federal bank regulatory agencies issued an interim final rule to neutralize regulatory capital effects for banks participating in the Federal Reserve's Paycheck Protection Program (PPP) facility, applying a zero percent risk weight to these loans.",
+      "direction": "unchanged",
+      "claim_type": "actual",
+      "occurrence_at": null,
+      "numeric": [
+        {
+          "value": "0",
+          "unit": "percent",
+          "kind": "level",
+          "comparison_basis": null,
+          "source_quote": "zero percent risk weight"
+        }
+      ],
+      "evidence_quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility... the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes."
+    }
+  ]
+}

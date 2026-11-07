@@ -1,0 +1,5 @@
+Broadcom, a global technology company, makes and sells hardware components used in computer servers. VMware sells software products and services which enable servers to work more efficiently.
+
+Following its initial Phase 1 investigation , the Competition and Markets Authority (CMA) identified competition concerns warranting in-depth review and referred the deal to a Phase 2 inquiry. An independent panel then conducted an in-depth investigation, considering new evidence and stakeholder feedback, and provisionally found that Broadcom’s proposed purchase of VMware would not substantially reduce competition in the supply of server hardware components in the UK.
+
+Following a consultation on its provisional findings, and having considered the feedback, the panel has confirmed its final decision is that the deal does not substantially reduce competition – clearing it to proceed in the UK.

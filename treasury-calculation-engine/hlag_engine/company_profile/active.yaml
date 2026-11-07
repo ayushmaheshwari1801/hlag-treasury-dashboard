@@ -1,0 +1,4 @@
+# Active company profile version (spec 3.1, decision P32). load_profile() with no path reads
+# the file named here. Change it only with hlag_engine.data.profile_admin.activate_profile_version, an
+# explicit administrator step that is written to the audit log; never edit it by hand.
+profile_file: company_profile_2026H1-v4.yaml

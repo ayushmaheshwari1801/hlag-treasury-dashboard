@@ -1,0 +1,9 @@
+Initial investigation finds Adobe’s purchase of Figma could reduce innovation.
+
+Adobe has five working days to submit proposals to address the CMA’s concerns.
+
+Otherwise, the investigation will proceed to an in-depth phase 2 review.
+
+Adobe is a global software developer and specialises in products which allow customers to create and edit images (including its industry-standard Photoshop and Illustrator applications), as well as video, motion design, and interactive content. Figma, which was founded in 2012, is a leading provider of screen design and whiteboarding tools. Screen design software is an increasingly essential tool that enables users to design digital products and services such as applications and websites. Adobe announced it would acquire Figma for $20 billion in September 2022.
+
+The Competition and Markets Authority (CMA) has identified concerns in the supply of screen design software, where Adobe’s and Figma’s products compete. The CMA found that Figma has established a substantial share of the market for screen design software and that Adobe has been continuously investing in and competing in this segment. The CMA found that competition between Figma and Adobe has driven investment in updating and developing screen design software, and this important rivalry could be lost if the deal goes ahead.

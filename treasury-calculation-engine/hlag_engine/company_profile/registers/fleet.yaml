@@ -1,0 +1,7 @@
+# Fleet register (3.4). ASSUMPTION unless a figure is disclosed.
+scrubber_share:
+  profile_key: bunker.scrubber_share
+  label: ASSUMPTION
+  note: "Value lives in the profile; replaced if a scrubber fleet figure is disclosed (7.3)."
+notes:
+  - {text: "Dual-fuel and LNG-capable vessels: LNG, biofuel and other grades are not modelled (7.1).", label: ASSUMPTION}

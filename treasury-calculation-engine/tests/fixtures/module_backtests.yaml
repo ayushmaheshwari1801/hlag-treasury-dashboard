@@ -1,0 +1,19 @@
+# Back-test inputs for 6.13 and 7.13, from spec 6.2, 7.2 and 7.13 (not in the profile).
+freight_bridge:   # (volume TTEU, rate USD/TEU) per trade; DERIVED, trade labels to verify (6.16)
+  current: {ASIA_EUROPE: [1866, 1367], ASIA_AMERICA: [2472, 1407], EUROPE_AMERICA: [1341, 1467], AFRICA_INTRA: [1004, 1391]}
+  prior: {ASIA_EUROPE: [1872, 1310], ASIA_AMERICA: [2456, 1493], EUROPE_AMERICA: [1398, 1506], AFRICA_INTRA: [862, 1245]}
+  reported_change_m: 98   # trade-assigned revenue 9,395 - 9,297
+bunker:
+  consumption_mt: 2.4       # H1 2026, IR pp. 10-11
+  price: 592
+  expense_m: 1540           # bunker and emissions expense H1 2026
+  co2_m: 112
+  tolerance_m: 29.6         # BT2: the effect of rounding 2.4m t
+  consumption_change: -0.035
+  prior_price: 542
+  prior_expense_m: 1421
+  prior_co2_m: 74
+rates:            # static +-100 bp check (8.13, D10), EUR m
+  variable_debt_eur_m: 1999.1    # AR p. 217
+  published_up_m: -20.8          # +100 bp lowers earnings (AR p. 217, 2025)
+  published_down_m: 21.5

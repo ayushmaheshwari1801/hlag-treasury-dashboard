@@ -1,0 +1,97 @@
+{
+  "schema_version": 8,
+  "run_id": "Rillustrative-contract8",
+  "status": "completed",
+  "events": [
+    {
+      "category": "regulatory",
+      "event_id": "E05a5cc9d32647c0990a5",
+      "title": "Rule",
+      "summary": "The adopted rule assigns a zero percent risk weight.",
+      "score": {
+        "impact": 1,
+        "relevance": 1,
+        "urgency": 1,
+        "total": 20,
+        "reasoning": {
+          "impact": "Restricted issue.",
+          "relevance": "Speculative applicability.",
+          "urgency": "Background monitoring."
+        }
+      },
+      "why_it_matters": [
+        "Company applicability is not established."
+      ],
+      "what_to_do": [
+        "If relevant, verify applicability."
+      ],
+      "article_ids": [
+        "A14c821ae03fdd65be3945dc7",
+        "Abe253f388e1534cad2baddcb"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://example.org/report",
+      "title": "Rule",
+      "text": "Independent report: the adopted rule assigns a zero percent risk weight.",
+      "publisher": null,
+      "published_at": "2026-10-30T00:00:00Z",
+      "article_id": "A14c821ae03fdd65be3945dc7",
+      "discovered_at": "2026-11-01T11:35:48.540065Z",
+      "normalized_url": "https://example.org/report",
+      "content_hash": "0cdaa44c2c5f05cf135693e58610483182e31f6cce64e4c625d48b2fbf901c4d"
+    },
+    {
+      "url": "https://example.org/rule",
+      "title": "Rule",
+      "text": "The authority adopted a zero percent risk weight.",
+      "publisher": null,
+      "published_at": "2026-10-30T00:00:00Z",
+      "article_id": "Abe253f388e1534cad2baddcb",
+      "discovered_at": "2026-11-01T11:35:48.528527Z",
+      "normalized_url": "https://example.org/rule",
+      "content_hash": "87add5f0f78361e69e98f3378d9af2ec8953bc676d5765c65f37168943488542"
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "search_coverage": [],
+    "articles_attempted": 2,
+    "articles_cached": 0,
+    "articles_successful": 2,
+    "articles_failed": 0,
+    "article_groups": 1,
+    "discarded_entries": 0,
+    "discarded_observations": 0,
+    "rejected_event_drafts": 0,
+    "search_known_cost_usd": 0,
+    "search_cost_usd": 0,
+    "w3": {
+      "group_identity": {
+        "calls": 1,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "wall_seconds": 0.0,
+        "known_cost_usd": 0.001,
+        "cost_usd": 0.001
+      }
+    },
+    "wall_seconds": 0.12777719999940018,
+    "llm_calls": 4,
+    "llm_calls_by_stage": {
+      "construct": 2,
+      "group_identity": 1,
+      "analyze": 1
+    },
+    "input_tokens": 40,
+    "output_tokens": 20,
+    "known_cost_usd": 0.004,
+    "cost_usd": 0.004,
+    "cost_coverage": 1.0,
+    "search_calls": 0,
+    "articles_per_second": 15.65224468848424
+  },
+  "overall_summary": "regulatory: Rule (R5 20). The adopted rule assigns a zero percent risk weight. Sources: A14c821ae03fdd65be3945dc7, Abe253f388e1534cad2baddcb. Company applicability is not established. If relevant, verify applicability."
+}

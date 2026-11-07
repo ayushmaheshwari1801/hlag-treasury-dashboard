@@ -1,0 +1,23 @@
+# Joint Red Sea test (spec 14.3), with the corrected figures under "Spec corrections" in
+# docs/decisions_pending.md. Combines the freight and bunker fixtures (6.14, 7.14; base: bunker_example.yaml,
+# which loads freight_example.yaml) with a 5% EUR invoicing share on freight at a T0 rate of 1.15 USD per EUR
+# (unchanged in the scenario). Every material series is loaded with the anchor snapshot equal to T0 (5.5), so
+# the anchor adjustment is zero and the status can be LOW. Liquidity: T1 1,500, T2 200, reserve 750, OCF and
+# leases zero, one capex payment of -450 on 30 Sep 2027. Expected figures in USD m as written.
+base: bunker_example.yaml
+profile_values:
+  freight.non_usd_share.ASIA_EUROPE: 0.05
+liquidity: {t1: 1500000000, t2: 200000000, reserve: 750000000, capex: [[2027-09-30, -450000000]]}
+breach_variant_capex: -920000000
+expected:
+  teu_transfer: 300000
+  cumulative_net_delta: {2026-12-30: "-213.692", 2026-12-31: "-227.692", 2027-01-30: "-37.560", 2027-10-31: "-37.560"}
+  attribution: {freight: "15.96", bunker: "-53.520", rates: "0.00", fx: "0.00", total: "-37.560"}
+  h_b: {before: "950.000", min: "500.000", min_date: 2027-09-30}
+  h_s_2026_12_31: "722.308"
+  h_s_min: {value: "462.440", date: 2027-09-30}
+  consumed_pct: "7.51"
+  status: LOW
+  desk_exceptions: {freight: {g: "168.00", pct: "33.6"}}
+  bunker_g: {g: "59.692", pct: "11.9"}
+  breach_variant: {h_b_min: "30.000", h_s_min: "-7.560", status: CRITICAL}

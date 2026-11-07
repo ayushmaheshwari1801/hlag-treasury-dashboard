@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "annotation_status": "draft_single_implementer_not_independently_adjudicated",
+  "purpose": "Separate MajorChange draft labels; never provider inputs; not a certified recall denominator.",
+  "authentic_sources": 6,
+  "limitations": [
+    "Material group boundaries require independent adjudication before precision/recall claims.",
+    "Missing real-world no-change/duplicate/correction cases are complemented by explicitly synthetic contracts, not fabricated authentic news."
+  ],
+  "samples": [
+    {
+      "source_id": "real-405b3123823f",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "nonprofit-expansion-proposal",
+          "change_type": "status",
+          "claim_type": "proposed",
+          "numeric": null,
+          "evidence_segments": [
+            1,
+            2
+          ],
+          "required": "Proposed expansion of Main Street Lending Program to nonprofit organizations; no implementation claim."
+        }
+      ]
+    },
+    {
+      "source_id": "real-44021d390d22",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "tax-exempt-spread-cut",
+          "change_type": "numeric",
+          "direction": "decrease",
+          "numeric": {
+            "current_value": null,
+            "previous_value": null,
+            "delta": "-50",
+            "delta_unit": "basis points"
+          },
+          "evidence_segments": [
+            2
+          ],
+          "required": "Interest rate spread on tax-exempt notes reduced for each credit rating category."
+        },
+        {
+          "key": "taxable-relative-adjustment",
+          "change_type": "directional",
+          "direction": "decrease",
+          "numeric": null,
+          "evidence_segments": [
+            2
+          ],
+          "required": "Adjustment of taxable notes relative to tax-exempt notes reduced, without an invented magnitude."
+        }
+      ]
+    },
+    {
+      "source_id": "real-50339f5e620a",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "ppplf-operational",
+          "change_type": "status",
+          "claim_type": "announced",
+          "numeric": null,
+          "evidence_segments": [
+            1
+          ],
+          "required": "Facility fully operational and available; ongoing rather than resolved."
+        }
+      ]
+    },
+    {
+      "source_id": "real-c841e1f2377b",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "smccf-wind-down-plan",
+          "change_type": "status",
+          "claim_type": "announced",
+          "numeric": null,
+          "evidence_segments": [
+            1,
+            3,
+            4
+          ],
+          "required": "Plans for gradual portfolio sales, not completed sales. Prior December facility closure is historical context."
+        }
+      ]
+    },
+    {
+      "source_id": "real-7645ea4d8dda",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "ppp-facility-announcement",
+          "change_type": "status",
+          "claim_type": "announced",
+          "numeric": null,
+          "evidence_segments": [
+            1
+          ],
+          "required": "Facility will be established; not yet operational; unspecified previous state remains null."
+        }
+      ]
+    },
+    {
+      "source_id": "real-a114d8803587",
+      "kind": "authentic",
+      "expected_changes": [
+        {
+          "key": "capital-rule",
+          "change_type": "status",
+          "claim_type": "announced",
+          "evidence_segments": [
+            1,
+            3,
+            5
+          ],
+          "required": "Interim final rule neutralizes capital effects, effective immediately, with a 30-day comment window after Federal Register publication; no fabricated publication date."
+        },
+        {
+          "key": "risk-weight-clarification",
+          "change_type": "numeric",
+          "evidence_segments": [
+            4
+          ],
+          "required": "Zero percent risk weight clarification is part of this rule development, not an unrelated static observation."
+        }
+      ]
+    },
+    {
+      "source_id": "synthetic-no-change",
+      "kind": "synthetic_contract_only",
+      "source": "Alpha terminal is a container port. Its published background lists its established operating purpose. No new action or change is reported.",
+      "expected_changes": []
+    },
+    {
+      "source_id": "synthetic-forecast-bound",
+      "kind": "synthetic_contract_only",
+      "source": "The port authority forecasts that transit times may increase by up to two days next month; this is a forecast rather than an observed delay.",
+      "expected_changes": [
+        {
+          "key": "forecast-delay",
+          "change_type": "directional",
+          "direction": "increase",
+          "claim_type": "forecast",
+          "numeric": null,
+          "required": "Preserve the upper bound and forecast qualification; do not invent an exact observed change."
+        }
+      ]
+    },
+    {
+      "source_id": "synthetic-duplicate",
+      "kind": "synthetic_contract_only",
+      "source": "Alpha terminal suspended operations following a safety incident.",
+      "second_source": "Alpha terminal suspended operations following a safety incident.",
+      "expected": "Same occurrence; corroboration does not create another material Event version or score."
+    },
+    {
+      "source_id": "synthetic-correction",
+      "kind": "synthetic_contract_only",
+      "first_revision": "Alpha terminal suspended operations following a safety incident.",
+      "second_revision": "Correction: the earlier report was incorrect. Alpha terminal never suspended operations.",
+      "expected": "Suspend withdrawn evidence, preserve historical revision and assessments, and do not label the correction as an actual reopening or resolution."
+    }
+  ]
+}

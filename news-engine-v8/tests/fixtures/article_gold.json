@@ -1,0 +1,403 @@
+{
+  "dataset": "article_synthetic_v2",
+  "independent": false,
+  "description": "Recorded synthetic regression cases. This is not the independent 40-60 article gold set required for live quality validation.",
+  "cases": [
+    {
+      "case_id": "A01",
+      "round": 1,
+      "url": "https://port-delta.example.org/strike",
+      "title": "Port Delta announces planned strike",
+      "body": "Port Delta authority announced a planned strike lasting 24 hours. The planned stoppage concerns cargo handling at Port Delta. An official reopening announcement has not yet been issued.",
+      "published_at": "2026-10-19T09:00:00+08:00",
+      "category": "Industry",
+      "group": "strike-original",
+      "relevance": 4,
+      "review_status": "confirmed",
+      "facts": [
+        "Port Delta authority announced a planned strike lasting 24 hours."
+      ],
+      "followup_needs": [
+        "Check official Port Delta reopening announcement"
+      ],
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 24,
+          "unit": "hours",
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A02",
+      "round": 1,
+      "url": "https://market-a.example.org/proposal",
+      "title": "Market A proposes repatriation rule",
+      "body": "Market A regulator published a proposal to change the approval process for corporate repatriation payments. The proposal has not been adopted and creates no current payment restriction.",
+      "published_at": "2026-10-19T10:00:00+08:00",
+      "category": "Regulatory",
+      "group": "proposal",
+      "relevance": 3,
+      "review_status": "confirmed",
+      "facts": [
+        "Market A regulator published a proposal to change the approval process for corporate repatriation payments."
+      ],
+      "signals": [
+        {
+          "indicator": "repatriation_rule_proposal",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A03",
+      "round": 1,
+      "url": "https://market-b.example.org/rate",
+      "title": "Market B raises policy rate",
+      "body": "Market B central bank announced that its policy rate increased by 50 basis points. The statement describes the size of the adjustment but does not provide a comparable previous rate level.",
+      "published_at": "2026-10-19T11:00:00+08:00",
+      "category": "Macroeconomic",
+      "group": "policy-rate",
+      "relevance": 4,
+      "review_status": "confirmed",
+      "facts": [
+        "Market B central bank announced that its policy rate increased by 50 basis points."
+      ],
+      "signals": [
+        {
+          "indicator": "policy_rate_adjustment",
+          "level": "numeric",
+          "value": 50,
+          "unit": "basis points",
+          "change": null,
+          "direction": "increase"
+        }
+      ]
+    },
+    {
+      "case_id": "A04",
+      "round": 1,
+      "url": "https://maritime.example.org/agreement",
+      "title": "MPA and CCS sign cooperation agreement",
+      "body": "MPA and CCS signed an agreement covering green shipping. The same agreement also covers digitization of maritime services. The notice provides no numerical targets or binding payment obligations.",
+      "published_at": "2026-10-19T12:00:00+08:00",
+      "category": "Industry",
+      "group": "cooperation",
+      "relevance": 2,
+      "review_status": "confirmed",
+      "facts": [
+        "MPA and CCS signed an agreement covering green shipping.",
+        "The same agreement also covers digitization of maritime services."
+      ],
+      "signals": [
+        {
+          "indicator": "maritime_cooperation_agreement",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A05",
+      "round": 2,
+      "url": "https://shipping-wire.example.de/streik",
+      "title": "Port Delta kündigt Streik an",
+      "body": "Translated from Port Delta statement. Die Hafenbehörde Port Delta kündigte einen geplanten Streik von 24 hours an. Diese übersetzte Meldung ist eine syndizierte Kopie der ursprünglichen Ankündigung.",
+      "published_at": "2026-10-20T08:00:00+08:00",
+      "category": "Industry",
+      "group": "strike-original",
+      "relevance": 4,
+      "review_status": "confirmed",
+      "duplicate_of": "A01",
+      "duplicate_reason": "Translated from Port Delta statement",
+      "facts": [
+        "Port Delta authority announced a planned strike lasting 24 hours."
+      ],
+      "signals": []
+    },
+    {
+      "case_id": "A06",
+      "round": 2,
+      "url": "https://independent.example.org/strike-extension",
+      "title": "Port Delta strike extended",
+      "body": "Independent port reporting confirms that the planned strike at Port Delta was extended from 24 hours to 72 hours. Both durations refer to the same planned cargo-handling stoppage at Port Delta.",
+      "published_at": "2026-10-20T09:00:00+08:00",
+      "category": "Industry",
+      "group": "extension-report",
+      "relevance": 5,
+      "review_status": "confirmed",
+      "facts": [
+        "The planned strike at Port Delta was extended from 24 hours to 72 hours."
+      ],
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ]
+    },
+    {
+      "case_id": "A07",
+      "round": 2,
+      "url": "https://customs.example.org/clearance",
+      "title": "Customs introduces clearance documentation rule",
+      "body": "The customs authority adopted a new requirement for electronic clearance documents. The notice specifies the documents that must accompany submissions but states no numerical settlement limit.",
+      "published_at": "2026-10-20T10:00:00+08:00",
+      "category": "Regulatory",
+      "group": "customs",
+      "relevance": 3,
+      "review_status": "confirmed",
+      "facts": [
+        "The customs authority adopted a new requirement for electronic clearance documents."
+      ],
+      "signals": [
+        {
+          "indicator": "clearance_document_rule",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A08",
+      "round": 2,
+      "url": "https://rumor.example.org/reopening",
+      "title": "Unofficial post alleges strike ended",
+      "body": "An unofficial social-media post alleges that the Port Delta strike has ended. The claim has not been verified by the port authority or independent reporting and remains an unconfirmed allegation.",
+      "published_at": "2026-10-20T11:00:00+08:00",
+      "category": "Industry",
+      "group": "unverified-post",
+      "relevance": 3,
+      "review_status": "pending",
+      "facts": [
+        "An unverified unofficial post alleges that the Port Delta strike has ended."
+      ],
+      "followup_needs": [
+        "Check official Port Delta reopening announcement"
+      ],
+      "signals": []
+    },
+    {
+      "case_id": "A09",
+      "round": 3,
+      "url": "https://port-delta.example.org/reopening",
+      "title": "Port Delta authority confirms reopening",
+      "body": "Port Delta authority confirmed in an official operational notice that cargo handling has resumed. This reopening notice is a separate publication from the original planned strike announcement.",
+      "published_at": "2026-10-21T08:00:00+08:00",
+      "category": "Industry",
+      "group": "reopening-notice",
+      "relevance": 5,
+      "review_status": "confirmed",
+      "facts": [
+        "Port Delta authority confirmed that cargo handling has resumed."
+      ],
+      "signals": [
+        {
+          "indicator": "port_reopening_notice",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A10",
+      "round": 3,
+      "url": "https://independent.example.org/strike-extension",
+      "title": "Port Delta strike extended",
+      "body": "Independent port reporting confirms that the planned strike at Port Delta was extended from 24 hours to 72 hours. Both durations refer to the same planned cargo-handling stoppage at Port Delta. Update: the port authority has now confirmed that cargo handling has resumed.",
+      "published_at": "2026-10-20T09:00:00+08:00",
+      "category": "Industry",
+      "group": "extension-report",
+      "relevance": 5,
+      "review_status": "confirmed",
+      "facts": [
+        "The planned strike at Port Delta was extended from 24 hours to 72 hours.",
+        "The port authority has now confirmed that cargo handling has resumed."
+      ],
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ]
+    },
+    {
+      "case_id": "A11",
+      "round": 3,
+      "url": "https://independent.example.org/strike-extension?utm_source=demo#top",
+      "title": "Port Delta strike extended",
+      "body": "Independent port reporting confirms that the planned strike at Port Delta was extended from 24 hours to 72 hours.\n\nBoth durations refer to the same planned cargo-handling stoppage at Port Delta.  Update: the port authority has now confirmed that cargo handling has resumed.",
+      "published_at": "2026-10-20T09:00:00+08:00",
+      "category": "Industry",
+      "group": "extension-report",
+      "relevance": 5,
+      "review_status": "confirmed",
+      "evaluate": false,
+      "facts": [
+        "The planned strike at Port Delta was extended from 24 hours to 72 hours.",
+        "The port authority has now confirmed that cargo handling has resumed."
+      ],
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24,
+            "delta": 48,
+            "unit": "hours"
+          },
+          "direction": "increase"
+        }
+      ]
+    },
+    {
+      "case_id": "A12",
+      "round": 3,
+      "url": "https://shipping-data.example.org/weekly",
+      "title": "Fuel and freight observations",
+      "body": "The shipping bulletin reported bunker fuel at 600 USD per tonne. It also reported a freight rate of 1200 USD per TEU. The bulletin supplies no comparable earlier observations for either measure.",
+      "published_at": "2026-10-21T09:00:00+08:00",
+      "category": "Industry",
+      "group": "fuel-freight",
+      "relevance": 4,
+      "review_status": "confirmed",
+      "facts": [
+        "The shipping bulletin reported bunker fuel at 600 USD per tonne.",
+        "It also reported a freight rate of 1200 USD per TEU."
+      ],
+      "signals": [
+        {
+          "indicator": "bunker_fuel_price",
+          "level": "numeric",
+          "value": 600,
+          "unit": "USD per tonne",
+          "change": null,
+          "direction": null
+        },
+        {
+          "indicator": "freight_rate",
+          "level": "numeric",
+          "value": 1200,
+          "unit": "USD per TEU",
+          "change": null,
+          "direction": null
+        }
+      ]
+    },
+    {
+      "case_id": "A13",
+      "round": 3,
+      "url": "https://port-watch.example.org/congestion",
+      "title": "Port congestion worsens",
+      "body": "The port operator reported that congestion is worsening. The public notice provides no numerical waiting-time estimate and does not estimate how many company shipments may be affected.",
+      "published_at": "2026-10-21T10:00:00+08:00",
+      "category": "Industry",
+      "group": "congestion",
+      "relevance": 3,
+      "review_status": "confirmed",
+      "facts": [
+        "The port operator reported that congestion is worsening."
+      ],
+      "signals": [
+        {
+          "indicator": "port_congestion",
+          "level": "directional",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": "worsening"
+        }
+      ]
+    },
+    {
+      "case_id": "A14",
+      "round": 3,
+      "url": "https://statistics.example.org/inflation",
+      "title": "Inflation measure rises",
+      "body": "The statistics office reported annual inflation at 4 percent, compared with 3 percent in the previous month. Both figures use the same national consumer-price index definition and annual reference basis.",
+      "published_at": "2026-10-21T11:00:00+08:00",
+      "category": "Macroeconomic",
+      "group": "inflation",
+      "relevance": 4,
+      "review_status": "confirmed",
+      "facts": [
+        "Annual inflation was 4 percent, compared with 3 percent in the previous month."
+      ],
+      "signals": [
+        {
+          "indicator": "annual_inflation",
+          "level": "numeric",
+          "value": 4,
+          "unit": "percent",
+          "change": {
+            "previous": 3,
+            "delta": 1,
+            "unit": "percentage points"
+          },
+          "direction": "increase"
+        }
+      ]
+    },
+    {
+      "case_id": "A15",
+      "round": 3,
+      "url": "https://market-a.example.org/proposal",
+      "title": "Market A proposes repatriation rule",
+      "body": "Correction: Market A regulator clarified that the repatriation-payment approval change remains a proposal. The proposal has not been adopted. An earlier description suggesting that the rule was already in force was incorrect.",
+      "published_at": "2026-10-21T12:00:00+08:00",
+      "category": "Regulatory",
+      "group": "proposal",
+      "relevance": 3,
+      "review_status": "confirmed",
+      "facts": [
+        "Market A regulator clarified that the repatriation-payment approval change remains a proposal.",
+        "The proposal has not been adopted."
+      ],
+      "signals": [
+        {
+          "indicator": "repatriation_rule_proposal",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null
+        }
+      ]
+    }
+  ],
+  "citation_audits": []
+}

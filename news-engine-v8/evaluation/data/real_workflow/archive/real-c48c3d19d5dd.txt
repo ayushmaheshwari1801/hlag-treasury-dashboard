@@ -1,0 +1,23 @@
+The Federal Trade Commission issued an Opinion and Order requiring DNA sequencing provider, Illumina, Inc., to divest GRAIL, Inc., which makes a multi-cancer early detection (MCED) test, finding that the deal would stifle competition and innovation in the U.S. market for life-saving cancer tests. The Opinion reverses an Administrative Law Judge’s Initial Decision that dismissed the antitrust charges in a complaint brought by FTC staff.
+
+GRAIL makes non-invasive, early detection liquid biopsy tests that can screen for multiple types of cancer in asymptomatic patients at very early stages using DNA sequencing. GRAIL is one of several competitors racing to develop and commercialize these life-saving liquid biopsy tests. Illumina is the dominant producer of next-generation sequencing (NGS) platforms, which are used to analyze genetic material from the blood samples drawn for MCED tests. These tests could be used to detect multiple types of cancer, most of which are not screened for at all today.
+
+The Commission found that the acquisition would diminish innovation in the U.S. market for MCED tests while increasing prices and decreasing choice and quality of tests. This is extremely concerning given the importance of swiftly developing effective and affordable tools to detect cancer early.
+
+The Opinion raises other concerns about the acquisition that support the Commission’s divesture order:
+
+Illumina is currently, and for the reasonably near future, will remain the only viable supplier of a critical input: NGS platforms necessary for MCED tests. Entry barriers prevent rival platforms from competing with Illumina’s high throughput, high accuracy, and favorable cost profile.
+
+Illumina can easily foreclose GRAIL’s competitors by raising their costs or withholding or degrading access to supply, service, or new technologies—inputs on which MCED test developers rely.
+
+Illumina has an enormous financial incentive to ensure that GRAIL wins the innovation race in the U.S. MCED market. Illumina stands to earn substantially more profit on the sale of GRAIL tests than it does by supporting rival test developers. And Illumina’s ample mechanisms for effecting foreclosure give it multiple ways to act on that incentive.
+
+Real world evidence of Illumina’s past behavior reinforces the Commission’s antitrust concerns. For instance, Illumina gave GRAIL special pricing and other benefits while it was wholly owned by Illumina. The Opinion also concludes that the merging parties’ “Open Offer,” which seeks to address competition concerns of the acquisition through supply agreements with Illumina’s oncology customers, is an ineffective remedy that tackles harm on an ad hoc basis. According to the Opinion, such behavioral measures “simply cannot substitute for the incentives of a competitive marketplace.”
+
+Finally, the Opinion rejects parties’ claim that this acquisition is likely to yield results that save lives, noting that their efficiency projections were vague, self-serving, and unsupported. Ultimately, the Opinion holds that letting competition spur through innovation among MCED test providers would do more to save lives than allowing a monopolist to vertically integrate and capture the market.
+
+This Opinion and Order will now become final unless Respondents file a petition for review in a federal Court of Appeals within 60 days from the date of the service of this Order.
+
+The Commission vote to issue the Opinion and Order was 4-0. Commissioner Christine S. Wilson issued a concurring Opinion . The Commission vote closed on March 31, 2023, prior to Commissioner Wilson’s departure from the Commission.
+
+The Federal Trade Commission works to promote competition , and protect and educate consumers. You can learn more about how competition benefits consumers or file an antitrust complaint . For the latest news and resources, follow the FTC on social media , subscribe to press releases and read our blog .

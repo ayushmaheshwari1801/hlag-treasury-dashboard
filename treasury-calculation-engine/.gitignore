@@ -1,0 +1,15 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+*.sqlite
+*.db
+.DS_Store
+build/
+*.egg-info/
+
+# Raw Bloomberg Terminal data (licensed, never committed; P90)
+docs/handoff/price_history_filled.xlsx
+data/history/weekly_history.csv
+hlag_engine/data/history/weekly_history.csv

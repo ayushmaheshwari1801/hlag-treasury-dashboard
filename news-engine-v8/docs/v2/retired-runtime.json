@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "src/news_agent/article_projection.py",
+      "sha256": "5fdec4755e0163fa8fa64c2ce0e28af8b10b6edbd622ef9e51c7d21a47bf65f8",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/demo_articles.py",
+      "sha256": "f2c7155b51921084dc1524fb23b39f2855b68172d2f75602730ebf7b9d8f5dfb",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/demo_events.py",
+      "sha256": "c99165d82c310c6e0292cf1bfa18f7e1a92d6bc87dcc7162af7a5658292eaf48",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/demo_event_scores.py",
+      "sha256": "d481248f085e023eb257f8bdbaabf2afe076ea65a69871dada558c20aa2562a8",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/demo_extractions.py",
+      "sha256": "ea31e2638a7326eaa6c7d2a67c36c598ebde754c1bba4388c4c438e32c6e8dd9",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/demo_semantics.py",
+      "sha256": "ce308f41831622e31f9906aeee6fe9825b968201308fb120925b7ca6fc491044",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/events.py",
+      "sha256": "2540423816237a9c91f6c328f9bc79757a128744e0b3d7f8ab13edf459255182",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_batches.py",
+      "sha256": "a639a0771737bb4e35ccdf8c18958a8abf21c0ee3eb98aab699bcfbab0527b92",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_facts.py",
+      "sha256": "e0c70e3e2528e6d0c8c44f2439af59d9735bc74e01361cccc87bff6449b83ce0",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_inference.py",
+      "sha256": "3e995c9474f0daf6465126c07770a9efd17c9db380e4a16e46c235c765edf8b8",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_models.py",
+      "sha256": "0f283e0cd4cf647041e7ce26ed3768c0785fb4220858bded83cf66999bbf947b",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_score_store.py",
+      "sha256": "c90e820435c64926a263c9a28728423e3ee9b905543060ddc6f83ae1e7723f67",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_scoring.py",
+      "sha256": "26848b964a8b3f9b7f658b6c5e5c3a75140da6b385c01974e0049afd85121d67",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/event_store.py",
+      "sha256": "82d1991dcbf397590e66511ad3f17fb29be8ef1929b34e0295dd209572c26a10",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/extract.py",
+      "sha256": "791191f1d33ff00a2faa3f7bdc1fbac6b7227e1c4fd43ad5c234a70eb42c1cbe",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/extraction_chunks.py",
+      "sha256": "88e656385351a884389e029644ca9ea67a8e059a227541e6c6438359f082fa06",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/extraction_store.py",
+      "sha256": "a04742d7f5279e986bf3e9fe74a771841391f972e9a593bc2e5c685e6e911237",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/e_semantics.py",
+      "sha256": "575eeec2c2a71a2ef632c9c475d887f0b6492920fdafe023af9b83bae456b652",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/major_facts.py",
+      "sha256": "8c399c753e5d9a8302b247b6b34e8dd0e46842da93bb6831c43f3d645d120a3b",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/models.py",
+      "sha256": "147eed2e9cda922263f0221b32e9654acd2600e6b28554fe039855ce185b583b",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/pipeline.py",
+      "sha256": "76ec0ef7c4d6200ea91c3fa3688d60268e4ea9c5295675dd2e33650ea3a524fa",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/resolver.py",
+      "sha256": "56ec08f8333a98e30d38abec9df8036f3cde68a54cc62dc3b204a2cdab34de28",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/summary_text.py",
+      "sha256": "7b0e9e9e3b7606a98807ce412a950c7fbfd2c0afcb3e2491691c5a7263037db7",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w2_followups.py",
+      "sha256": "3bebf70f7073a5377d4b36f0d86cd047165a50567f5d11527a93baa15672d23a",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_brief.py",
+      "sha256": "04587e7791307120286e35872c697f935cdfa0f9242a2423e88530350ec0c435",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_editorial.py",
+      "sha256": "5bb84e0fb96bdf0bd01f4aa31c58a5adce15fe8f12953ea4a78410c421b6127b",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_event_selection.py",
+      "sha256": "a764a3a27f9155be8a26564a5aee117637d4436ca7999debd95301df92501b92",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_facts.py",
+      "sha256": "8b5556e0233a369869f6594ccd437ce1641ba5cc43c12815a1d0b36e68124ce3",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_ordering.py",
+      "sha256": "f0148bf428a941ede4c2353930226446397cf174fb96fc7817893bdc5d38e5d6",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/w4_semantics.py",
+      "sha256": "f577be10ae4789cd8f7f0ce5475796351518c03ecb6c786ecc476450dc236e89",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/extract.txt",
+      "sha256": "d8e9deb23779953163a27cfce21483f408b708aa791b5e67c448f61e52f63ca6",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/extraction_review.txt",
+      "sha256": "d4410d1e8045b0301d55acf01765c5c197ff36e1b1ef0c7c8bda1e54f5f4140a",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_associate.txt",
+      "sha256": "c423741404c7725ab7f25ef505f16cb8278fd743be5553e23137e2af46e8359f",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_score.txt",
+      "sha256": "5eb110d6de906457086eb64217d96c791d92b6e2c1fe30e237053d9ed1e2a7f3",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_score_repair.txt",
+      "sha256": "8d6f8428224e3c692fcb3ceca359607ba939ed2b6da2bffad34053edab1f6c49",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_score_review.txt",
+      "sha256": "6ed2548e47a0ffa59a4d869a05fd9122d4ae60173fbb6ce628d781e1f6a5f74b",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_semantic_repair.txt",
+      "sha256": "0cf883ff31003ffd3741af8b1e159c6d84ce125a68fc876bb8fd152319fbb3c0",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/e_semantic_review.txt",
+      "sha256": "034a2238ef9545f8e75f6c5ebc8d2563e540e6b1a50db6ee1667cabe153afbf6",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/w2_followups.txt",
+      "sha256": "369dfeafef17152b02230f2150e239aa7259d90b54bc646c8cdabcbda55a509f",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/w4_brief.txt",
+      "sha256": "4f6180d126a7fc12deb0424d4e592b34d0ce663218f0add938796a8e7e63be6a",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/w4_repair.txt",
+      "sha256": "c22b86dc03a6e8f71b557195dad6db07c35fa3d12822d5c7afa4630a36f85579",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/w4_semantic_review.txt",
+      "sha256": "30cdc1f83ed564f4103e71e6bb5349c9040334bad35761f05bdae2735d88ca98",
+      "recovery": "Git baseline c0fe0b1"
+    },
+    {
+      "path": "src/news_agent/prompts/watch_match.txt",
+      "sha256": "1543b1cd51cbcc773a178e539b1e703f9ed1bf2a183ef8695bfbd64ce48780c3",
+      "recovery": "Git baseline c0fe0b1"
+    }
+  ]
+}

@@ -1,0 +1,1057 @@
+# Company profile (spec 3.1). One version per administrator change; slider moves never
+# create a version. Units: amounts in full currency units (USD, EUR, CAD, INR, BRL);
+# *_pct whole percents; *_share fractions 0-1; *_bp basis points (decisions P1).
+# Placeholders (status to_enter / to_verify / pending_history) are listed in
+# docs/placeholders.md. "range proposed" in a rationale marks an allowed_range the spec
+# does not give; those are listed there too, for the team to confirm.
+
+profile_version: "2026H1-v1"
+
+parameters:
+
+  # ---------------------------------------------------------------- liquidity (3.1, 3.7)
+  liquidity.cash_and_equivalents_usd:
+    value: 3150000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "15"}
+    as_of: 2026-06-30
+    note: "Used as cash at T0 for interest-bearing cash until step 5; replaced by rolled-forward cash in step 5 (P17)."
+  liquidity.special_fund_usd:
+    value: 2035000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "15"}
+    as_of: 2026-06-30
+  liquidity.unused_credit_lines_usd:
+    value: 725000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "15"}
+    as_of: 2026-06-30
+  liquidity.liquidity_reserve_usd:
+    value: 5909000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "15"}
+    as_of: 2026-06-30
+  liquidity.net_debt_usd:
+    value: 1969000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "15"}
+    as_of: 2026-06-30
+  liquidity.operating_cash_flow_h1_usd:
+    value: 849000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "14"}
+    period: "H1 2026"
+  liquidity.baseline_ocf_daily_usd:
+    value: 4690607.73
+    label: DERIVED
+    kind: sizing
+    unit: USD per day
+    formula: "operating_cash_flow_h1_usd / 181"
+    period: "H1 2026"
+  liquidity.minimum_operational_reserve_usd:
+    value: 750000000
+    label: ASSUMPTION
+    kind: sizing
+    unit: USD
+    allowed_range: [0, 2000000000]
+    rationale: "About 15 days of H1 2026 transport expenses (3.7). Range proposed, not in spec."
+  liquidity.interest_in_ocf:
+    value: false
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [true, false]
+    rationale: "Interest paid assumed outside operating cash flow, pending the cash flow statement check (2.2)."
+    status: to_verify
+    note: "Check whether interest paid sits inside operating cash flow in the H1 2026 cash flow statement (IR) (13.2)."
+  liquidity.count_liquid_investments:
+    value: false
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [true, false]
+    rationale: "Special fund counted in headroom only when switched on (D21)."
+  liquidity.margin_eligible_share_of_T1:
+    value: 0.25
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "Share of operating cash usable for margin on a tested hypothetical swap (3.7)."
+  liquidity.annual_lease_repayments_usd:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: USD per year
+    source: {report: "Annual Report 2025, cash flow statement", page: null}
+    status: to_enter
+    note: "Enter annual repayments of lease liabilities from the AR 2025 cash flow statement (financing activities), as a positive amount. Monthly lease payment = this / 12 (3.7)."
+  liquidity.lease_repayments_include_interest:
+    value: false
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [true, false]
+    rationale: "Working default: lease interest separate from lease repayments (13.2, D51)."
+    status: to_verify
+    note: "Check in the AR 2025 cash flow statement whether lease repayments include interest; true makes the LEASE interest line DELTA_ONLY (D51)."
+  liquidity.capex_monthly_usd:
+    value: null
+    label: DERIVED
+    kind: sizing
+    unit: USD per month
+    formula: "H1 2026 capital expenditure / 6 (or disclosed FY guidance / 12), excluding FX_TRANSACTION amounts (D34)"
+    status: to_enter
+    note: "Working default is the H1 run-rate (13.2): H1 2026 capex from the IR cash flow statement / 6, entered as a positive amount. Replace with guidance if disclosed."
+  liquidity.capex_includes_fx_transaction:
+    value: false
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [true, false]
+    rationale: "Capex baseline assumed to exclude the INR and BRL obligations (D34)."
+    status: to_verify
+    note: "Confirm what the INR and BRL obligations are for and whether the capex source already includes them (D34, 13.2)."
+
+  # ---------------------------------------------------------------- debt and FX rates (3.1, 3.7, D12)
+  debt.financial_debt_and_leases_usd:
+    value: 7153000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "14-15"}
+    as_of: 2026-06-30
+  debt.current_financial_debt_and_leases_usd:
+    value: 1852000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "14-15"}
+    as_of: 2026-06-30
+  debt.current_lease_liabilities_usd:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: null}
+    as_of: 2026-06-30
+    status: to_enter
+    note: "Current lease liabilities inside USD 1,852m at 30 Jun 2026. If not disclosed, the generator uses annual lease repayments (working default, ASSUMPTION) (3.7, 13.2)."
+  fx.usd_per_eur_close_2025_12_31:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: USD per EUR
+    source: {report: "Annual Report 2025", page: null}
+    as_of: 2025-12-31
+    status: to_enter
+    note: "Closing USD/EUR rate at 31 Dec 2025 from the AR. Converts the AR's EUR disclosures (floating debt, fixed debt, lease interest) (D12)."
+  fx.usd_per_eur_close_2026_06_30:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: USD per EUR
+    source: {report: "Investor Report H1 2026", page: "16"}
+    as_of: 2026-06-30
+    status: to_enter
+    note: "Closing USD/EUR rate at 30 Jun 2026. The spec cites both 1.1756 and 1.1396 to IR p. 16; verify which is the 30 Jun 2026 closing rate (D12). Converts the EUR share of the 30 Jun 2026 maturities."
+
+  # ---------------------------------------------------------------- freight (6.2, 6.3, 6.5)
+  freight.transport_volume_h1_teu:
+    value: 6684000
+    label: DISCLOSED
+    kind: sizing
+    unit: TEU
+    source: {report: "Investor Report H1 2026", page: "2, 10"}
+    period: "H1 2026"
+  freight.average_rate_h1_usd_per_teu:
+    value: 1406
+    label: DISCLOSED
+    kind: sizing
+    unit: USD per TEU
+    source: {report: "Investor Report H1 2026", page: "2, 10"}
+    period: "H1 2026"
+  freight.liner_revenue_h1_usd:
+    value: 10461000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "2, 11-12"}
+    period: "H1 2026"
+  freight.revenue_not_assigned_h1_usd:
+    value: 1065000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "11-12"}
+    period: "H1 2026"
+  freight.trade_receivables_usd:
+    value: 2998000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "13"}
+    as_of: 2026-06-30
+  freight.h1_volume_teu.ASIA_EUROPE:
+    value: 1866000
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "IR H1 2026 trade table, first row (order mapped as in 6.2)"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order and labels against IR p. 10, then relabel DISCLOSED (6.2, 13.2)."
+  freight.h1_volume_teu.ASIA_AMERICA:
+    value: 2472000
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "IR H1 2026 trade table, second row (order mapped as in 6.2)"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order and labels against IR p. 10, then relabel DISCLOSED (6.2, 13.2)."
+  freight.h1_volume_teu.EUROPE_AMERICA:
+    value: 1341000
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "IR H1 2026 trade table, third row (order mapped as in 6.2)"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order and labels against IR p. 10, then relabel DISCLOSED (6.2, 13.2)."
+  freight.h1_volume_teu.AFRICA_INTRA:
+    value: 1004000
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "IR H1 2026 trade table, fourth row (order mapped as in 6.2)"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order and labels against IR p. 10, then relabel DISCLOSED (6.2, 13.2)."
+  freight.p0.ASIA_EUROPE:
+    value: 1367
+    label: DERIVED
+    kind: sizing
+    unit: USD per TEU
+    formula: "IR H1 2026 trade table rate, first row (order mapped as in 6.2); all-in"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order against IR p. 10 and that the rate is all-in (6.1, 6.2, 13.2). Replace with the newest quarterly rate together with the anchor snapshot (D70)."
+  freight.p0.ASIA_AMERICA:
+    value: 1407
+    label: DERIVED
+    kind: sizing
+    unit: USD per TEU
+    formula: "IR H1 2026 trade table rate, second row (order mapped as in 6.2); all-in"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order against IR p. 10 and that the rate is all-in (6.1, 6.2, 13.2). Replace with the newest quarterly rate together with the anchor snapshot (D70)."
+  freight.p0.EUROPE_AMERICA:
+    value: 1467
+    label: DERIVED
+    kind: sizing
+    unit: USD per TEU
+    formula: "IR H1 2026 trade table rate, third row (order mapped as in 6.2); all-in"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order against IR p. 10 and that the rate is all-in (6.1, 6.2, 13.2). Replace with the newest quarterly rate together with the anchor snapshot (D70)."
+  freight.p0.AFRICA_INTRA:
+    value: 1391
+    label: DERIVED
+    kind: sizing
+    unit: USD per TEU
+    formula: "IR H1 2026 trade table rate, fourth row (order mapped as in 6.2); all-in"
+    period: "H1 2026"
+    status: to_verify
+    note: "Verify trade order against IR p. 10 and that the rate is all-in (6.1, 6.2, 13.2). Replace with the newest quarterly rate together with the anchor snapshot (D70)."
+  freight.group_volume_teu.2025Q3:
+    value: null
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "9M 2025 transport volume - H1 2025 transport volume"
+    status: to_enter
+    note: "Derive from the Q3 2025 (9M) quarterly statement minus the H1 2025 half-year report, on the 2026 reporting basis if restated (6.3, P16)."
+  freight.group_volume_teu.2025Q4:
+    value: null
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "FY2025 transport volume - 9M 2025 transport volume"
+    status: to_enter
+    note: "Derive from AR 2025 (FY2025) minus the Q3 2025 (9M) statement (6.3, P16)."
+  freight.group_volume_teu.2026Q1:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: TEU
+    source: {report: "Q1 2026 quarterly statement", page: null}
+    status: to_enter
+    note: "Enter Q1 2026 transport volume from the Q1 2026 statement (6.3, P16)."
+  freight.group_volume_teu.2026Q2:
+    value: null
+    label: DERIVED
+    kind: sizing
+    unit: TEU
+    formula: "H1 2026 transport volume (6,684 TTEU) - Q1 2026 transport volume"
+    status: to_enter
+    note: "Derive as 6,684,000 TEU (IR p. 2, 10) minus the Q1 2026 figure (6.3, P16)."
+  freight.growth_g:
+    value: 0.02
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction per year
+    allowed_range: [-0.05, 0.05]
+    rationale: "Volume growth pending the stated outlook; swept -5% to +5% (6.3). Also grows the latest same quarter for quarters not yet published (P16)."
+  freight.contract_share:
+    value: 0.50
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0.30, 0.70]
+    rationale: "Contract share of each trade's volume; swept 30-70% (6.3)."
+  freight.index_linked_share:
+    value: 0.10
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0, 0.30]
+    rationale: "Index-linked share of each trade's volume (6.3). Range proposed, not in spec."
+  freight.cohort_scheme.ASIA_EUROPE:
+    value: monthly_12
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [monthly_12, annual_may]
+    rationale: "12 monthly cohorts, 12-month terms, reset on the first day of their month (6.3)."
+  freight.cohort_scheme.ASIA_AMERICA:
+    value: annual_may
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [monthly_12, annual_may]
+    rationale: "One cohort, 12-month term, reset 1 May each year (6.3)."
+  freight.cohort_scheme.EUROPE_AMERICA:
+    value: monthly_12
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [monthly_12, annual_may]
+    rationale: "12 monthly cohorts, 12-month terms, reset on the first day of their month (6.3)."
+  freight.cohort_scheme.AFRICA_INTRA:
+    value: monthly_12
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [monthly_12, annual_may]
+    rationale: "12 monthly cohorts, 12-month terms, reset on the first day of their month (6.3)."
+  freight.beta:
+    value: 1.0
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 1.5]
+    rationale: "Spot pass-through of index moves; never estimated against company-wide realised rates (6.5). Range proposed, not in spec."
+  freight.pricing_lag_days:
+    value: 28
+    label: ASSUMPTION
+    kind: time_varying
+    unit: days
+    allowed_range: [0, 90]
+    adjustable: true
+    rationale: "Spot pricing lag (6.5); range equals the catalogue hard limits (6.10)."
+  freight.kappa:
+    value: 0.8
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 1]
+    rationale: "Index-linked clause pass-through (6.5, D39). Range proposed, not in spec."
+  freight.clause_lag_days:
+    value: 30
+    label: ASSUMPTION
+    kind: time_varying
+    unit: days
+    allowed_range: [0, 90]
+    rationale: "Index-linked clause lag (6.5). Range proposed, not in spec."
+  freight.gamma:
+    value: 0.5
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 1]
+    adjustable: true
+    rationale: "Contract repricing share at reset (6.5); range equals the catalogue hard limits (6.10)."
+  freight.leakage_gap_down:
+    value: 0.30
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0.10, 0.60]
+    adjustable: true
+    rationale: "Downside leakage trigger (6.5, D7); range equals the catalogue hard limits (6.10)."
+  freight.leakage_gap_up:
+    value: 0.30
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0.10, 0.60]
+    adjustable: true
+    rationale: "Upside leakage trigger (6.5, D7); range equals the catalogue hard limits (6.10)."
+  freight.leakage_share_down:
+    value: 0.10
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share of intact cohort volume moving to spot on the downside; swept 0-20%, never an estimate (6.5). Range equals the catalogue hard limits (6.10)."
+  freight.leakage_share_up:
+    value: 0.10
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share of intact cohort volume moving to spot on the upside; swept 0-20%, never an estimate (6.5). Range equals the catalogue hard limits (6.10)."
+  freight.leakage_volume_loss:
+    value: 0.0
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.20]
+    rationale: "Share of cohort volume lost on downside leakage (6.5). Range proposed, not in spec."
+  freight.non_usd_share.ASIA_EUROPE:
+    value: 0.05
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share invoiced in EUR (6.3); range equals the catalogue hard limits (6.10)."
+  freight.non_usd_share.ASIA_AMERICA:
+    value: 0.03
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share invoiced in CNY (6.3); range equals the catalogue hard limits (6.10)."
+  freight.non_usd_share.EUROPE_AMERICA:
+    value: 0.05
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share invoiced in EUR (6.3); range equals the catalogue hard limits (6.10)."
+  freight.non_usd_share.AFRICA_INTRA:
+    value: 0.05
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 0.30]
+    adjustable: true
+    rationale: "Share invoiced in EUR (6.3); range equals the catalogue hard limits (6.10)."
+  freight.invoice_currency.ASIA_EUROPE:
+    value: EUR
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [EUR, CNY]
+    rationale: "Non-USD invoicing currency of the trade (6.3)."
+  freight.invoice_currency.ASIA_AMERICA:
+    value: CNY
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [EUR, CNY]
+    rationale: "Non-USD invoicing currency of the trade (6.3)."
+  freight.invoice_currency.EUROPE_AMERICA:
+    value: EUR
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [EUR, CNY]
+    rationale: "Non-USD invoicing currency of the trade (6.3)."
+  freight.invoice_currency.AFRICA_INTRA:
+    value: EUR
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [EUR, CNY]
+    rationale: "Non-USD invoicing currency of the trade (6.3)."
+  freight.delay_affected_share:
+    value: 1.0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    adjustable: true
+    rationale: "Share of revenue collected later when transit is delayed; conservative, swept 0-100% (6.5, D40)."
+  freight.collection_lag_days:
+    value: 49
+    label: DERIVED
+    kind: time_varying
+    unit: days
+    formula: "trade_receivables_30jun2026 / (q2_2026_group_revenue / 91)"
+    allowed_range: [20, 90]
+    rationale: "Quarter-end receivables over daily group revenue (Liner plus Terminal & Infrastructure); disclosed 30-day term shown alongside (3.1)."
+    status: to_verify
+    note: "Recompute from trade receivables USD 2,998m (IR p. 13) and Q2 2026 group revenue (IR; Liner plus Terminal & Infrastructure) / 91 days; expected 48-50 days (3.1, 6.3)."
+  freight.payment_term_days:
+    value: 30
+    label: DISCLOSED
+    kind: context
+    unit: days
+    source: {report: "Annual Report 2025", page: "185"}
+
+  # ---------------------------------------------------------------- bunker (7.2, 7.3)
+  bunker.consumption_h1_t:
+    value: 2400000
+    label: DISCLOSED
+    kind: sizing
+    unit: t
+    source: {report: "Investor Report H1 2026", page: "10-11"}
+    period: "H1 2026"
+  bunker.average_price_paid_h1_usd_per_t:
+    value: 592
+    label: DISCLOSED
+    kind: context
+    unit: USD per t
+    source: {report: "Investor Report H1 2026", page: "10-11"}
+    period: "H1 2026"
+  bunker.co2_certificate_cost_h1_usd:
+    value: 112000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "10-11"}
+    period: "H1 2026"
+  bunker.monthly_consumption_t:
+    value: 400000
+    label: DERIVED
+    kind: sizing
+    unit: t per month
+    formula: "consumption_h1_t / 6"
+  bunker.fuel_per_teu_t:
+    value: 0.359066
+    label: DERIVED
+    kind: sizing
+    unit: t per TEU
+    formula: "consumption_h1_t / transport_volume_h1_teu"
+  bunker.hub_weight_sin:
+    value: 0.60
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0.30, 0.90]
+    adjustable: true
+    rationale: "Asia-heavy bunkering; Rotterdam weight = 1 - Singapore weight; swept (7.3). Range equals the catalogue hard limits (7.10)."
+  bunker.scrubber_share:
+    value: 0.15
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 0.40]
+    adjustable: true
+    rationale: "Modest HSFO share rather than 0 (7.3). Range equals the catalogue hard limits (7.10)."
+    status: to_verify
+    note: "Check the AR and IR for a disclosed scrubber fleet figure; if found, replace this default (7.3, 13.2)."
+  bunker.supplier_lag_days:
+    value: 30
+    label: ASSUMPTION
+    kind: time_varying
+    unit: days
+    allowed_range: [0, 90]
+    adjustable: true
+    rationale: "Supplier payment lag (7.3). Range equals the catalogue hard limits (7.10)."
+  bunker.mfr_share:
+    value: 0.70
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    adjustable: true
+    rationale: "MFR share sigma, swept 0-100% (7.3). Range equals the catalogue hard limits (7.10)."
+  bunker.mfr_lag_months:
+    value: 2
+    label: ASSUMPTION
+    kind: time_varying
+    unit: months
+    allowed_range: [0, 6]
+    adjustable: true
+    rationale: "MFR reference-price lag L (7.3). Range equals the catalogue hard limits (7.10)."
+  bunker.asia_europe_consumption_share:
+    value: 0.35
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "Asia-Europe share of consumption alpha, for Cape routing uplift (7.3). Range proposed, not in spec."
+  bunker.beta_fallback:
+    value: 1.0
+    label: ASSUMPTION
+    kind: time_varying
+    allowed_range: [0, 2]
+    rationale: "Brent fill beta when fewer than 13 weeks of data (7.4). Range proposed, not in spec."
+  bunker.margin_factor:
+    value: 1.0
+    label: ASSUMPTION
+    kind: sizing
+    allowed_range: [0, 2]
+    rationale: "Posted margin factor on a hypothetical swap (7.7). Range proposed, not in spec."
+
+  # ---------------------------------------------------------------- rates (8.2, 8.3, 8.5)
+  rates.variable_rate_debt_eur:
+    value: 1999100000
+    label: DISCLOSED
+    kind: sizing
+    unit: EUR
+    source: {report: "Annual Report 2025", page: "217"}
+    as_of: 2025-12-31
+    note: "Assumed to exclude leases (13.2, 8.16)."
+  rates.financial_debt_total_eur:
+    value: 2750100000
+    label: DERIVED
+    kind: sizing
+    unit: EUR
+    formula: "banks 1,528.0m + bonds 301.4m + other 920.7m (AR pp. 211, 213)"
+    as_of: 2025-12-31
+  rates.lease_liabilities_eur:
+    value: 3637100000
+    label: DISCLOSED
+    kind: context
+    unit: EUR
+    source: {report: "Annual Report 2025", page: "211, 213"}
+    as_of: 2025-12-31
+  rates.weighted_average_rate_pct:
+    value: 4.8
+    label: DISCLOSED
+    kind: context
+    unit: percent
+    source: {report: "Annual Report 2025", page: "211"}
+  rates.interest_expense_h1_usd:
+    value: 236000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "9"}
+    period: "H1 2026"
+  rates.money_market_income_h1_usd:
+    value: 69000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "9"}
+    period: "H1 2026"
+  rates.special_fund_income_h1_usd:
+    value: 41000000
+    label: DISCLOSED
+    kind: context
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "9"}
+    period: "H1 2026"
+  rates.lease_interest_fy2025_eur:
+    value: 207100000
+    label: DISCLOSED
+    kind: sizing
+    unit: EUR
+    source: {report: "Annual Report 2025", page: "188"}
+    period: "FY2025"
+  rates.floating_split_usd:
+    value: 0.70
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "USD share of floating debt; EUR share = 1 - this (8.3)."
+  rates.floating_tranches_per_currency:
+    value: 3
+    label: ASSUMPTION
+    kind: sizing
+    allowed_range: [1, 12]
+    rationale: "Three equal tranches per currency, resetting quarterly, staggered one month apart (8.3). Range proposed, not in spec."
+  rates.spread_usd_bp:
+    value: 200
+    label: ASSUMPTION
+    kind: sizing
+    unit: bp
+    allowed_range: [0, 600]
+    rationale: "USD floating spread over SOFR, checked in the calibration (8.3, 8.13). Range proposed, not in spec."
+  rates.spread_eur_bp:
+    value: 225
+    label: ASSUMPTION
+    kind: sizing
+    unit: bp
+    allowed_range: [0, 600]
+    rationale: "EUR floating spread over ESTR; the extra 25 bp covers the gap to the loan benchmark (8.3). Range proposed, not in spec."
+  rates.fixed_rate_pct:
+    value: 4.8
+    label: ASSUMPTION
+    kind: sizing
+    unit: percent
+    allowed_range: [0, 15]
+    rationale: "The disclosed group weighted average (AR p. 211), used as the fixed rate on USD fixed debt (8.3). Range proposed, not in spec."
+  rates.bond_notional_eur:
+    value: 300000000
+    label: DISCLOSED
+    kind: sizing
+    unit: EUR
+    source: {report: "Annual Report 2025", page: "211"}
+  rates.bond_coupon_pct:
+    value: 2.5
+    label: DISCLOSED
+    kind: sizing
+    unit: percent
+    source: {report: "Annual Report 2025", page: "211"}
+  rates.bond_coupon_month_day:
+    value: "10-15"
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: ["10-15"]
+    rationale: "Annual coupon on 15 Oct (8.3)."
+    status: to_verify
+    note: "Verify the sustainability-linked bond's coupon date (AR p. 211 or the bond terms) (8.3, 13.2)."
+  rates.bond_step_up_applies:
+    value: false
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [true, false]
+    rationale: "Working default: no 0.25 pp step-up from 15 Oct 2025 (8.3, 13.2)."
+    status: to_verify
+    note: "Verify whether the 0.25 pp coupon step-up applies (targets missed?) (AR p. 211, 13.2)."
+  rates.bond_maturity_date:
+    value: 2028-10-15
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [2028-10-15]
+    rationale: "Working default: 7-year bullet bond issued in 2021, maturing on its coupon date in 2028, after the horizon; excluded from the maturity slices (P49)."
+    status: to_verify
+    note: "Verify the maturity date of the EUR 300m sustainability-linked bond (AR p. 211 or the bond terms)."
+  rates.interest_bearing_cash_share:
+    value: 0.85
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0.50, 1.00]
+    adjustable: true
+    rationale: "Interest-bearing share of cash (8.3). Range equals the catalogue hard limits (8.10)."
+  rates.deposit_split_usd:
+    value: 0.80
+    label: ASSUMPTION
+    kind: sizing
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "USD share of interest-bearing cash; EUR share = 1 - this (8.3)."
+  rates.deposit_cohorts_per_currency:
+    value: 3
+    label: ASSUMPTION
+    kind: sizing
+    allowed_range: [1, 12]
+    rationale: "Three equal deposit cohorts per currency, rolling every 3 months, staggered one month apart (8.3). Range proposed, not in spec."
+  rates.deposit_spread_bp:
+    value: 10
+    label: ASSUMPTION
+    kind: sizing
+    unit: bp below benchmark
+    allowed_range: [0, 100]
+    rationale: "Deposit yield = benchmark - 10 bp, floored at 0 (8.3, 8.5). Range proposed, not in spec."
+  rates.new_issue_premium_bp:
+    value: 0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: bp
+    allowed_range: [-100, 400]
+    adjustable: true
+    rationale: "New-issue premium over BB OAS (8.5). Range equals the catalogue hard limits (8.10)."
+  rates.swap_spread_bp:
+    value: 0
+    label: ASSUMPTION
+    kind: sizing
+    unit: bp
+    allowed_range: [-50, 100]
+    rationale: "Hypothetical swap fixed rate = 2-year yield + this spread (8.7, D20). Range proposed, not in spec."
+  rates.refinancing_mode:
+    value: rollover
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [rollover, unavailable]
+    rationale: "Informational only, not a live setting: the base pass always uses rollover (2.7, zero_shock) and a scenario sets refinancing_mode in its rates block (P50). Maturing financial debt refinanced by default (D1)."
+  rates.zim_tranche_on:
+    value: false
+    label: ASSUMPTION
+    kind: state
+    allowed_values: [true, false]
+    adjustable: true
+    rationale: "Off until the deal status is verified; always shown both ways (8.3, 13.1)."
+  rates.zim_amount_usd:
+    value: 4200000000
+    label: DISCLOSED
+    kind: sizing
+    unit: USD
+    source: {report: "Investor Report H1 2026", page: "3"}
+  rates.zim_spread_bp:
+    value: 225
+    label: ASSUMPTION
+    kind: sizing
+    unit: bp
+    allowed_range: [0, 600]
+    rationale: "ZIM tranche at SOFR + 225 bp, terms not disclosed (8.3). Range proposed, not in spec."
+    status: to_verify
+    note: "ZIM financing status and terms: drawn, committed or proposed; amount, timing, benchmark, spread (8.16, 13.2)."
+  rates.zim_draw_date:
+    value: 2027-01-01
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [2027-01-01]
+    rationale: "Assumed drawdown date (8.3)."
+    status: to_verify
+    note: "ZIM financing status and terms (8.16, 13.2)."
+  rates.fomc_meeting_dates:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    source: {report: "Federal Reserve FOMC meeting calendar (federalreserve.gov)", page: null}
+    status: to_enter
+    note: "Enter FOMC meeting dates from T0 to the horizon end (Nov 2026 - Oct 2027) from the official calendar (8.3, 13.4)."
+  rates.ecb_meeting_dates:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    source: {report: "ECB monetary policy meeting calendar (ecb.europa.eu)", page: null}
+    status: to_enter
+    note: "Enter ECB monetary policy meeting dates from T0 to the horizon end from the official calendar (8.3, 13.4)."
+
+  # ---------------------------------------------------------------- fx (9B.2, 9B.3, 9B.4)
+  fx.cad_forward_notional_cad:
+    value: 57500000
+    label: DISCLOSED
+    kind: sizing
+    unit: CAD
+    source: {report: "Annual Report 2025", page: "220"}
+    as_of: 2025-12-31
+  fx.cad_weekly_cost_cad:
+    value: 5540000
+    label: DERIVED
+    kind: sizing
+    unit: CAD per week
+    formula: "at least CAD 72m per 13 weeks (57.5m / 0.80 cap = 71.9m, rounded to 72m) / 13"
+  fx.eur_operating_cost_per_quarter_eur:
+    value: 350000000
+    label: ASSUMPTION
+    kind: sizing
+    unit: EUR per quarter
+    allowed_range: [0, 1000000000]
+    rationale: "EUR operating costs, swept (9B.3). Range proposed, not in spec."
+  fx.dividend_reference_eur:
+    value: null
+    label: DISCLOSED
+    kind: sizing
+    unit: EUR
+    source: {report: "Annual Report 2025", page: null}
+    status: to_enter
+    note: "Enter the latest disclosed total dividend (EUR) and any stated dividend policy; the FY2026 dividend paid in 2027 equals it unless the policy gives an estimate (9B.3, 13.2)."
+  fx.dividend_date:
+    value: 2027-05-10
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [2027-05-10]
+    rationale: "Assumed payment date (9B.3)."
+  fx.inr_obligation_inr:
+    value: 1400000000
+    label: DISCLOSED
+    kind: sizing
+    unit: INR
+    source: {report: "Annual Report 2025", page: "215"}
+  fx.brl_obligation_brl:
+    value: 256000000
+    label: DISCLOSED
+    kind: sizing
+    unit: BRL
+    source: {report: "Annual Report 2025", page: "215"}
+  fx.inr_brl_obligations_on:
+    value: true
+    label: ASSUMPTION
+    kind: state
+    allowed_values: [true, false]
+    adjustable: true
+    rationale: "On by default; the obligations may already be settled (9B.3)."
+    status: to_verify
+    note: "INR and BRL obligations: what they are for, whether already settled, payment dates (9B.3, 13.2, D34)."
+  fx.obligation_shift_months:
+    value: 0
+    label: ASSUMPTION
+    kind: sizing
+    unit: months
+    allowed_range: [0, 24]
+    adjustable: true
+    rationale: "Shift of the INR and BRL payment dates (9B.9). Range equals the catalogue hard limits."
+  fx.hedge_ratio.cad:
+    value: 0.70
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 0.80]
+    adjustable: true
+    rationale: "CAD rolling programme below the disclosed 80% cap (AR p. 215); above the cap fails validation (9B.4)."
+  fx.hedge_ratio.eur_debt:
+    value: 1.0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    adjustable: true
+    rationale: "Within the disclosed up-to-100% hedging of EUR debt repayment (9B.4)."
+  fx.hedge_ratio.inr_brl:
+    value: 1.0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    adjustable: true
+    rationale: "Transaction forwards locked at the 31 Dec 2025 rate (9B.4)."
+  fx.hedge_ratio.eur_operating_costs:
+    value: 0.0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "0% by default (9B.4)."
+  fx.hedge_ratio.eur_dividend:
+    value: 0.0
+    label: ASSUMPTION
+    kind: time_varying
+    unit: fraction
+    allowed_range: [0, 1]
+    rationale: "0% by default (9B.4)."
+  fx.memo_position_usd.CNY:
+    value: 85000000
+    label: DERIVED
+    kind: sizing
+    unit: USD (long)
+    formula: "CNY 10% sensitivity USD 8.5m / 10% (AR p. 216)"
+  fx.memo_position_usd.GBP:
+    value: -24000000
+    label: DERIVED
+    kind: sizing
+    unit: USD (short)
+    formula: "GBP 10% sensitivity USD 2.4m / 10% (AR p. 216)"
+  fx.forward_points:
+    value: 0
+    label: ASSUMPTION
+    kind: sizing
+    allowed_values: [0]
+    rationale: "Forward points ignored (9A.3, 13.3)."
+  fx.lock_rate_usd_per_unit.INR:
+    value: null
+    label: MARKET
+    kind: sizing
+    status: pending_history
+    note: "USD per INR on 31 Dec 2025 from ECB reference rates, loaded in step 3; the INR policy hedge is locked at it (9B.4)."
+  fx.lock_rate_usd_per_unit.BRL:
+    value: null
+    label: MARKET
+    kind: sizing
+    status: pending_history
+    note: "USD per BRL on 31 Dec 2025 from ECB reference rates, loaded in step 3; the BRL policy hedge is locked at it (9B.4)."
+
+  # ---------------------------------------------------------------- adjustments (3.3)
+  adjustments.max_review_days:
+    value: 180
+    label: ASSUMPTION
+    kind: sizing
+    unit: days
+    allowed_range: [1, 365]
+    rationale: "Longest review window for an adjustment (3.3, 12). Range proposed, not in spec."
+
+# ------------------------------------------------------------------- catalogue (3.3)
+# Value modes: freight keys are step_or_direct (6.10); bunker.scrubber_share is
+# step_or_direct (3.3 example). The spec does not state a mode for the other bunker,
+# rates and fx step keys; they use step_or_direct (to confirm, see docs/placeholders.md).
+catalogue:
+  freight.pricing_lag_days:
+    {module: freight, event_types: [trade_disruption, market_structure, company_announcement], value_mode: step_or_direct, steps: {small: 7, medium: 14, large: 28}, hard_limits: [0, 90], max_review_days: 180}
+  freight.gamma:
+    {module: freight, event_types: [contract_season, company_announcement], value_mode: step_or_direct, steps: {small: 0.10, medium: 0.20, large: 0.30}, hard_limits: [0, 1], max_review_days: 180}
+  freight.leakage_gap_down:
+    {module: freight, event_types: [market_structure, trade_disruption], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.15}, hard_limits: [0.10, 0.60], max_review_days: 180}
+  freight.leakage_gap_up:
+    {module: freight, event_types: [market_structure, trade_disruption], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.15}, hard_limits: [0.10, 0.60], max_review_days: 180}
+  freight.leakage_share_down:
+    {module: freight, event_types: [market_structure, competitor_action], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.15}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.leakage_share_up:
+    {module: freight, event_types: [market_structure, competitor_action], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.15}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.non_usd_share.ASIA_EUROPE:
+    {module: freight, event_types: [payment_rule, fx_policy, company_announcement], value_mode: step_or_direct, steps: {small: 0.02, medium: 0.05, large: 0.10}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.non_usd_share.ASIA_AMERICA:
+    {module: freight, event_types: [payment_rule, fx_policy, company_announcement], value_mode: step_or_direct, steps: {small: 0.02, medium: 0.05, large: 0.10}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.non_usd_share.EUROPE_AMERICA:
+    {module: freight, event_types: [payment_rule, fx_policy, company_announcement], value_mode: step_or_direct, steps: {small: 0.02, medium: 0.05, large: 0.10}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.non_usd_share.AFRICA_INTRA:
+    {module: freight, event_types: [payment_rule, fx_policy, company_announcement], value_mode: step_or_direct, steps: {small: 0.02, medium: 0.05, large: 0.10}, hard_limits: [0, 0.30], max_review_days: 180}
+  freight.delay_affected_share:
+    {module: freight, event_types: [trade_disruption, payment_rule, company_announcement], value_mode: step_or_direct, steps: {small: 0.10, medium: 0.25, large: 0.50}, hard_limits: [0, 1], max_review_days: 180}
+  bunker.hub_weight_sin:
+    {module: bunker, event_types: [trade_disruption, port_disruption, sanction], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.20}, hard_limits: [0.30, 0.90], max_review_days: 180}
+  bunker.scrubber_share:
+    {module: bunker, event_types: [regulation, fleet_change, company_announcement], value_mode: step_or_direct, steps: {small: 0.02, medium: 0.05, large: 0.10}, hard_limits: [0, 0.40], max_review_days: 180}
+  bunker.mfr_share:
+    {module: bunker, event_types: [company_announcement, market_structure], value_mode: step_or_direct, steps: {small: 0.10, medium: 0.20, large: 0.30}, hard_limits: [0, 1], max_review_days: 180}
+  bunker.mfr_lag_months:
+    {module: bunker, event_types: [company_announcement], value_mode: step_or_direct, steps: {small: 1, medium: 2, large: 3}, hard_limits: [0, 6], max_review_days: 180}
+  bunker.supplier_lag_days:
+    {module: bunker, event_types: [supplier_news, payment_rule], value_mode: step_or_direct, steps: {small: 7, medium: 14, large: 21}, hard_limits: [0, 90], max_review_days: 180}
+  rates.new_issue_premium_bp:
+    {module: rates, event_types: [financing_news, rating_change, credit_event], value_mode: step_or_direct, steps: {small: 25, medium: 50, large: 100}, hard_limits: [-100, 400], max_review_days: 180}
+  rates.interest_bearing_cash_share:
+    {module: rates, event_types: [bank_failure, capital_control, company_announcement], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.20}, hard_limits: [0.50, 1.00], max_review_days: 180}
+  rates.zim_tranche_on:
+    {module: rates, event_types: [financing_news, company_announcement], value_mode: switch, max_review_days: 180}
+  fx.hedge_ratio.cad:
+    {module: fx, event_types: [company_announcement, regulation], value_mode: step_or_direct, steps: {small: 0.05, medium: 0.10, large: 0.20}, hard_limits: [0, 0.80], max_review_days: 180}
+  fx.hedge_ratio.eur_debt:
+    {module: fx, event_types: [company_announcement], value_mode: step_or_direct, steps: {small: 0.10, medium: 0.25, large: 0.50}, hard_limits: [0, 1], max_review_days: 180}
+  fx.hedge_ratio.inr_brl:
+    {module: fx, event_types: [company_announcement, capital_control], value_mode: step_or_direct, steps: {small: 0.10, medium: 0.25, large: 0.50}, hard_limits: [0, 1], max_review_days: 180}
+  fx.obligation_shift_months:
+    {module: fx, event_types: [company_announcement, capital_control, payment_rule], value_mode: step_or_direct, steps: {small: 1, medium: 3, large: 6}, hard_limits: [0, 24], max_review_days: 180}
+  fx.inr_brl_obligations_on:
+    {module: fx, event_types: [company_announcement], value_mode: switch, max_review_days: 180}
+
+# Availability keys liquidity.<tier>.<counterparty>, one per register bank and tier (3.7).
+# Base value 1.0 (fully available). Steps are absolute cuts floored at 0; large means 0 (P19).
+availability_catalogue:
+  tiers: [T1, T2]
+  entry:
+    module: liquidity
+    event_types: [bank_failure, credit_event, sanction, capital_control]
+    value_mode: step_only
+    steps: {small: 0.25, medium: 0.50, large: 1.00}
+    hard_limits: [0, 1]
+    max_review_days: 180
+    step_effect: reduce_floor_zero
+
+# ------------------------------------------------------------------- anchor snapshot (3.7, D69, D70)
+# The anchor period is always the OCF run-rate's period; replace together with the run-rate
+# and P0 in one profile version. Series values are H1 2026 averages of loaded history (step 3).
+anchor_snapshot:
+  period: "H1 2026"
+  start: 2026-01-01
+  end: 2026-06-30
+  series:
+    WCI_SHA_RTM: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly values", note: "Average the loaded weekly WCI Shanghai-Rotterdam values for Jan-Jun 2026 (USD/FEU) once history is loaded in step 3."}
+    WCI_SHA_LAX: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly values", note: "Average the loaded weekly WCI Shanghai-Los Angeles values for Jan-Jun 2026 (USD/FEU), step 3."}
+    WCI_RTM_NYC: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly values", note: "Average the loaded weekly WCI Rotterdam-New York values for Jan-Jun 2026 (USD/FEU), step 3."}
+    WCI_COMPOSITE: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly values", note: "Average the loaded weekly WCI composite values for Jan-Jun 2026 (USD/FEU), step 3."}
+    VLSFO_SIN: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly prints", note: "Average loaded weekly VLSFO Singapore prints for Jan-Jun 2026 (USD/t), step 3; compare the blend with USD 592/t paid (IR pp. 10-11)."}
+    VLSFO_RTM: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly prints", note: "Average loaded weekly VLSFO Rotterdam prints for Jan-Jun 2026 (USD/t), step 3."}
+    HSFO_SIN: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly prints", note: "Average loaded weekly HSFO 380 cst Singapore prints for Jan-Jun 2026 (USD/t), step 3."}
+    HSFO_RTM: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of loaded weekly prints", note: "Average loaded weekly HSFO 380 cst Rotterdam prints for Jan-Jun 2026 (USD/t), step 3."}
+    SOFR: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of daily values", note: "Average daily SOFR (NY Fed) for Jan-Jun 2026, step 3."}
+    ESTR: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of daily values", note: "Average daily ESTR (ECB) for Jan-Jun 2026, step 3."}
+    BB_OAS: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of daily values", note: "Average daily BB OAS (FRED, series ID to confirm) for Jan-Jun 2026, step 3."}
+    UST_2Y: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of daily values", note: "Average daily FRED DGS2 for Jan-Jun 2026, step 3."}
+    EA_2Y: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of daily values", note: "Average daily ECB euro area 2-year spot rate (series ID to confirm) for Jan-Jun 2026, step 3."}
+    FX_USD_PER_EUR:
+      value: 1.1667
+      label: DISCLOSED
+      status: to_verify
+      source: {report: "Investor Report H1 2026", page: "16"}
+      note: "H1 2026 average USD/EUR. Verify against IR p. 16. Do not confuse with the closing rates 1.1756 and 1.1396 also cited to IR p. 16; D12 governs which closing rate converts which EUR disclosure (3.7, 13.2)."
+    FX_USD_PER_CAD: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of ECB daily values, as USD per unit", note: "Average ECB daily CAD rates for Jan-Jun 2026, converted to USD per CAD, step 3."}
+    FX_USD_PER_GBP: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of ECB daily values, as USD per unit", note: "Average ECB daily GBP rates for Jan-Jun 2026, converted to USD per GBP, step 3."}
+    FX_USD_PER_CNY: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of ECB daily values, as USD per unit", note: "Average ECB daily CNY rates for Jan-Jun 2026, converted to USD per CNY, step 3."}
+    FX_USD_PER_INR: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of ECB daily values, as USD per unit", note: "Average ECB daily INR rates for Jan-Jun 2026, converted to USD per INR, step 3."}
+    FX_USD_PER_BRL: {value: null, label: DERIVED, status: pending_history, formula: "H1 2026 average of ECB daily values, as USD per unit", note: "Average ECB daily BRL rates for Jan-Jun 2026, converted to USD per BRL, step 3."}
+  context:
+    rotterdam_mfo_0_5_usd_per_t_2026_06_30: 540
+    scfi_usd_per_teu_2026_06_30: 3240

@@ -1,0 +1,29 @@
+New evidence provisionally alleviates concerns in relation to supply of gaming consoles in the UK
+
+Previously stated provisional view that deal raises concerns in cloud gaming unaffected
+
+Investigation continues, with final report still due by 26 April 2023
+
+In February, the Competition and Markets Authority (CMA) published provisional findings setting out that the deal raises competition concerns in relation to both console gaming and cloud gaming services in the UK. The publication of the provisional findings initiated a period of consultation in which the CMA invited responses to those findings from interested parties and continued to gather further information.
+
+The CMA has received a significant amount of new evidence in response to its original provisional findings. Having considered this new evidence carefully, together with the wide range of information gathered before those provisional findings were issued, the CMA inquiry group has updated its provisional findings and reached the provisional conclusion that, overall, the transaction will not result in a substantial lessening of competition in relation to console gaming in the UK.
+
+The most significant new evidence provided to the CMA relates to Microsoft’s financial incentives to make Activision’s games, including Call of Duty (CoD), exclusive to its own consoles. While the CMA’s original analysis indicated that this strategy would be profitable under most scenarios, new data (which provides better insight into the actual purchasing behaviour of CoD gamers) indicates that this strategy would be significantly loss-making under any plausible scenario. On this basis, the updated analysis now shows that it would not be commercially beneficial to Microsoft to make CoD exclusive to Xbox following the deal, but that Microsoft will instead still have the incentive to continue to make the game available on PlayStation.
+
+The CMA’s addendum to its provisional findings today relates only to competition in the supply of consoles and not to competition in the supply of cloud gaming services, where the CMA is continuing to carefully consider the responses provided in relation to the original provisional findings. The CMA’s merger investigation continues, and it remains due to issue its final report by 26 April 2023.
+
+Martin Coleman, chair of the independent panel of experts conducting this investigation, said:
+
+Provisional findings are a key aspect of the merger process and are explicitly designed to give the businesses involved, and any interested third parties, the chance to respond with new evidence before we make a final decision.
+
+Having considered the additional evidence provided, we have now provisionally concluded that the merger will not result in a substantial lessening of competition in console gaming services because the cost to Microsoft of withholding Call of Duty from PlayStation would outweigh any gains from taking such action.
+
+Our provisional view that this deal raises concerns in the cloud gaming market is not affected by today’s announcement. Our investigation remains on course for completion by the end of April.
+
+For more information, visit the Microsoft / Activision case page .
+
+For media enquiries, contact the CMA press office on 020 3738 6460 or press@cma.gov.uk .
+
+Microsoft is a global technology company offering a wide range of products and services, with a global turnover of nearly £125 billion last year. Since 2001, it has sold various generations of Xbox gaming consoles. Gamers typically download digital copies of the games they want to play on Xbox from Microsoft’s Xbox Store. Microsoft also offers a multi-game subscription service, Xbox Game Pass, where gamers pay a monthly fee to gain access to a library of games.
+
+Activision Blizzard is a game developer and publisher with a global turnover of £6.3 billion last year. It develops popular gaming content for consoles, PC, and mobile, which includes titles such as Call of Duty, World of Warcraft and Candy Crush.

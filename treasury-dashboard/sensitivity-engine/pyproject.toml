@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "treasury-sensitivity"
+version = "0.1.0"
+description = "Deterministic market-risk sensitivity engine (FX, EUR rates, VLSFO, freight) for the Treasury dashboard"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7,<3",
+    "PyYAML>=6,<7",
+    "httpx>=0.27,<1",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.30,<1",
+    "tzdata>=2025.2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+treasury_sensitivity = ["defaults.yaml", "fixtures/*.json", "static/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

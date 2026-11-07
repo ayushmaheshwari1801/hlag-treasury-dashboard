@@ -1,0 +1,23 @@
+A summary of the CMA’s report, which was sent to the Secretary of State (SoS) for the Department for Digital, Culture, Media and Sport (DCMS) on 20 July ahead of the set deadline, has now been published . The CMA has determined that an in-depth investigation into the deal between NVIDIA and Arm is warranted on competition grounds.
+
+Should the deal go ahead, the CMA is concerned that the merged business would have the ability and incentive to harm the competitiveness of NVIDIA’s rivals by restricting access to Arm’s intellectual property (IP). Arm’s IP is used by companies that produce semiconductor chips and related products, in competition with NVIDIA.
+
+Ultimately, the CMA is concerned this loss of competition could stifle innovation across a number of markets, including data centres, gaming, the ‘internet of things’, and self-driving cars. This could result in more expensive or lower quality products for businesses and consumers.
+
+NVIDIA offered a behavioural remedy – a measure which regulates the ongoing behaviour of a business – but the CMA found that this type of remedy would not alleviate its concerns. Therefore, the CMA found that the merger should be progressed to an in-depth Phase 2 investigation on competition grounds.
+
+Andrea Coscelli, chief executive of the CMA, said: “We’re concerned that NVIDIA controlling Arm could create real problems for NVIDIA’s rivals by limiting their access to key technologies, and ultimately stifling innovation across a number of important and growing markets. This could end up with consumers missing out on new products, or prices going up.
+
+“The chip technology industry is worth billions and is vital to products that businesses and consumers rely on every day. This includes the critical data processing and datacentre technology that supports digital businesses across the economy, and the future development of artificial intelligence technologies that will be important to growth industries like robotics and self-driving cars.”
+
+On 19 April 2021, the SoS issued a public interest intervention notice in relation to the merger, on the ground of national security. In line with its legal duties, the CMA has provided the DCMS SoS with a report on its competition findings, along with a summary of representations received from third parties which relate to the national security public interest consideration. The SoS will decide whether the merger should be referred for an in-depth Phase 2 investigation on both competition and national security grounds, or if it should be passed back to the CMA to investigate on competition grounds only. The timing of this decision will be decided by the SoS.
+
+In conducting its investigation, the CMA has worked closely with other competition authorities around the world to carefully consider the impact of the deal.
+
+For more information, visit the NVIDIA / Arm merger inquiry case page .
+
+Notes to Editor
+
+The Internet of Things (IoT) refers to the connection of electronic devices to the internet and to other devices to allow them to collect, process and share data. IoT devices include everyday consumer devices like smart speakers, and devices in industrial applications like robotic systems.
+
+Datacentres are large groups of networked computer systems used by organisations for the storage, processing, and distribution of large amounts of data. The key hardware that makes up a datacentre infrastructure allows it to perform computing, storage and networking functions.

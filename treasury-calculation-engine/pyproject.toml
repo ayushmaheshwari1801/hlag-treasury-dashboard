@@ -1,0 +1,30 @@
+[project]
+name = "treasury-calculation-engine"
+version = "0.1.0"
+description = "Deterministic cash-flow stress engine (see docs/spec.md)"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7,<3",
+    "pyyaml>=6",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["hlag_engine*"]
+
+[tool.setuptools.package-data]
+# config shipped with the package: profile versions, registers, thresholds, the history template
+"hlag_engine.company_profile" = ["*.yaml", "registers/*.yaml"]
+# never the local weekly_history.csv: raw Bloomberg data is not shipped (P90)
+"hlag_engine.data" = ["history/weekly_history_template.csv", "history/README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,70 @@
+# Worked example 6.14: Red Sea re-escalation, freight part (spec 5.5, 6.14).
+# A reduced copy of the real profile: profile_values override entries of the complete test
+# profile; exposures are listed explicitly because the generator cannot build this register
+# (one trade, November only, a cohort resetting 15 Nov) (P42). The anchor snapshot equals the
+# T0 snapshot, so the anchor adjustment is zero (5.5, D69).
+# The WCI level is a fixture choice (USD 2,800/FEU = USD 1,400/TEU); only ratios matter.
+# Expected figures are USD m as written in the spec, with the spec's decimals.
+as_of: 2026-10-31
+profile_values:
+  freight.beta: 1.0
+  freight.pricing_lag_days: 28
+  freight.kappa: 0.8
+  freight.clause_lag_days: 30
+  freight.gamma: 0.5
+  freight.leakage_gap_down: 0.3
+  freight.leakage_gap_up: 0.3
+  freight.leakage_share_down: 0.1
+  freight.leakage_share_up: 0.1
+  freight.leakage_volume_loss: 0.0
+  freight.collection_lag_days: 49
+  freight.delay_affected_share: 1.0
+  freight.non_usd_share.ASIA_EUROPE: 0.0
+market:
+  WCI_SHA_RTM: {value: 2800.0, unit: USD/FEU, value_date: 2026-10-29}
+exposures:
+  - {sub_id: "freight:volume:ASIA_EUROPE:2026-11", owner_spec: freight, kind: volume, label: ASSUMPTION,
+     sizing_note: "300,000 TEU in November 2026, 10,000 TEU per day",
+     quantities: {teu: 300000, daily_teu: 10000, days: 30}, dates: {month: 2026-11-01}}
+  - {sub_id: "freight:spot:ASIA_EUROPE", owner_spec: freight, kind: spot, currency: USD, label: ASSUMPTION,
+     sizing_note: "spot 40%", quantities: {share: 0.4, p0_usd_per_teu: 1400}}
+  - {sub_id: "freight:index:ASIA_EUROPE", owner_spec: freight, kind: index, currency: USD, label: ASSUMPTION,
+     sizing_note: "index-linked 10%", quantities: {share: 0.1, p0_usd_per_teu: 1400}}
+  - {sub_id: "freight:contract:ASIA_EUROPE:A", owner_spec: freight, kind: contract, currency: USD,
+     label: ASSUMPTION, sizing_note: "cohort A 25%, resets 15 Nov 2026",
+     quantities: {share: 0.25, rate_usd_per_teu: 1400, term_months: 12}, dates: {reset_date: 2026-11-15}}
+  - {sub_id: "freight:contract:ASIA_EUROPE:B", owner_spec: freight, kind: contract, currency: USD,
+     label: ASSUMPTION, sizing_note: "cohort B 25%, resets 1 Mar 2027",
+     quantities: {share: 0.25, rate_usd_per_teu: 1400, term_months: 12}, dates: {reset_date: 2027-03-01}}
+scenario:
+  name: "Red Sea re-escalation, freight part"
+  start_date: 2026-11-01
+  duration_days: 182
+  default_shape: step
+  source: custom
+  preset_id: red_sea_reescalation
+  freight:
+    rate_shock_pct: {ASIA_EUROPE: 40}
+    transit_delay_days: {ASIA_EUROPE: 12}
+expected:
+  rates_usd_per_teu:            # spot, index-linked, cohort A, cohort B (intact) by shipment day
+    base:       {2026-11-01: [1400, 1400, 1400, 1400], 2026-11-30: [1400, 1400, 1400, 1400]}
+    scenario:   {2026-11-01: [1400, 1400, 1400, 1400], 2026-11-14: [1400, 1400, 1400, 1400],
+                 2026-11-15: [1400, 1400, 1680, 1400], 2026-11-28: [1400, 1400, 1680, 1400],
+                 2026-11-29: [1960, 1400, 1680, 1400], 2026-11-30: [1960, 1400, 1680, 1400]}
+  revenue_per_day:
+    base: {2026-11-01: "14.00", 2026-11-30: "14.00"}
+    scenario: {2026-11-01: "14.00", 2026-11-14: "14.00", 2026-11-15: "14.70", 2026-11-28: "14.70",
+               2026-11-29: "17.08", 2026-11-30: "17.08"}
+  leakage: {cohort: "ASIA_EUROPE:B", date: 2026-11-29, direction: up, leaked_teu_per_day: 250}
+  november_revenue_base: "420.00"
+  november_revenue_scenario: "435.96"
+  revenue_delta: "15.96"
+  revenue_delta_parts: {cohort_a: "11.20", spot: "4.48", leakage: "0.28"}
+  realised_rate_scenario_usd_per_teu: "1453.20"
+  base_cash_dates: [2026-12-20, 2027-01-18]
+  scenario_cash_dates: [2027-01-01, 2027-01-30]
+  cumulative_cash_delta: {2026-12-31: "-168.00", 2027-01-18: "-165.20", 2027-01-30: "15.96"}
+  gross_adverse: {value: "168.00", date: 2026-12-31}
+  volume_lines_teu: {base: 300000, scenario: 300000}
+  delay_share_50_cumulative_2026_12_31: "-84.00"

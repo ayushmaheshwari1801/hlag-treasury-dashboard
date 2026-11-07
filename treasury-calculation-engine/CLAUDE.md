@@ -1,0 +1,8 @@
+- The specification is docs/spec.md. It is the single source of truth. MUST means required; SHOULD means default.
+- Never edit docs/spec.md. If the spec is unclear, contradictory or seems wrong, stop and ask me; do not guess.
+- Build only the step I ask for (section 14.1). Do not start later steps.
+- Python 3.12, Pydantic v2, pytest. Follow the repository layout in section 1.5.
+- The engine (run_scenario and everything it calls) is deterministic: no LLM calls, no network calls, no randomness.
+- Every new behaviour needs a pytest test. Run the full test suite before saying a task is done, and report the result.
+- Never put API keys or secrets in code. Use a .env file, which must be in .gitignore.
+- Before writing code for a new step, give me a short plan (files, classes, tests) and wait for my approval.

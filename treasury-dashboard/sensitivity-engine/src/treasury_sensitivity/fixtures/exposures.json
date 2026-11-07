@@ -1,0 +1,103 @@
+{
+ "_meta": {
+  "synthetic": true,
+  "warning": "SYNTHETIC exposures and hedges. No ERP/TMS/bank data. ASSUMED exposure, sized to the order of magnitude of the supplied layout. Hapag-Lloyd's H1 2026 report discloses only that the functional currency is USD and the net FX result is small (losses USD 237m, gains USD 244m)."
+ },
+ "as_of": "2026-10-30",
+ "positions": [
+  {
+   "id": "EXP-CAD-001",
+   "currency": "CAD",
+   "direction": "payable",
+   "amount_m": "75",
+   "underlying": "CAD operating payables (synthetic)",
+   "maturity": "2027-01-29",
+   "set": "CAD_PAYABLE_13W",
+   "provenance": "ILLUSTRATIVE"
+  },
+  {
+   "id": "EXP-EUR-001",
+   "currency": "EUR",
+   "direction": "receivable",
+   "amount_m": "3000",
+   "underlying": "EUR freight revenue net of EUR costs (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "EUR_RECEIVABLE_6M",
+   "provenance": "ILLUSTRATIVE"
+  },
+  {
+   "id": "EXP-GBP-001",
+   "currency": "GBP",
+   "direction": "payable",
+   "amount_m": "2000",
+   "underlying": "GBP operating payables (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "GBP_PAYABLE_6M",
+   "provenance": "ILLUSTRATIVE"
+  },
+  {
+   "id": "EXP-CNY-001",
+   "currency": "CNY",
+   "direction": "payable",
+   "amount_m": "15000",
+   "underlying": "CNY operating payables (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "CNY_PAYABLE_6M",
+   "provenance": "ILLUSTRATIVE"
+  }
+ ],
+ "hedges": [
+  {
+   "id": "HDG-CAD-001",
+   "currency": "CAD",
+   "side": "buy_forward",
+   "notional_m": "57.5",
+   "underlying": "CAD operating payables (synthetic)",
+   "maturity": "2027-01-29",
+   "set": "CAD_PAYABLE_13W",
+   "provenance": "DISCLOSED HISTORICAL",
+   "verified": false,
+   "contract_rate": null,
+   "note": "Historical disclosed notional; not verified as a live matched hedge."
+  },
+  {
+   "id": "HDG-EUR-001",
+   "currency": "EUR",
+   "side": "sell_forward",
+   "notional_m": "1000",
+   "underlying": "EUR freight revenue net of EUR costs (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "EUR_RECEIVABLE_6M",
+   "provenance": "ILLUSTRATIVE",
+   "verified": false,
+   "contract_rate": null,
+   "note": "ASSUMED exposure, sized to the order of magnitude of the supplied layout. Hapag-Lloyd's H1 2026 report discloses only that the functional currency is USD and the net FX result is small (losses USD 237m, gains USD 244m)."
+  },
+  {
+   "id": "HDG-GBP-001",
+   "currency": "GBP",
+   "side": "buy_forward",
+   "notional_m": "500",
+   "underlying": "GBP operating payables (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "GBP_PAYABLE_6M",
+   "provenance": "ILLUSTRATIVE",
+   "verified": false,
+   "contract_rate": null,
+   "note": "ASSUMED exposure, sized to the order of magnitude of the supplied layout. Hapag-Lloyd's H1 2026 report discloses only that the functional currency is USD and the net FX result is small (losses USD 237m, gains USD 244m)."
+  },
+  {
+   "id": "HDG-CNY-001",
+   "currency": "CNY",
+   "side": "buy_forward",
+   "notional_m": "3000",
+   "underlying": "CNY operating payables (synthetic)",
+   "maturity": "2027-04-30",
+   "set": "CNY_PAYABLE_6M",
+   "provenance": "ILLUSTRATIVE",
+   "verified": false,
+   "contract_rate": null,
+   "note": "ASSUMED exposure, sized to the order of magnitude of the supplied layout. Hapag-Lloyd's H1 2026 report discloses only that the functional currency is USD and the net FX result is small (losses USD 237m, gains USD 244m)."
+  }
+ ]
+}

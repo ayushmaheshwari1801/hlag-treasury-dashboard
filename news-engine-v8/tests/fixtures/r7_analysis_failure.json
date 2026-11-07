@@ -1,0 +1,337 @@
+{
+  "source_id": "real-a114d8803587",
+  "event": {
+    "event_id": "E597e929c68899fe850c7",
+    "title": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no ",
+    "summary": "",
+    "latest_change_id": "Cfdb5fbb62efbc5d43d28",
+    "identity": {
+      "subject": "federal bank regulatory agencies",
+      "action": "modifies",
+      "occurrence": "interim final rule",
+      "scope": "capital rules to neutralize regulatory capital effects of participating in the PPP facility",
+      "location": "United States",
+      "occurrence_at": null
+    },
+    "status": "ongoing",
+    "created_at": "2026-11-01T05:50:44.994604Z",
+    "last_seen_at": "2026-11-01T05:50:44.994604Z",
+    "last_material_at": "2020-04-09T00:00:00Z",
+    "score": null,
+    "treasury_implications": [],
+    "major_changes": [
+      {
+        "change_id": "C9e0074580bc949bc8187",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "description": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility.",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "identity": {
+          "subject": "federal bank regulatory agencies",
+          "action": "modifies",
+          "occurrence": "interim final rule",
+          "scope": "capital rules",
+          "location": "United States",
+          "occurrence_at": null
+        },
+        "numeric": [],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null,
+        "corroborating_sources": []
+      },
+      {
+        "change_id": "C10e94e2f9f1b96130cf8",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "description": "the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "identity": {
+          "subject": "federal bank regulatory agencies",
+          "action": "clarifies",
+          "occurrence": "interim final rule",
+          "scope": "PPP loans risk weight",
+          "location": "United States",
+          "occurrence_at": null
+        },
+        "numeric": [
+          {
+            "value": "0",
+            "unit": "percent",
+            "kind": "level",
+            "comparison_basis": null,
+            "source_quote": "zero percent"
+          }
+        ],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null,
+        "corroborating_sources": []
+      },
+      {
+        "change_id": "Cfdb5fbb62efbc5d43d28",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "description": "The rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register .",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "identity": {
+          "subject": "federal bank regulatory agencies",
+          "action": "effective immediately",
+          "occurrence": "interim final rule",
+          "scope": "public comment period",
+          "location": "United States",
+          "occurrence_at": null
+        },
+        "numeric": [
+          {
+            "value": "30",
+            "unit": "days",
+            "kind": "threshold",
+            "comparison_basis": "after publication in the Federal Register",
+            "source_quote": "30 days"
+          }
+        ],
+        "evidence": {
+          "quote": "The rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register .",
+          "start": 905,
+          "end": 1024
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null,
+        "corroborating_sources": []
+      }
+    ]
+  },
+  "first_response": {
+    "summary": "An interim final rule has been issued to modify regulatory capital requirements, neutralizing the capital effects for financial institutions participating in the Federal Reserve's Paycheck Protection Program (PPP) facility. The rule establishes that PPP loans pledged to the facility carry no credit or market risk for the participating agencies. Furthermore, the rule clarifies that a zero percent risk weight is applied to all loans covered by the PPP for capital purposes, aligning with CARES Act requirements. The rule is effective immediately, with a 30-day comment period following its publication in the Federal Register.",
+    "impact": 1,
+    "relevance": 3,
+    "urgency": 2,
+    "reasoning": {
+      "impact": "The rule modifies bank capital requirements for specific US relief loans but does not change broader market benchmarks, policy rates, or the company's direct financial obligations.",
+      "relevance": "Applicability to the company is dependent on unproven relationships with US-regulated banks participating in the PPP, though it directly affects the capital treatment of such lending.",
+      "urgency": "The rule is already effective for participating lenders, but for a non-bank corporate entity, it represents a monitoring requirement for potential impacts on banking counterparties."
+    },
+    "treasury_implications": [
+      "The source does not establish company applicability/effects/deadlines regarding eligibility for PPP loans or direct capital rule exposure.",
+      "Monitoring of US banking counterparties may be required to determine if the zero percent risk weight affects their capacity or terms for PPP-related lending, should the company seek such facilities."
+    ]
+  },
+  "repair_response": {
+    "summary": "An interim final rule has been issued to modify regulatory capital rules, neutralizing the capital effects for agencies participating in the Federal Reserve's Paycheck Protection Program (PPP) facility. The rule states there is no credit or market risk for PPP loans pledged to the facility. Additionally, the rule clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes, consistent with current capital rules and CARES Act requirements. The rule is effective immediately, with a 30-day comment period following its publication in the Federal Register.",
+    "impact": 1,
+    "relevance": 3,
+    "urgency": 2,
+    "reasoning": {
+      "impact": "The rule modifies bank capital requirements for specific US relief loans but does not change broader market benchmarks, policy rates, or evidenced company obligations.",
+      "relevance": "The financial mechanism affects the capital treatment of PPP lending, but the source does not establish company applicability, financial effects or a company deadline.",
+      "urgency": "While the rule is effective immediately for lenders, any treasury relevance for the company is limited to routine monitoring of the banking environment."
+    },
+    "treasury_implications": []
+  },
+  "first_context": {
+    "event_id": "E597e929c68899fe850c7",
+    "reference_time": "2020-04-09T00:00:00+00:00",
+    "changes": [
+      {
+        "change_id": "C9e0074580bc949bc8187",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      },
+      {
+        "change_id": "C10e94e2f9f1b96130cf8",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [
+          {
+            "value": "0",
+            "unit": "percent",
+            "kind": "level",
+            "comparison_basis": null,
+            "source_quote": "zero percent"
+          }
+        ],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      },
+      {
+        "change_id": "Cfdb5fbb62efbc5d43d28",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [
+          {
+            "value": "30",
+            "unit": "days",
+            "kind": "threshold",
+            "comparison_basis": "after publication in the Federal Register",
+            "source_quote": "30 days"
+          }
+        ],
+        "evidence": {
+          "quote": "The rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register .",
+          "start": 905,
+          "end": 1024
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      }
+    ],
+    "allowed_source_numbers": [
+      "0",
+      "30"
+    ],
+    "implementation_evidence": "Actual source developments are supplied; use only their stated scope.",
+    "company_evidence": "The source does not name Hapag-Lloyd or establish its exposure, eligibility, subsidiaries or counterparties. Use the fixed mandate for relevance, but do not assert company impact, no impact, ineligibility or no response requirement."
+  },
+  "repair_context": {
+    "event_id": "E597e929c68899fe850c7",
+    "reference_time": "2020-04-09T00:00:00+00:00",
+    "changes": [
+      {
+        "change_id": "C9e0074580bc949bc8187",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      },
+      {
+        "change_id": "C10e94e2f9f1b96130cf8",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [
+          {
+            "value": "0",
+            "unit": "percent",
+            "kind": "level",
+            "comparison_basis": null,
+            "source_quote": "zero percent"
+          }
+        ],
+        "evidence": {
+          "quote": "The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.",
+          "start": 435,
+          "end": 903
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      },
+      {
+        "change_id": "Cfdb5fbb62efbc5d43d28",
+        "source_id": "A872480e44a84fe3962e396ee",
+        "direction": "unknown",
+        "claim_type": "actual",
+        "occurrence_at": null,
+        "numeric": [
+          {
+            "value": "30",
+            "unit": "days",
+            "kind": "threshold",
+            "comparison_basis": "after publication in the Federal Register",
+            "source_quote": "30 days"
+          }
+        ],
+        "evidence": {
+          "quote": "The rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register .",
+          "start": 905,
+          "end": 1024
+        },
+        "event_id": "E597e929c68899fe850c7",
+        "duplicate_of": null
+      }
+    ],
+    "allowed_source_numbers": [
+      "0",
+      "30"
+    ],
+    "implementation_evidence": "Actual source developments are supplied; use only their stated scope.",
+    "company_evidence": "The source does not name Hapag-Lloyd or establish its exposure, eligibility, subsidiaries or counterparties. Use the fixed mandate for relevance, but do not assert company impact, no impact, ineligibility or no response requirement.",
+    "repair": "absence of company evidence is not proof of no impact or ineligibility; remove this exact assertion: does not change broader market benchmarks, policy rates, or the company; instead state: The source does not establish company applicability, financial effects or a company deadline.",
+    "rejected_response": {
+      "summary": "An interim final rule has been issued to modify regulatory capital requirements, neutralizing the capital effects for financial institutions participating in the Federal Reserve's Paycheck Protection Program (PPP) facility. The rule establishes that PPP loans pledged to the facility carry no credit or market risk for the participating agencies. Furthermore, the rule clarifies that a zero percent risk weight is applied to all loans covered by the PPP for capital purposes, aligning with CARES Act requirements. The rule is effective immediately, with a 30-day comment period following its publication in the Federal Register.",
+      "impact": 1,
+      "relevance": 3,
+      "urgency": 2,
+      "reasoning": {
+        "impact": "The rule modifies bank capital requirements for specific US relief loans but does not change broader market benchmarks, policy rates, or the company's direct financial obligations.",
+        "relevance": "Applicability to the company is dependent on unproven relationships with US-regulated banks participating in the PPP, though it directly affects the capital treatment of such lending.",
+        "urgency": "The rule is already effective for participating lenders, but for a non-bank corporate entity, it represents a monitoring requirement for potential impacts on banking counterparties."
+      },
+      "treasury_implications": [
+        "The source does not establish company applicability/effects/deadlines regarding eligibility for PPP loans or direct capital rule exposure.",
+        "Monitoring of US banking counterparties may be required to determine if the zero percent risk weight affects their capacity or terms for PPP-related lending, should the company seek such facilities."
+      ]
+    }
+  },
+  "later_retry_responses": [
+    {
+      "summary": "An interim final rule has been issued to modify regulatory capital rules for participating in the Federal Reserve's Paycheck Protection Program (PPP) facility. The rule neutralizes regulatory capital effects by assigning a zero percent risk weight to PPP loans pledged to the facility, reflecting an absence of credit or market risk. Additionally, the rule clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes. The rule is effective immediately, with a 30-day comment period following its publication in the Federal Register.",
+      "impact": 1,
+      "relevance": 3,
+      "urgency": 2,
+      "reasoning": {
+        "impact": "The rule modifies capital requirements for banks providing PPP loans but does not change general policy rates, funding benchmarks, or corporate obligations for Hapag-Lloyd.",
+        "relevance": "The rule's relevance is dependent on unproven relationships between the company or its subsidiaries and U.S. banking counterparties participating in the PPP facility.",
+        "urgency": "The rule is already effective, requiring only routine monitoring of its influence on the credit environment, with no immediate Treasury response deadline established for the company."
+      },
+      "treasury_implications": [
+        "Monitoring of the U.S. banking environment for changes in lending capacity or credit availability resulting from modified bank capital requirements.",
+        "The source does not establish company applicability, effects, or specific deadlines for Hapag-Lloyd."
+      ]
+    },
+    {
+      "summary": "An interim final rule has been issued to modify regulatory capital rules for participants in the Federal Reserve's Paycheck Protection Program (PPP) facility. The rule neutralizes the regulatory capital effects of participating in the facility by assigning a zero percent risk weight to PPP loans for capital purposes, based on the assessment that there is no credit or market risk for loans pledged to the facility. The rule is effective immediately, with a 30-day comment period following publication in the Federal Register.",
+      "impact": 1,
+      "relevance": 3,
+      "urgency": 2,
+      "reasoning": {
+        "impact": "The rule modifies regulatory capital treatment for specific US bank loans but does not evidence a change in general policy rates, funding benchmarks, or corporate financial obligations.",
+        "relevance": "Applicability is dependent on unproven relationships between the company, its potential US subsidiaries, or counterparties and banks participating in the PPP facility.",
+        "urgency": "The rule is effective immediately, but the source does not establish a specific Treasury response deadline or mandatory action for the company."
+      },
+      "treasury_implications": [
+        "Monitoring of US banking counterparties for potential changes in lending capacity or credit availability resulting from the modified zero percent risk weight on PPP loans.",
+        "The source does not establish company applicability, effects, or deadlines for Hapag-Lloyd."
+      ]
+    }
+  ]
+}

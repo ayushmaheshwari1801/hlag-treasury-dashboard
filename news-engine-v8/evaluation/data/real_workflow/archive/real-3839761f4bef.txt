@@ -1,0 +1,39 @@
+While the CMA has identified limited residual concerns with the new deal, Microsoft has put forward remedies which the CMA has provisionally concluded should address these issues.
+
+The CMA is now consulting on the remedies before making a final decision.
+
+Earlier this year, the CMA blocked Microsoft from acquiring the whole of Activision due to concerns that the deal would harm competition in cloud gaming in the UK. After that deal was blocked, Microsoft submitted a restructured transaction in August for the CMA to review.
+
+Under that new deal, Microsoft will not purchase the cloud gaming rights held by Activision, which will instead be sold to an independent third party, Ubisoft Entertainment SA (Ubisoft), before the deal is completed.
+
+The prior sale of the cloud gaming rights will establish Ubisoft as a key supplier of content to cloud gaming services, replicating the role that Activision would have played in the market as an independent player.
+
+In contrast to the original deal, Microsoft will no longer control cloud gaming rights for Activision’s content, so would not be in a position to limit access to Activision’s key content to its own cloud gaming service or to withhold those games from rivals. Unlike the remedies the CMA previously rejected, Ubisoft will be free to offer Activision’s games both directly to consumers and to all cloud gaming service providers however it chooses, including for buy-to-play or multigame subscription services, or any new model for providing content that might emerge as the market develops. The deal with Ubisoft also requires Microsoft to port Activision games to operating systems other than Windows and support game emulators when requested, addressing the other main shortcoming with the previous remedies package.
+
+The CMA considers that the restructured deal makes important changes that substantially address the concerns it set out in relation to the original transaction earlier this year.
+
+In particular, the sale of Activision’s cloud streaming rights to Ubisoft will prevent this important content – including games such as Call of Duty, Overwatch, and World of Warcraft – from coming under the control of Microsoft in relation to cloud gaming. The CMA originally found that Microsoft already has a strong position in cloud gaming services and could have used its control over Activision content to stifle competition and reinforce this position. The new deal instead results in the cloud streaming rights for Activision’s games being transferred to an independent player, Ubisoft, maintaining open competition as the market for cloud gaming develops over the coming years.
+
+While the restructured deal is materially different to the previous transaction and substantially addresses most concerns, the CMA has limited residual concerns that certain provisions in the sale of Activision’s cloud streaming rights to Ubisoft could be circumvented, terminated, or not enforced.
+
+To address these concerns, Microsoft has offered remedies to ensure that the terms of the sale of Activision’s rights to Ubisoft are enforceable by the CMA. The CMA has provisionally concluded that this additional protection should resolve those residual concerns.
+
+The CMA has now opened a consultation, until 6 October, on Microsoft’s proposed remedies.
+
+“This is a new and substantially different deal, which keeps the cloud distribution of these important games in the hands of a strong independent supplier, Ubisoft, rather than under the control of Microsoft.”
+
+“With additional protections to make sure that the deal is properly implemented, this will maintain the structure of the market, enabling open competition to continue to shape the development of cloud gaming in the years to come, and giving UK gamers the opportunity to access Activision’s games in many different ways, including through cloud-based multigame subscription services.”
+
+“The CMA’s position has been consistent throughout – this merger could only go ahead if competition, innovation, and choice in cloud gaming was preserved. In response to our original prohibition, Microsoft has now substantially restructured the deal, taking the necessary steps to address our original concerns.
+
+“It would have been far better, though, if Microsoft had put forward this restructure during our original investigation. This case illustrates the costs, uncertainty and delay that parties can incur if a credible and effective remedy option exists but is not put on the table at the right time.”
+
+More information on the restructured transaction, the new Phase 1 investigation and how to submit comments is available on the Microsoft / Activision Blizzard (ex-cloud streaming rights) merger inquiry .
+
+Microsoft is proposing to purchase Activision, excluding cloud gaming rights for existing and future Activision PC and console games released over the next 15 years (excluding in the European Economic Area).
+
+Following the prohibition of the original deal, Microsoft also requires permission from the CMA to buy any part of Activision, so the CMA has also launched a separate consultation to inform its decision on whether to grant Microsoft permission to buy Activision. Both consultations will remain open until Friday, 6 October.
+
+The full timeline of the CMA’s investigation into the original transaction (Phase 1 and 2) is available here: Microsoft / Activision Blizzard merger inquiry - GOV.UK (www.gov.uk)
+
+All media enquiries should be directed to the CMA press office by email on press@cma.gov.uk , or by phone on 020 3738 6460.

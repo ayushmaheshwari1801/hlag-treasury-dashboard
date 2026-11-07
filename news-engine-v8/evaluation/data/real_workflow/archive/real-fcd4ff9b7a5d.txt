@@ -1,0 +1,15 @@
+The Competition and Markets Authority (CMA) has therefore today confirmed it intends to cancel its investigation into the merger.
+
+The abandonment comes ahead of the planned main party hearings in February, where the CMA inquiry group was set to scrutinise information relating to the deal as part of a formal process.
+
+The CMA provided a report to the Secretary of State (SoS) for the Department for Digital, Culture, Media and Sport in July 2021 – in line with its legal duty – after the SoS issued a public interest intervention notice in relation to the merger, on the ground of national security.
+
+In the report, the CMA found that an in-depth investigation into the deal was warranted on competition grounds due to concerns that, should the deal go ahead, the merged business would have the ability and incentive to harm the competitiveness of NVIDIA’s rivals by restricting access to Arm’s intellectual property (IP). This technology is used by companies that produce semiconductor chips and related products, in competition with NVIDIA. A summary of that report is available online .
+
+The SoS then decided to progress the merger to an in-depth Phase 2 investigation in November 2021, based on national security and competition concerns.
+
+In conducting its investigation, the CMA has worked closely with other competition authorities around the world to carefully consider the impact of the deal.
+
+More information is available on the NVIDIA/Arm case page .
+
+For media enquiries, contact the CMA press office on 020 3738 6460 or press@cma.gov.uk .

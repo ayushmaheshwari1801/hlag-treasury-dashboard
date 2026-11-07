@@ -1,0 +1,31 @@
+Broadcom, a leading US-based technology company, makes and sells hardware components – such as network interface cards (NICs) and storage adapters – used in computer servers. VMware sells software products and services, including server virtualisation software, which enables servers to be used more efficiently by separating them into multiple virtualised servers. Broadcom’s hardware and VMware’s software are relied upon by thousands of businesses and public bodies in the UK, including major banks, major retailers, telecoms firms, UK government departments and other public institutions.
+
+Following its initial Phase 1 investigation , the Competition and Markets Authority (CMA) identified competition concerns warranting in-depth review and referred the deal to a Phase 2 inquiry.
+
+After examining the evidence gathered from Broadcom, VMware and other interested parties, an independent CMA panel has provisionally found the deal would not substantially reduce competition in the supply of server hardware components in the UK.
+
+The panel explored concerns that the deal could harm the ability of Broadcom’s rivals to compete if the merged company were to make their products work less well (or not at all) with VMware’s server virtualisation software. However, it has provisionally found that the potential financial benefit to Broadcom and VMware of making rival products work less well with VMware’s software would not outweigh the potential financial cost in terms of lost business.
+
+The panel also considered whether the deal could harm innovation. The panel looked at whether Broadcom’s rivals need to share commercially sensitive information with VMware to ensure their hardware and VMware’s software work together in computer servers, and whether there could be concerns about Broadcom potentially having access to such information following the deal.
+
+The panel found the deal would be unlikely to harm innovation, in particular since information about new product adaptations only needs to be shared with VMware at a stage when it is too late to be of commercial benefit to Broadcom.
+
+Richard Feasey, chair of the independent inquiry panel carrying out the investigation, said:
+
+Computer servers – often using the products of Broadcom and VMware – play a critical role in enabling us to work in the office or at home or to access TV shows or use banking services.
+
+That’s why it’s important we investigate this deal to ensure that UK businesses continue to benefit from competition and innovation in the supply of server components. After carefully considering a broad range of evidence, we have provisionally found that this deal would not harm competition.
+
+Today’s findings are provisional, and the CMA will now consult on its findings and listen to any further views before reaching a final decision.
+
+The CMA welcomes responses from interested parties to its provisional findings by 9 August 2023. These will be considered ahead of the CMA issuing its final report, which is due by 12 September 2023.
+
+More information can be found on the CMA’s Broadcom / VMware case page .
+
+The CMA received a significant volume of evidence from Broadcom and VMware, including over 250 000 internal business documents. The CMA also gathered evidence from customers, other hardware providers and virtualisation software providers, which included several requests for information and holding calls with many of these respondents.
+
+In a Phase 2 review, the panel considers whether it is more likely than not that a deal will substantially lessen competition – a higher threshold than Phase 1. Accordingly, some mergers that are referred to Phase 2 will ultimately be cleared.
+
+The Broadcom / VMware deal is valued at $69 billion, consisting of $61 billion of equity and the assumption of $8 billion of debt, making it the largest acquisition to be investigated by the CMA.
+
+For media enquiries, contact the CMA press office on 020 3738 6460 or press@cma.gov.uk .

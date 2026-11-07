@@ -1,0 +1,19 @@
+# Operating footprint (3.4, D27). Feeds news relevance only.
+cash_structure:
+  value: "Liquidity managed centrally by group treasury"
+  label: DISCLOSED
+  source: {report: "Annual Report 2025", page: "218"}
+countries:
+  - {code: DE, currencies: [EUR], payment_rails: [SEPA, SWIFT], label: ASSUMPTION}
+  - {code: NL, currencies: [EUR], payment_rails: [SEPA, SWIFT], label: ASSUMPTION}
+  - {code: US, currencies: [USD], payment_rails: [SWIFT, Fedwire], label: ASSUMPTION}
+  - {code: CA, currencies: [CAD], payment_rails: [SWIFT], label: ASSUMPTION}
+  - {code: GB, currencies: [GBP], payment_rails: [SWIFT], label: ASSUMPTION}
+  - {code: IN, currencies: [INR], payment_rails: [India RTGS/NEFT, SWIFT], label: ASSUMPTION}
+  - {code: BR, currencies: [BRL], payment_rails: [Brazil TED/PIX, SWIFT], label: ASSUMPTION}
+  - {code: CN, currencies: [CNY], payment_rails: [China CNAPS/CIPS], label: ASSUMPTION}
+  - {code: SG, currencies: [USD], payment_rails: [SWIFT], label: ASSUMPTION}
+cash_location_shares:
+  label: ASSUMPTION
+  note: "Matches the deposit currency split rates.deposit_split_usd (8.3)."
+  shares: {USD: 0.80, EUR: 0.20}

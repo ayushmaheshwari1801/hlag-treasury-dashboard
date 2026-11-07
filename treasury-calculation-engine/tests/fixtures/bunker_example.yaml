@@ -1,0 +1,57 @@
+# Worked example 7.14: Red Sea re-escalation, bunker part (spec 5.5, 7.14).
+# Reuses the freight fixture (6.14) for TEU and collection timing: freight_fixture is loaded
+# first and this file's values override it. Exposures are explicit (P42). The anchor snapshot
+# equals the T0 snapshot. MFR lag is 0 months in this fixture only. Expected figures are USD m
+# (unless stated) as written in the spec, with the spec's decimals.
+as_of: 2026-10-31
+freight_fixture: freight_example.yaml
+profile_values:
+  bunker.monthly_consumption_t: 400000
+  bunker.hub_weight_sin: 0.6
+  bunker.scrubber_share: 0.2
+  bunker.supplier_lag_days: 30
+  bunker.mfr_share: 0.7
+  bunker.mfr_lag_months: 0
+  bunker.fuel_per_teu_t: 0.36
+market:
+  VLSFO_SIN: {value: 600.0, unit: USD/t, value_date: 2026-10-29}
+  VLSFO_RTM: {value: 580.0, unit: USD/t, value_date: 2026-10-29}
+  HSFO_SIN: {value: 450.0, unit: USD/t, value_date: 2026-10-29}
+  HSFO_RTM: {value: 430.0, unit: USD/t, value_date: 2026-10-29}
+exposures:
+  - {sub_id: "bunker:purchase:SIN:VLSFO:2026-11", owner_spec: bunker, kind: purchase, currency: USD, label: ASSUMPTION,
+     sizing_note: "400,000 t x 60% x 80%", quantities: {tonnes: 192000}, dates: {month: 2026-11-01}}
+  - {sub_id: "bunker:purchase:SIN:HSFO:2026-11", owner_spec: bunker, kind: purchase, currency: USD, label: ASSUMPTION,
+     sizing_note: "400,000 t x 60% x 20%", quantities: {tonnes: 48000}, dates: {month: 2026-11-01}}
+  - {sub_id: "bunker:purchase:RTM:VLSFO:2026-11", owner_spec: bunker, kind: purchase, currency: USD, label: ASSUMPTION,
+     sizing_note: "400,000 t x 40% x 80%", quantities: {tonnes: 128000}, dates: {month: 2026-11-01}}
+  - {sub_id: "bunker:purchase:RTM:HSFO:2026-11", owner_spec: bunker, kind: purchase, currency: USD, label: ASSUMPTION,
+     sizing_note: "400,000 t x 40% x 20%", quantities: {tonnes: 32000}, dates: {month: 2026-11-01}}
+scenario:
+  name: "Red Sea re-escalation, joint freight and bunker parts"
+  start_date: 2026-11-01
+  duration_days: 182
+  default_shape: step
+  source: custom
+  preset_id: red_sea_reescalation
+  freight:
+    rate_shock_pct: {ASIA_EUROPE: 40}
+    transit_delay_days: {ASIA_EUROPE: 12}
+  bunker: {vlsfo_shock_pct: 15, hsfo_shock_pct: 12, consumption_uplift_pct: 30, uplift_affected_share: 0.35}
+expected:   # USD/t for prices, tonnes for consumption, USD m otherwise
+  price_paid_usd_per_t: {base: "562.00", scenario: "643.648"}
+  blended_sin_usd_per_t: {base: "570.00", scenario: "652.80"}
+  blended_rtm_usd_per_t: {base: "550.00", scenario: "629.92"}
+  consumption_t: {base: 400000, scenario: 442000}
+  november_purchases: {base: "224.800", scenario: "284.492"}
+  daily_payment: {base: "-7.493", scenario: "-9.483", first: 2026-12-01, last: 2026-12-30}
+  fuel_purchase_delta: "-59.692"
+  fuel_purchase_delta_parts: {price: "-32.659", uplift: "-27.033"}
+  fuel_mix: {blended_change_pct: "14.53", vlsfo_only_change_pct: "15.00", s0_base: "592.00", s0_scenario: "680.80"}
+  mfr_change_november: "6.173"
+  mfr_cash: {first: 2027-01-01, last: 2027-01-30, per_day: "0.206"}
+  # The spec writes -53.519 (= -59.692 + 6.173, a sum of parts rounded to 3 decimals); the rules give
+  # exactly -53,519,827.20 USD (P44, spec corrections).
+  net_bunker_delta_usd: "-53519827.20"
+  gross_adverse: {value: "59.692", date: 2026-12-30}
+  mfr_share_of_gross_pct: "10.3"

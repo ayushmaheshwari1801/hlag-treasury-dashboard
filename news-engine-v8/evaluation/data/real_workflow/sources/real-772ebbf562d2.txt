@@ -1,0 +1,5 @@
+This is an early opportunity for interested third parties to comment on the impact that the takeover could have on competition in the UK, in advance of the Competition and Markets Authority’s (CMA) formal investigation starting later this year.
+
+US-based chip designer and producer NVIDIA Corporation (NVIDIA) plans to purchase the Intellectual Property Group business of UK-based Arm Limited (Arm) in a deal worth $40 billion. Arm develops and licenses intellectual property (IP) and software tools for chip designs. The products and services supplied by the companies support a wide range of applications used by businesses and consumers across the UK, including desktop computers and mobile devices, game consoles and vehicle computer systems.
+
+The CMA will look at the deal’s possible effect on competition in the UK. The CMA is likely to consider whether, following the takeover, Arm has an incentive to withdraw, raise prices or reduce the quality of its IP licensing services to NVIDIA’s rivals.

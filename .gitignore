@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv-local/
+venv/
+.uv-cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+
+# Node / frontend
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# Secrets (keep the templates)
+.env
+.env.*
+!.env.example
+
+# Runtime databases and local data
+*.sqlite
+*.sqlite-*
+*.sqlite.lock
+*.db
+/data/
+outputs/
+/output/
+/inputs/
+.test-tmp/
+pipeline-check-*/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

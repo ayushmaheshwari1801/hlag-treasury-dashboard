@@ -1,0 +1,5 @@
+The federal bank regulatory agencies today announced an interim final rule to encourage lending to small businesses through the Small Business Administration's Paycheck Protection Program, or PPP. The PPP was established by the Coronavirus Aid, Relief, and Economic Security Act, or CARES Act, and provides loans to small businesses so that they can keep their workers on the payroll during the disruptions caused by the coronavirus.
+
+The interim final rule modifies the agencies' capital rules to neutralize the regulatory capital effects of participating in the Federal Reserve's PPP facility because there is no credit or market risk in association with PPP loans pledged to the facility. Consistent with the agencies' current capital rules and the CARES Act requirements, the interim final rule also clarifies that a zero percent risk weight applies to loans covered by the PPP for capital purposes.
+
+The rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register .

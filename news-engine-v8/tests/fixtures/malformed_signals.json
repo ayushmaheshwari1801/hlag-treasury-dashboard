@@ -1,0 +1,90 @@
+[
+  {
+    "signal": {
+      "indicator": "UK major ports total freight tonnage (Q2 2026 year-on-year change)",
+      "level": "directional",
+      "value": null,
+      "unit": null,
+      "change": {
+        "previous": 106.73684210526316,
+        "delta": -5.336842105263156,
+        "unit": "million tonnes"
+      },
+      "direction": "decrease",
+      "source_ids": [
+        "A508e177afb89249003721bf2"
+      ]
+    },
+    "excerpt": "total freight tonnage through UK major ports fell 5% year on year in Q2 2026 to 101.4 million tonnes",
+    "previous_excerpt": null,
+    "comparable": false
+  },
+  {
+    "signal": {
+      "indicator": "UK sanctions coverage of Russia's total oil production capacity",
+      "level": "numeric",
+      "value": null,
+      "unit": null,
+      "change": null,
+      "direction": "increase",
+      "source_ids": [
+        "Ae3abdb0db0640b1954ec5bda"
+      ]
+    },
+    "excerpt": "UK sanctions now cover over 90% of Russia's total oil production capacity",
+    "previous_excerpt": null,
+    "comparable": false
+  },
+  {
+    "signal": {
+      "indicator": "Port of Singapore berth waiting time range",
+      "level": "numeric",
+      "value": null,
+      "unit": "days",
+      "change": null,
+      "direction": null,
+      "source_ids": [
+        "Ae36fa2f42294c5e498aa9359"
+      ]
+    },
+    "excerpt": "Vessels can face waiting times ranging from three to five days before obtaining a berth",
+    "previous_excerpt": null,
+    "comparable": true
+  },
+  {
+    "signal": {
+      "indicator": "Average G7 Government Bond Yield Change (Feb to Sep 2026)",
+      "level": "numeric",
+      "value": null,
+      "unit": null,
+      "change": null,
+      "direction": "increase",
+      "source_ids": [
+        "Adcee70afea786e5e4a6ac4d5"
+      ]
+    },
+    "excerpt": "Average 10-year government bond yields across Group of Seven economies increased by more than one percentage point between February and September, reaching their highest level in nearly two decades, according to the fund.",
+    "previous_excerpt": null,
+    "comparable": false
+  },
+  {
+    "signal": {
+      "indicator": "Colombo congestion rating",
+      "level": "directional",
+      "value": null,
+      "unit": null,
+      "change": {
+        "previous": 20.6,
+        "delta": -20.6,
+        "unit": "hours"
+      },
+      "direction": "improving",
+      "source_ids": [
+        "A7f87e813cd528a80cc011b60"
+      ]
+    },
+    "excerpt": "Colombo eased to BUSY after its delay fell by 20.6 hours.",
+    "previous_excerpt": null,
+    "comparable": true
+  }
+]

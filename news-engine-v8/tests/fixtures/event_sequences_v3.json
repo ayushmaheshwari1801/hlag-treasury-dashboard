@@ -1,0 +1,179 @@
+{
+  "schema_version": 3,
+  "name": "events-occurrence-development-v3",
+  "provenance": "synthetic, same seven v2 source articles; revised occurrence/development annotation contract",
+  "annotation_policy": "An Event is one business occurrence across its lifetime. A Development is an update within it. Unconfirmed possible reopening attaches as pending_claim, not conflict or verified resolution. Event membership labels are unchanged from v2.",
+  "limitations": [
+    "Correlated synthetic sequences, not a human-annotated real-news benchmark.",
+    "E-only evaluation with frozen W2 facts, review and duplicate labels; no upstream W2 quality claim.",
+    "Live mode measures models on these sources; mock mode tests orchestration only."
+  ],
+  "sequences": [
+    {
+      "id": "ports-01",
+      "articles": [
+        {
+          "source": {
+            "title": "Delta announces October strike",
+            "body": "Port Delta announces a strike beginning October 20, 2026.",
+            "url": "https://example.org/event-0",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-19T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-19T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta announces a strike beginning October 20, 2026."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "X",
+            "lifecycle": "announced",
+            "decision": "create",
+            "kind": "new_development"
+          }
+        },
+        {
+          "source": {
+            "title": "Delta syndicated announcement",
+            "body": "Port Delta announces a strike beginning October 20, 2026.",
+            "url": "https://example.org/event-1",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-20T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-20T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta announces a strike beginning October 20, 2026."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": 0
+          },
+          "gold": {
+            "event": "X",
+            "lifecycle": "announced",
+            "decision": "duplicate",
+            "kind": "no_change"
+          }
+        },
+        {
+          "source": {
+            "title": "Delta strike extended",
+            "body": "Port Delta strike has been extended to 72 hours.",
+            "url": "https://example.org/event-2",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-21T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-21T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta strike has been extended to 72 hours."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "X",
+            "lifecycle": "ongoing",
+            "decision": "attach",
+            "kind": "new_development"
+          }
+        },
+        {
+          "source": {
+            "title": "Echo strike announced",
+            "body": "Port Echo announces a strike lasting 72 hours.",
+            "url": "https://example.org/event-3",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-22T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-22T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Echo announces a strike lasting 72 hours."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "Y",
+            "lifecycle": "announced",
+            "decision": "create",
+            "kind": "new_development"
+          }
+        },
+        {
+          "source": {
+            "title": "Delta reopening rumor",
+            "body": "Port Delta may reopen according to an unconfirmed report.",
+            "url": "https://example.org/event-4",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-23T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-23T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta may reopen according to an unconfirmed report."
+            ],
+            "review_status": "pending",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "X",
+            "lifecycle": "ongoing",
+            "decision": "attach",
+            "kind": "pending_claim"
+          }
+        },
+        {
+          "source": {
+            "title": "Delta operations resumed",
+            "body": "Port Delta strike ended and port operations resumed. This synthetic MPA fixture describes the restoration of port operations after the strike. This synthetic MPA fixture describes the restoration of port operations after the strike. This synthetic MPA fixture describes the restoration of port operations after the strike. This synthetic MPA fixture describes the restoration of port operations after the strike. ",
+            "url": "https://www.mpa.gov.sg/media-centre/details/demo-event-5",
+            "source": "Maritime and Port Authority of Singapore",
+            "published_at": "2026-10-24T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-24T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta strike ended and port operations resumed."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "X",
+            "lifecycle": "resolved",
+            "decision": "attach",
+            "kind": "resolution"
+          }
+        },
+        {
+          "source": {
+            "title": "Delta November strike",
+            "body": "Port Delta announces a separate strike beginning November 20, 2026.",
+            "url": "https://example.org/event-6",
+            "source": "Synthetic fixture",
+            "published_at": "2026-10-25T08:00:00+00:00"
+          },
+          "discovered_at": "2026-10-25T08:00:00+00:00",
+          "w2": {
+            "facts": [
+              "Port Delta announces a separate strike beginning November 20, 2026."
+            ],
+            "review_status": "confirmed",
+            "duplicate_index": null
+          },
+          "gold": {
+            "event": "Z",
+            "lifecycle": "announced",
+            "decision": "create",
+            "kind": "new_development"
+          }
+        }
+      ]
+    }
+  ]
+}

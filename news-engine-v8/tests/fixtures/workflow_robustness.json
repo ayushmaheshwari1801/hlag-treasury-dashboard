@@ -1,0 +1,547 @@
+{
+  "dataset": "workflow_robustness_v1",
+  "independent": false,
+  "provenance": "Hand-authored synthetic adversarial cases derived from PR #1 evidence-boundary reviews; not an independent model benchmark.",
+  "cases": [
+    {
+      "case_id": "negated_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration did not increase from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration did not increase from 24 to 72 hours.",
+      "previous_excerpt": "Port Delta strike duration did not increase from 24 to 72 hours.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "negated_no_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration did not increase from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration did not increase from 24 to 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "interval_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours.",
+      "previous_excerpt": "Port Delta strike duration ranges from 24 to 72 hours.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "interval_no_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "hypothetical_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration could increase from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration could increase from 24 to 72 hours.",
+      "previous_excerpt": "Port Delta strike duration could increase from 24 to 72 hours.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "hypothetical_no_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration could increase from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration could increase from 24 to 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "unrelated_sentence_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours. Shipping costs increased.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours. Shipping costs increased.",
+      "previous_excerpt": "Port Delta strike duration ranges from 24 to 72 hours. Shipping costs increased.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "unrelated_sentence_no_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours. Shipping costs increased.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours. Shipping costs increased.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "unrelated_clause_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours and shipping costs increased.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours and shipping costs increased.",
+      "previous_excerpt": "Port Delta strike duration ranges from 24 to 72 hours and shipping costs increased.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "unrelated_clause_no_change",
+      "group": "unsupported_observation",
+      "body": "Port Delta strike duration ranges from 24 to 72 hours and shipping costs increased.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration ranges from 24 to 72 hours and shipping costs increased.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "conditional_change",
+      "group": "unsupported_observation",
+      "body": "If Port Delta strike duration increased from 24 to 72 hours, costs would rise.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "If Port Delta strike duration increased from 24 to 72 hours, costs would rise.",
+      "previous_excerpt": "If Port Delta strike duration increased from 24 to 72 hours, costs would rise.",
+      "comparable": true,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "conditional_no_change",
+      "group": "unsupported_observation",
+      "body": "If Port Delta strike duration increased from 24 to 72 hours, costs would rise.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "If Port Delta strike duration increased from 24 to 72 hours, costs would rise.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "affirmative_change",
+      "group": "positive_control",
+      "body": "Port Delta strike duration increased from 24 to 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 999,
+          "unit": "hours"
+        },
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration increased from 24 to 72 hours.",
+      "previous_excerpt": "Port Delta strike duration increased from 24 to 72 hours.",
+      "comparable": true,
+      "expected": {
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": {
+          "previous": 24,
+          "delta": 48,
+          "unit": "hours"
+        },
+        "direction": "increase"
+      }
+    },
+    {
+      "case_id": "single_observation",
+      "group": "positive_control",
+      "body": "Port Delta strike duration is 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration is 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "numeric",
+        "value": 72,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      }
+    },
+    {
+      "case_id": "invented_scalar",
+      "group": "unsupported_measurement",
+      "body": "Port Delta strike duration is 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 999,
+        "unit": "hours",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration is 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "invented_unit",
+      "group": "unsupported_measurement",
+      "body": "Port Delta strike duration is 72 hours.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 72,
+        "unit": "days",
+        "change": null,
+        "direction": null
+      },
+      "excerpt": "Port Delta strike duration is 72 hours.",
+      "previous_excerpt": null,
+      "comparable": false,
+      "expected": {
+        "level": "factual_only",
+        "value": null,
+        "unit": null,
+        "change": null,
+        "direction": null,
+        "indicator_is_quote": true,
+        "warning": true
+      }
+    },
+    {
+      "case_id": "metric",
+      "group": "comparison_dimensions",
+      "body": "US policy rate is 4.5 percent. US inflation is 3 percent.",
+      "model_signal": {
+        "indicator": "policy rate",
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": {
+          "previous": 3,
+          "delta": 999,
+          "unit": "percentage points"
+        },
+        "direction": null
+      },
+      "excerpt": "US policy rate is 4.5 percent.",
+      "previous_excerpt": "US inflation is 3 percent.",
+      "comparable": true,
+      "expected": {
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": null,
+        "direction": null
+      }
+    },
+    {
+      "case_id": "geography",
+      "group": "comparison_dimensions",
+      "body": "German inflation is 4.5 percent. French inflation is 3 percent.",
+      "model_signal": {
+        "indicator": "policy rate",
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": {
+          "previous": 3,
+          "delta": 999,
+          "unit": "percentage points"
+        },
+        "direction": null
+      },
+      "excerpt": "German inflation is 4.5 percent.",
+      "previous_excerpt": "French inflation is 3 percent.",
+      "comparable": true,
+      "expected": {
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": null,
+        "direction": null
+      }
+    },
+    {
+      "case_id": "basis",
+      "group": "comparison_dimensions",
+      "body": "US annual inflation is 4.5 percent. US monthly inflation is 3 percent.",
+      "model_signal": {
+        "indicator": "policy rate",
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": {
+          "previous": 3,
+          "delta": 999,
+          "unit": "percentage points"
+        },
+        "direction": null
+      },
+      "excerpt": "US annual inflation is 4.5 percent.",
+      "previous_excerpt": "US monthly inflation is 3 percent.",
+      "comparable": true,
+      "expected": {
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": null,
+        "direction": null
+      }
+    },
+    {
+      "case_id": "percent_change",
+      "group": "positive_control",
+      "body": "US policy rate increased from 3 percent to 4.5 percent.",
+      "model_signal": {
+        "indicator": "strike duration",
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": {
+          "previous": 3,
+          "delta": 999,
+          "unit": "percentage points"
+        },
+        "direction": null
+      },
+      "excerpt": "US policy rate increased from 3 percent to 4.5 percent.",
+      "previous_excerpt": "US policy rate increased from 3 percent to 4.5 percent.",
+      "comparable": true,
+      "expected": {
+        "level": "numeric",
+        "value": 4.5,
+        "unit": "percent",
+        "change": {
+          "previous": 3,
+          "delta": 1.5,
+          "unit": "percentage points"
+        },
+        "direction": "increase"
+      }
+    }
+  ]
+}

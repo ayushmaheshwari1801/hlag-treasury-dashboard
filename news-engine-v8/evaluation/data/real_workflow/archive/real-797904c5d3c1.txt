@@ -1,0 +1,25 @@
+The Federal Trade Commission is seeking to block biopharmaceutical giant Amgen Inc. from acquiring Horizon Therapeutics plc, saying the deal would allow Amgen to leverage its portfolio of blockbuster drugs to entrench the monopoly positions of Horizon medications used to treat two serious conditions, thyroid eye disease and chronic refractory gout.
+
+The FTC filed a lawsuit in federal court to block the transaction, saying it would enable Amgen to use rebates on its existing blockbuster drugs to pressure insurance companies and pharmacy benefit managers (PBMs) into favoring Horizon’s two monopoly products – Tepezza, used to treat thyroid eye disease, and Krystexxa, used to treat chronic refractory gout. Neither of these treatments have any competition in the pharmaceutical marketplace.
+
+“Rampant consolidation in the pharmaceutical industry has given powerful companies a pass to exorbitantly hike prescription drug prices, deny patients access to more affordable generics, and hamstring innovation in life-saving markets,” said FTC Bureau of Competition Director Holly Vedova. “Today’s action --- the FTC’s first challenge to a pharmaceutical merger in recent memory --- sends a clear signal to the market: The FTC won't hesitate to challenge mergers that enable pharmaceutical conglomerates to entrench their monopolies at the expense of consumers and fair competition.”
+
+The proposed acquisition is the largest pharmaceutical transaction announced in 2022. Given how central protecting and growing Tepezza and Krystexxa monopoly revenues are to the deal valuation Amgen calculated for Horizon, Amgen has strong incentives post-acquisition to raise Tepezza and Krystexxa rivals’ barriers to entry or dissuade them from competing as aggressively if and when they gain FDA approval, the agency argues.
+
+This action dovetails with other ongoing work at the Commission in response to widespread complaints about rebates and fees paid by drug manufacturers to PBMs and other intermediaries to favor high-cost drugs at the expense of lower cost drugs. As the Commission explained in a policy statement issued in June 2022, these financial relationships create numerous conflicts of interest and can shift costs and misalign incentives in a way that stifles competition from lower-cost or higher-quality drugs, thereby harming patients, doctors, health plans, and competition. The FTC’s market inquiry examining the business practices of PBMs is also ongoing.
+
+California-based Amgen is one of the world’s largest biopharmaceutical companies, with global sales of about $24.8 billion and a product portfolio of 27 approved drugs, including blockbuster drugs Enbrel (for rheumatoid arthritis), Otezla (psoriasis), and Prolia (osteoporosis). Amgen has for years built its pharmaceutical portfolio through acquisitions, thereby increasing its leverage with the insurers and PBMs that negotiate reimbursement for its products.
+
+Horizon, based in Dublin, Ireland and Deerfield, Illinois, is a global biotechnology company with about $3.6 billion in sales that focuses on medicines treating rare, autoimmune, and severe inflammatory diseases. Horizon markets and distributes 11 drug products in the United States, including Tepezza and Krystexxa.
+
+In securities filings, Horizon has boasted that its Tepezza “has no direct approved competition,” and that Krystexxa “faces limited direct competition.” Because of this, Horizon charges extremely high prices for those medications – approximately $350,000 for a six-month course of treatment of Tepezza and approximately $650,000 for an annual supply of Krystexxa.
+
+Amgen has a history of leveraging its broad portfolio of blockbuster drugs to gain advantages over potential rivals. In particular, the company has engaged in cross-market bundling, which involves conditioning rebates (or offering incremental rebates) on products such as Enbrel in exchange for giving Amgen drugs preferred placement on the insurers’ and PBMs’ lists of covered medications in different product markets.
+
+The value of the rebates that Amgen can offer on its high-volume drugs as part of its cross-market bundles may make it difficult, if not impossible, for smaller rivals who are developing drugs to compete against Tepezza and Krystexxa to match the level of rebates that Amgen would be able to offer.
+
+By substituting Amgen, with its portfolio of blockbuster drugs and significant contracting leverage, for Horizon, the FTC said the deal could give the merged firm the ability and incentive to entrench Tepezza’s and Krystexxa’s monopolies through its multi-product contracting strategies. This could effectively deprive patients, doctors, and health plans from the benefits of competition and access to critical new options for treatment of thyroid eye disease and chronic refractory gout.
+
+The Commission vote to authorize staff to seek a temporary restraining order and preliminary injunction was 3-0.
+
+The Mergers I Division of the FTC’s Bureau of Competition was responsible for this matter.

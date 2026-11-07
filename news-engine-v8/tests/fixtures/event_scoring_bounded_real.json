@@ -1,0 +1,849 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "kind": "recorded-real-scoring-context",
+    "workflow_run": 41169382589,
+    "commit": "74f1c0527c6640f06b33f8e6241f9d4ef6bc7fd7",
+    "source_dataset": "event_sequences_real_v1.json",
+    "source_sequence": "liquidity-us",
+    "note": "Exact public source text, accepted evidence ranges and Event snapshots recorded during the online run. Ledger row IDs are reconstructed solely for offline context selection; no quality gold is changed or asserted."
+  },
+  "context_max_bytes": 8000,
+  "articles": [
+    {
+      "article_id": "A22fb6c7263fbbee58a6af6db",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board announces it is expanding the scope and eligibility for the Main Street Lending Program",
+      "body": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200430a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-04-30T00:00:00+00:00",
+      "discovered_at": "2020-04-30T23:00:10+00:00"
+    },
+    {
+      "article_id": "Afef8f177d78872caa885ace6",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board expands its Main Street Lending Program to allow more small and medium-sized businesses to be able to receive support",
+      "body": "The Federal Reserve Board on Monday expanded its Main Street Lending Program to allow more small and medium-sized businesses to be able to receive support. The Board lowered the minimum loan amount, raised the maximum loan limit, adjusted the principal repayment schedule to begin after two years, and extended the term to five years, providing borrowers with greater flexibility in repaying the loans. The Board expects the Main Street program to be open for lender registration soon and to be actively buying loans shortly afterwards.\n\n\"Supporting small and mid-sized businesses so they are ready to reopen and rehire workers will help foster a broad-based economic recovery,\" Federal Reserve Chair Jerome H. Powell said. \"I am confident the changes we are making will improve the ability of the Main Street Lending Program to support employment during this difficult period.\"",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200608a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-06-08T00:00:00+00:00",
+      "discovered_at": "2020-06-08T23:00:14+00:00"
+    },
+    {
+      "article_id": "A656c6a87d92f6048e52c694b",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Statement from Secretary Steven T. Mnuchin on the Expansion of the Main Street Lending Program",
+      "body": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program announced by the Federal Reserve Board: “The expansions announced yesterday to the Main Street Lending Program are the result of an extensive comment period, and are designed to better meet the needs of small and medium-sized businesses. This should help support a broad-based economic recovery as the country reopens. Many great American companies that were in sound financial condition have been adversely impacted by the pandemic. The Main Street Lending Program was established to help ensure that these businesses have access to the liquidity they need to maintain, restart, and rehire as the economy safely reopens. The Federal Reserve Board lowered the minimum, increased the maximum loan size thresholds, and extended the repayment period by delaying principal payments for two years. They also extended the term to five years in order to provide greater flexibility for borrowers. Other changes include lowering the portion of the loans retained by the originating bank to five percent for all eligible loans submitted to the program.”",
+      "url": "https://home.treasury.gov/news/press-releases/sm1028",
+      "source": "U.S. Department of the Treasury",
+      "published_at": "2020-06-09T00:00:00+00:00",
+      "discovered_at": "2020-06-09T23:00:15+00:00"
+    },
+    {
+      "article_id": "Adace21e331e909169c6ffdd8",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board announces it will be seeking public feedback on proposal to expand its Main Street Lending Program to provide access to credit for nonprofit organizations",
+      "body": "The Federal Reserve Board on Monday announced it will be seeking public feedback on a proposal to expand its Main Street Lending Program to provide access to credit for nonprofit organizations. As with the existing Main Street Lending Program, which targets small and medium-sized businesses, the proposed expansion would offer loans to small and medium-sized nonprofits that were in sound financial condition before the coronavirus pandemic and could benefit from additional liquidity to manage through this challenging period.\n\n\"Nonprofit organizations are critical parts of our economy, employing millions of people, providing essential services to communities, and supporting innovation and the development of a highly skilled workforce,\" Federal Reserve Chair Jerome H. Powell said. \"Nonprofits provide vital services across the country and we are working to help them through this difficult time.\"",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200615b.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-06-15T00:00:00+00:00",
+      "discovered_at": "2020-06-15T23:00:17+00:00"
+    },
+    {
+      "article_id": "Aada4287df3d2c7086f7d01c6",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Statement from Secretary Steven T. Mnuchin on the Main Street Lending Program",
+      "body": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the opening of lender registration for the Main Street Lending Program:\n\n“This morning the Federal Reserve Bank of Boston announced that the Main Street Lending Program Lender Portal is now open. The program, which will operate through three facilities – the Main Street New Loan Facility, the Main Street Priority Loan Facility, and the Main Street Expanded Loan Facility – is designed to help ensure that small and medium-sized businesses have access to the credit they need to get through this challenging period. As announced last week, the portion of the loans retained by the originating bank has been lowered to five percent for all eligible loans submitted to the program, creating additional balance sheet capacity for participating lenders. I encourage all eligible lenders to register in order to provide loans to eligible borrowers as soon as possible.”",
+      "url": "https://home.treasury.gov/news/press-releases/sm1032",
+      "source": "U.S. Department of the Treasury",
+      "published_at": "2020-06-15T00:00:00+00:00",
+      "discovered_at": "2020-06-15T23:00:18+00:00"
+    },
+    {
+      "article_id": "Aeab28dd196c4b1f1727213f2",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Statement from Secretary Steven T. Mnuchin on Main Street Programs to Support Lending to Nonprofit Organizations",
+      "body": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the announcement that the Federal Reserve Board will seek public feedback on a proposal to expand the Main Street Lending Program to provide access to credit for nonprofit organizations: “Nonprofit organizations play a vital role in our economy and our society, and often are on the frontlines of our nation’s response to COVID-19. Many now face serious financial strains resulting from the disruptions to economic activity caused by the pandemic. With the support of the Treasury Department, the Board of Governors of the Federal Reserve System is seeking public feedback on a proposed expansion of the Main Street Lending Program to facilitate lending to U.S. nonprofit organizations through the creation of two new loan options: the Nonprofit New Loan Facility, and the Nonprofit Expanded Loan Facility. Like the existing Main Street facilities open to small and medium-sized businesses, the proposed Main Street nonprofit facilities would be supported by the Department’s $75 billion investment of loss-protecting capital under authority provided by the CARES Act. Terms for loans in the proposed nonprofit lending facilities are the same as for Main Street loans to for-profit businesses, but borrower eligibility requirements would be modified to correspond with the operational and accounting practices of the nonprofit sector.”",
+      "url": "https://home.treasury.gov/news/press-releases/sm1033",
+      "source": "U.S. Department of the Treasury",
+      "published_at": "2020-06-16T00:00:00+00:00",
+      "discovered_at": "2020-06-16T23:00:19+00:00"
+    },
+    {
+      "article_id": "A07807ef3d13557ce6836c7a3",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Statement from Secretary Steven T. Mnuchin on the Main Street Lending Program",
+      "body": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the Main Street Lending Program:\n\n“Today the Federal Reserve Bank of Boston announced that the Main Street Lending Program is now fully operational and ready to purchase qualifying loans. The Main Street program was established to provide a safety net for small and medium-sized businesses that were in sound financial condition before the pandemic and require bridge financing to get through this challenging period. We have seen a significant improvement in liquidity since the program was first announced and I am pleased that many banks, recognizing the challenges that this shock has posed for otherwise healthy businesses, have already been lending to firms in this sector. Small and medium-sized businesses play a vital role in our economy and the Main Street program will help ensure they have access to financing to maintain their operations as the economy safely reopens. I encourage all eligible lenders to participate and to begin submitting qualifying loans.”",
+      "url": "https://home.treasury.gov/news/press-releases/sm1053",
+      "source": "U.S. Department of the Treasury",
+      "published_at": "2020-07-06T00:00:00+00:00",
+      "discovered_at": "2020-07-06T23:00:21+00:00"
+    },
+    {
+      "article_id": "A38750fbc6fc71b1b8f12fbb1",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board modifies Main Street Lending Program to provide greater access to credit for nonprofit organizations such as educational institutions, hospitals, and social service organizations",
+      "body": "The Federal Reserve Board on Friday modified the Main Street Lending Program to provide greater access to credit for nonprofit organizations such as educational institutions, hospitals, and social service organizations. As detailed in term sheets released today, the Board approved two new loan options to provide support to a broad set of nonprofit organizations that were in sound financial condition prior to the pandemic.\n\n\"Nonprofits provide vital services across the country and employ millions of Americans,\" Federal Reserve Chair Jerome H. Powell said. \"We have listened carefully and adapted our approach so that we can best support them in carrying out their vital mission during this extraordinary time.\"",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200717a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-07-17T00:00:00+00:00",
+      "discovered_at": "2020-07-17T23:00:23+00:00"
+    },
+    {
+      "article_id": "Abcba6de35cd42bb30fb67137",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Statement from Secretary Steven T. Mnuchin on the Expansion of the Main Street Lending Program to Support Lending to Nonprofit Organizations",
+      "body": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program to provide greater access to credit for nonprofit organizations: “I have sent letters to Federal Reserve Board Chairman Jerome Powell approving the expansion of the Main Street Lending Program to include the Nonprofit Organization New Loan Facility and the Nonprofit Organization Expanded Loan Facility. As detailed in the term sheets released today by the Board of Governors of the Federal Reserve System, borrower eligibility requirements for the new facilities differ from those of Main Street business loans. However, loan terms and our broader objectives are consistent across all Main Street Lending Facilities. Main Street is designed to provide a safety net for small and medium-sized businesses and nonprofit organizations that were in sound financial condition before the pandemic and could benefit from additional liquidity to manage through this challenging period. Nonprofit organizations, from colleges and universities to healthcare providers, community groups and veterans’ organizations, play a vital role in our society and employ millions of hard working Americans. We are very pleased that the program now includes options to support lending to eligible nonprofits and can help these vital organizations continue their important work.”",
+      "url": "https://home.treasury.gov/news/press-releases/sm1064",
+      "source": "U.S. Department of the Treasury",
+      "published_at": "2020-07-17T00:00:00+00:00",
+      "discovered_at": "2020-07-17T23:00:24+00:00"
+    },
+    {
+      "article_id": "A4a1d8096e14750dbcb41f6cb",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board updates frequently asked questions to clarify the Board and Department of Treasury’s expectations regarding lender underwriting for the Main Street Lending Program",
+      "body": "The Federal Reserve Board on Friday updated its frequently asked questions (FAQs) to clarify the Board and Department of Treasury's expectations regarding lender underwriting for the Main Street Lending Program. The revised FAQs emphasize that lender underwriting should look back to the borrower's pre-pandemic condition and forward to their post-pandemic prospects. The FAQs also clarify supervisory expectations for lenders originating Main Street loans.\n\nThe program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. The program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits to allow borrower's time to recover from the pandemic",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200918a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-09-18T00:00:00+00:00",
+      "discovered_at": "2020-09-18T23:00:26+00:00"
+    },
+    {
+      "article_id": "Aaccbba5ee29cab1640132c87",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve Board adjusts terms of Main Street Lending Program to better target support to smaller businesses that employ millions of workers and are facing continued revenue shortfalls due to the pandemic",
+      "body": "The Federal Reserve Board on Friday adjusted the terms of the Main Street Lending Program in two important ways to better target support to smaller businesses that employ millions of workers and are facing continued revenue shortfalls due to the pandemic. In particular, the minimum loan size for three Main Street facilities available to for-profit and non-profit borrowers has been reduced from $250,000 to $100,000 and the fees have been adjusted to encourage the provision of these smaller loans. The Board and Department of the Treasury also issued a new frequently asked question clarifying that Paycheck Protection Program loans of up to $2 million may be excluded for purposes of determining the maximum loan size under the Main Street Lending Program, if certain requirements are met, which should also help smaller businesses access Main Street loans.\n\nThe Main Street Lending Program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. To allow borrowers time to recover from the pandemic, the program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits. Loan documents reflecting the new terms are expected to be available to registered lenders within the next week.",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20201030a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-10-30T00:00:00+00:00",
+      "discovered_at": "2020-10-30T23:00:27+00:00"
+    },
+    {
+      "article_id": "A206bceb6440240e8d322eefa",
+      "revision": 1,
+      "category": "Industry",
+      "title": "Federal Reserve extends termination date of Main Street Lending Program facilities to January 8, 2021 to allow more time to process and fund loans that were submitted to Main Street lender portal on or before December 14, 2020",
+      "body": "In order to allow more time to process and fund loans that were submitted to the Main Street lender portal on or before December 14, 2020, the Federal Reserve Board on Tuesday extended the termination date of the Main Street Lending Program facilities to January 8, 2021.\n\nAs described in new frequently asked questions and program term sheets, the extension is consistent with section 1005 of the Consolidated Appropriations Act and was also approved by the Secretary of the Treasury.",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20201229a.htm",
+      "source": "Federal Reserve",
+      "published_at": "2020-12-29T00:00:00+00:00",
+      "discovered_at": "2020-12-29T23:00:28+00:00"
+    }
+  ],
+  "ledger": [
+    {
+      "article_id": "A22fb6c7263fbbee58a6af6db",
+      "known_at": "2020-04-30T23:00:10+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 1089,
+        "source_range": {
+          "end": 9,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "create",
+        "distinction": "different_scope",
+        "event_id": null,
+        "evidence_range": {
+          "end": 9,
+          "start": 1
+        },
+        "identity_relation": "distinct_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The mention describes the Main Street Lending Program (MSLP), which is a distinct lending program from all retrieved events (MLF, PPPLF, CPFF, insider lending rule, PDCF). Although keywords like 'lending' and 'program' overlap, the underlying business scope is different: MSLP is a Federal Reserve facility for small and medium-sized businesses, while the candidates address municipalities, paycheck protection liquidity, commercial paper, insider lending rules, or primary dealer credit. No retrieved event matches the MSLP's subject, identifier, or scope.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 1,
+        "known_at": "2020-04-30T23:00:10+00:00"
+      }
+    },
+    {
+      "article_id": "Afef8f177d78872caa885ace6",
+      "known_at": "2020-06-08T23:00:14+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Monday expanded its Main Street Lending Program to allow more small and medium-sized businesses to be able to receive support. The Board lowered the minimum loan amount, raised the maximum loan limit, adjusted the principal repayment schedule to begin after two years, and extended the term to five years, providing borrowers with greater flexibility in repaying the loans. The Board expects the Main Street program to be open for lender registration soon and to be actively buying loans shortly afterwards.\n\n",
+        "identifier": null,
+        "lifecycle": "announced",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 538,
+        "source_range": {
+          "end": 3,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The same Main Street Lending Program receives a further expansion of terms and eligibility, advancing the same program. Changes to loan amounts, repayment terms, and eligibility are developments within the previously announced and ongoing program, not a new or separate occurrence. The identity is clear from the matching scope, subject, and action in the retrieved event.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 2,
+        "known_at": "2020-06-08T23:00:14+00:00"
+      }
+    },
+    {
+      "article_id": "A656c6a87d92f6048e52c694b",
+      "known_at": "2020-06-09T23:00:15+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program announced by the Federal Reserve Board: “The expansions announced yesterday to the Main Street Lending Program are the result of an extensive comment period, and are designed to better meet the needs of small and medium-sized businesses. This should help support a broad-based economic recovery as the country reopens. Many great American companies that were in sound financial condition have been adversely impacted by the pandemic. The Main Street Lending Program was established to help ensure that these businesses have access to the liquidity they need to maintain, restart, and rehire as the economy safely reopens. The Federal Reserve Board lowered the minimum, increased the maximum loan size thresholds, and extended the repayment period by delaying principal payments for two years. They also extended the term to five years in order to provide greater flexibility for borrowers. Other changes include lowering the portion of the loans retained by the originating bank to five percent for all eligible loans submitted to the program.”",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 1182,
+        "source_range": {
+          "end": 9,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The mention describes a confirmed, authoritative expansion of the Main Street Lending Program (lowered minimum loan size, increased maximum, extended repayment period, extended term, reduced lender retention). These are material changes to an existing tracked occurrence with the same scope and subject, not a separate program. The Treasury Secretary's statement is primary-source confirmation of new facts, making this a new development, nor merely corroboration or no_change.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 3,
+        "known_at": "2020-06-09T23:00:15+00:00"
+      }
+    },
+    {
+      "article_id": "Adace21e331e909169c6ffdd8",
+      "known_at": "2020-06-15T23:00:17+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Monday announced it will be seeking public feedback on a proposal to expand its Main Street Lending Program to provide access to credit for nonprofit organizations. As with the existing Main Street Lending Program, which targets small and medium-sized businesses, the proposed expansion would offer loans to small and medium-sized nonprofits that were in sound financial condition before the coronavirus pandemic and could benefit from additional liquidity to manage through this challenging period.\n\n",
+        "identifier": null,
+        "lifecycle": "announced",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program expansion for nonprofits",
+        "source_end": 530,
+        "source_range": {
+          "end": 2,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "Expanding the existing Main Street Lending Program to include nonprofits is a change in eligibility that belongs to the same program occurrence already tracked as E588bdfe5a7104f2896fd50abc76d85a5.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 4,
+        "known_at": "2020-06-15T23:00:17+00:00"
+      }
+    },
+    {
+      "article_id": "Aada4287df3d2c7086f7d01c6",
+      "known_at": "2020-06-15T23:00:18+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "“This morning the Federal Reserve Bank of Boston announced that the Main Street Lending Program Lender Portal is now open. The program, which will operate through three facilities – the Main Street New Loan Facility, the Main Street Priority Loan Facility, and the Main Street Expanded Loan Facility – is designed to help ensure that small and medium-sized businesses have access to the credit they need to get through this challenging period. ",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 606,
+        "source_range": {
+          "end": 5,
+          "start": 4
+        },
+        "source_start": 162,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The source reports the lender portal opening for the same Main Street Lending Program; this advances the facility from announced/under development to operational, a new development in the same business occurrence. Scope/subject match exactly; no evidence of a distinct program or separate occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 5,
+        "known_at": "2020-06-15T23:00:18+00:00"
+      }
+    },
+    {
+      "article_id": "Aeab28dd196c4b1f1727213f2",
+      "known_at": "2020-06-16T23:00:19+00:00",
+      "candidate": {
+        "action": "lending program expansion",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the announcement that the Federal Reserve Board will seek public feedback on a proposal to expand the Main Street Lending Program to provide access to credit for nonprofit organizations: “Nonprofit organizations play a vital role in our economy and our society, and often are on the frontlines of our nation’s response to COVID-19. Many now face serious financial strains resulting from the disruptions to economic activity caused by the pandemic. With the support of the Treasury Department, the Board of Governors of the Federal Reserve System is seeking public feedback on a proposed expansion of the Main Street Lending Program to facilitate lending to U.S. nonprofit organizations through the creation of two new loan options: the Nonprofit New Loan Facility, and the Nonprofit Expanded Loan Facility. Like the existing Main Street facilities open to small and medium-sized businesses, the proposed Main Street nonprofit facilities would be supported by the Department’s $75 billion investment of loss-protecting capital under authority provided by the CARES Act. Terms for loans in the proposed nonprofit lending facilities are the same as for Main Street loans to for-profit businesses, but borrower eligibility requirements would be modified to correspond with the operational and accounting practices of the nonprofit sector.”",
+        "identifier": "Nonprofit New Loan Facility, Nonprofit Expanded Loan Facility",
+        "lifecycle": "announced",
+        "location": "United States",
+        "open_questions": [
+          "Will the Federal Reserve Board finalize the proposed expansion?",
+          "What specific borrower eligibility modifications will be adopted for nonprofit organizations?",
+          "When will the new nonprofit loan options become operational?"
+        ],
+        "scope": "Main Street Lending Program expansion for nonprofit organizations (Nonprofit New Loan Facility and Nonprofit Expanded Loan Facility)",
+        "source_end": 1424,
+        "source_range": {
+          "end": 8,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The mentioned expansion to nonprofit organizations adds new eligibility and loan options to the same Main Street Lending Program already tracked as E588bdfe5a7104f2896fd50abc76d85a5. The underlying business occurrence—the Main Street Lending Program—remains unchanged; only its scope and borrower eligibility are modified. This is a development on the existing event, not a separate occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 6,
+        "known_at": "2020-06-16T23:00:19+00:00"
+      }
+    },
+    {
+      "article_id": "A07807ef3d13557ce6836c7a3",
+      "known_at": "2020-07-06T23:00:21+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": "2020-07-06T00:00:00Z",
+        "event_at": null,
+        "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the Main Street Lending Program:\n\n“Today the Federal Reserve Bank of Boston announced that the Main Street Lending Program is now fully operational and ready to purchase qualifying loans. The Main Street program was established to provide a safety net for small and medium-sized businesses that were in sound financial condition before the pandemic and require bridge financing to get through this challenging period. We have seen a significant improvement in liquidity since the program was first announced and I am pleased that many banks, recognizing the challenges that this shock has posed for otherwise healthy businesses, have already been lending to firms in this sector. Small and medium-sized businesses play a vital role in our economy and the Main Street program will help ensure they have access to financing to maintain their operations as the economy safely reopens. I encourage all eligible lenders to participate and to begin submitting qualifying loans.”",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 1061,
+        "source_range": {
+          "end": 8,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The Main Street Lending Program is now fully operational, representing a new development (announced to ongoing) within the same program occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 7,
+        "known_at": "2020-07-06T23:00:21+00:00"
+      }
+    },
+    {
+      "article_id": "A38750fbc6fc71b1b8f12fbb1",
+      "known_at": "2020-07-17T23:00:23+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": "2020-07-17T00:00:00Z",
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Friday modified the Main Street Lending Program to provide greater access to credit for nonprofit organizations such as educational institutions, hospitals, and social service organizations. As detailed in term sheets released today, the Board approved two new loan options to provide support to a broad set of nonprofit organizations that were in sound financial condition prior to the pandemic.\n\n\"Nonprofits provide vital services across the country and employ millions of Americans,\" Federal Reserve Chair Jerome H. Powell said. \"We have listened carefully and adapted our approach so that we can best support them in carrying out their vital mission during this extraordinary time.\"",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 715,
+        "source_range": {
+          "end": 5,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The source describes adding nonprofit eligibility and two new loan options to the same Main Street Lending Program, which is already tracked as E588bdfe5a7104f2896fd50abc76d85a5. This is a change in terms and eligibility (new loan options, expanded borrower types), advancing the same program occurrence, not a distinct scope or separate program.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 8,
+        "known_at": "2020-07-17T23:00:23+00:00"
+      }
+    },
+    {
+      "article_id": "Abcba6de35cd42bb30fb67137",
+      "known_at": "2020-07-17T23:00:24+00:00",
+      "candidate": {
+        "action": "lending program expansion",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program to provide greater access to credit for nonprofit organizations: “I have sent letters to Federal Reserve Board Chairman Jerome Powell approving the expansion of the Main Street Lending Program to include the Nonprofit Organization New Loan Facility and the Nonprofit Organization Expanded Loan Facility. As detailed in the term sheets released today by the Board of Governors of the Federal Reserve System, borrower eligibility requirements for the new facilities differ from those of Main Street business loans. However, loan terms and our broader objectives are consistent across all Main Street Lending Facilities. Main Street is designed to provide a safety net for small and medium-sized businesses and nonprofit organizations that were in sound financial condition before the pandemic and could benefit from additional liquidity to manage through this challenging period. Nonprofit organizations, from colleges and universities to healthcare providers, community groups and veterans’ organizations, play a vital role in our society and employ millions of hard working Americans. We are very pleased that the program now includes options to support lending to eligible nonprofits and can help these vital organizations continue their important work.”",
+        "identifier": null,
+        "lifecycle": "announced",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program expansion to include Nonprofit Organization New Loan Facility and Nonprofit Organization Expanded Loan Facility",
+        "source_end": 1393,
+        "source_range": {
+          "end": 8,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The announcement adds new nonprofit loan options (Nonprofit Organization New Loan Facility and Nonprofit Organization Expanded Loan Facility) to the same Main Street Lending Program, expanding eligibility rather than creating a separate program. The scope, subject, and objectives remain consistent with the existing occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 9,
+        "known_at": "2020-07-17T23:00:24+00:00"
+      }
+    },
+    {
+      "article_id": "A4a1d8096e14750dbcb41f6cb",
+      "known_at": "2020-09-18T23:00:26+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Friday updated its frequently asked questions (FAQs) to clarify the Board and Department of Treasury's expectations regarding lender underwriting for the Main Street Lending Program. The revised FAQs emphasize that lender underwriting should look back to the borrower's pre-pandemic condition and forward to their post-pandemic prospects. The FAQs also clarify supervisory expectations for lenders originating Main Street loans.\n\nThe program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. The program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits to allow borrower's time to recover from the pandemic",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 869,
+        "source_range": {
+          "end": 5,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The mention updates FAQs and clarifies underwriting expectations for the same Main Street Lending Program, a program-level update that does not change the scope or introduce a separate occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 10,
+        "known_at": "2020-09-18T23:00:26+00:00"
+      }
+    },
+    {
+      "article_id": "Aaccbba5ee29cab1640132c87",
+      "known_at": "2020-10-30T23:00:27+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": null,
+        "event_at": null,
+        "excerpt": "The Federal Reserve Board on Friday adjusted the terms of the Main Street Lending Program in two important ways to better target support to smaller businesses that employ millions of workers and are facing continued revenue shortfalls due to the pandemic. In particular, the minimum loan size for three Main Street facilities available to for-profit and non-profit borrowers has been reduced from $250,000 to $100,000 and the fees have been adjusted to encourage the provision of these smaller loans. The Board and Department of the Treasury also issued a new frequently asked question clarifying that Paycheck Protection Program loans of up to $2 million may be excluded for purposes of determining the maximum loan size under the Main Street Lending Program, if certain requirements are met, which should also help smaller businesses access Main Street loans.\n\nThe Main Street Lending Program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. To allow borrowers time to recover from the pandemic, the program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits. Loan documents reflecting the new terms are expected to be available to registered lenders within the next week.",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program term adjustment",
+        "source_end": 1407,
+        "source_range": {
+          "end": 6,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The mention describes term adjustments (minimum loan size reduction, fee adjustments, and a clarification about PPP loan exclusion) for the Main Street Lending Program. This is the same program as the existing event with scope 'Main Street Lending Program', same subject and scope. The changes advance the program's lifecycle—minimum loan size reduction from $250,000 to $100,000 and fee adjustments alter the terms, making it a new development rather than mere repetition or corroboration. The source is a primary, confirmed authority (Federal Reserve).",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 11,
+        "known_at": "2020-10-30T23:00:27+00:00"
+      }
+    },
+    {
+      "article_id": "A206bceb6440240e8d322eefa",
+      "known_at": "2020-12-29T23:00:28+00:00",
+      "candidate": {
+        "action": "lending program",
+        "development_at": "2020-12-29T00:00:00Z",
+        "event_at": null,
+        "excerpt": "In order to allow more time to process and fund loans that were submitted to the Main Street lender portal on or before December 14, 2020, the Federal Reserve Board on Tuesday extended the termination date of the Main Street Lending Program facilities to January 8, 2021.\n\nAs described in new frequently asked questions and program term sheets, the extension is consistent with section 1005 of the Consolidated Appropriations Act and was also approved by the Secretary of the Treasury.",
+        "identifier": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "open_questions": [],
+        "scope": "Main Street Lending Program facilities",
+        "source_end": 485,
+        "source_range": {
+          "end": 2,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "verification": "confirmed"
+      },
+      "decision": {
+        "decision": "attach",
+        "distinction": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence_range": null,
+        "identity_relation": "same_occurrence",
+        "kind": "new_development",
+        "mention_index": 0,
+        "needs_expansion": false,
+        "rationale": "The same Main Street Lending Program has its termination date extended—a changed duration, not a separate new occurrence.",
+        "watch_ids": []
+      },
+      "snapshot": {
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "version": 12,
+        "known_at": "2020-12-29T23:00:28+00:00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "name": "main-street-v6",
+      "snapshot": {
+        "action": "lending program",
+        "event_at": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence": [
+          {
+            "article_id": "A22fb6c7263fbbee58a6af6db",
+            "excerpt": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 9,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1089
+          },
+          {
+            "article_id": "A656c6a87d92f6048e52c694b",
+            "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program announced by the Federal Reserve Board: “The expansions announced yesterday to the Main Street Lending Program are the result of an extensive comment period, and are designed to better meet the needs of small and medium-sized businesses. This should help support a broad-based economic recovery as the country reopens. Many great American companies that were in sound financial condition have been adversely impacted by the pandemic. The Main Street Lending Program was established to help ensure that these businesses have access to the liquidity they need to maintain, restart, and rehire as the economy safely reopens. The Federal Reserve Board lowered the minimum, increased the maximum loan size thresholds, and extended the repayment period by delaying principal payments for two years. They also extended the term to five years in order to provide greater flexibility for borrowers. Other changes include lowering the portion of the loans retained by the originating bank to five percent for all eligible loans submitted to the program.”",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 9,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1182
+          },
+          {
+            "article_id": "Adace21e331e909169c6ffdd8",
+            "excerpt": "The Federal Reserve Board on Monday announced it will be seeking public feedback on a proposal to expand its Main Street Lending Program to provide access to credit for nonprofit organizations. As with the existing Main Street Lending Program, which targets small and medium-sized businesses, the proposed expansion would offer loans to small and medium-sized nonprofits that were in sound financial condition before the coronavirus pandemic and could benefit from additional liquidity to manage through this challenging period.\n\n",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 2,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 530
+          },
+          {
+            "article_id": "Aada4287df3d2c7086f7d01c6",
+            "excerpt": "“This morning the Federal Reserve Bank of Boston announced that the Main Street Lending Program Lender Portal is now open. The program, which will operate through three facilities – the Main Street New Loan Facility, the Main Street Priority Loan Facility, and the Main Street Expanded Loan Facility – is designed to help ensure that small and medium-sized businesses have access to the credit they need to get through this challenging period. ",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 5,
+              "start": 4
+            },
+            "source_start": 162,
+            "source_end": 606
+          },
+          {
+            "article_id": "Aeab28dd196c4b1f1727213f2",
+            "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the announcement that the Federal Reserve Board will seek public feedback on a proposal to expand the Main Street Lending Program to provide access to credit for nonprofit organizations: “Nonprofit organizations play a vital role in our economy and our society, and often are on the frontlines of our nation’s response to COVID-19. Many now face serious financial strains resulting from the disruptions to economic activity caused by the pandemic. With the support of the Treasury Department, the Board of Governors of the Federal Reserve System is seeking public feedback on a proposed expansion of the Main Street Lending Program to facilitate lending to U.S. nonprofit organizations through the creation of two new loan options: the Nonprofit New Loan Facility, and the Nonprofit Expanded Loan Facility. Like the existing Main Street facilities open to small and medium-sized businesses, the proposed Main Street nonprofit facilities would be supported by the Department’s $75 billion investment of loss-protecting capital under authority provided by the CARES Act. Terms for loans in the proposed nonprofit lending facilities are the same as for Main Street loans to for-profit businesses, but borrower eligibility requirements would be modified to correspond with the operational and accounting practices of the nonprofit sector.”",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 8,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1424
+          }
+        ],
+        "excerpt": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+        "identifier": null,
+        "known_at": "2020-06-16T23:00:19+00:00",
+        "last_development_at": null,
+        "lifecycle": "ongoing",
+        "location": null,
+        "material_article_id": "Aeab28dd196c4b1f1727213f2",
+        "material_at": "2020-06-16T00:00:00+00:00",
+        "material_known_at": "2020-06-16T23:00:19+00:00",
+        "needs_reconciliation": false,
+        "open_questions": [
+          "Will the Federal Reserve Board finalize the proposed expansion?",
+          "What specific borrower eligibility modifications will be adopted for nonprofit organizations?",
+          "When will the new nonprofit loan options become operational?"
+        ],
+        "pending_claims": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 1089,
+        "source_ids": [
+          "A22fb6c7263fbbee58a6af6db",
+          "Afef8f177d78872caa885ace6",
+          "A656c6a87d92f6048e52c694b",
+          "Adace21e331e909169c6ffdd8",
+          "Aada4287df3d2c7086f7d01c6",
+          "Aeab28dd196c4b1f1727213f2"
+        ],
+        "source_range": {
+          "end": 9,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "summary": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the announcement that the Federal Reserve Board will seek public feedback on a proposal to expand the Main Street Lending Program to provide access to credit for nonprofit organizations: “Nonprofit organizations play a vital role in our economy and our society, and often are on the frontlines of our nation’s response to COVID-19. Many now face serious financial strains resulting from the disruptions to economic activity caused by the pandemic. With the support of the Treasury Department, the Board of Governors of the Federal Reserve System is seeking public feedback on a proposed expansion of the Main Street Lending Program to facilitate lending to U.S. nonprofit organizations through the creation of two new loan options: the Nonprofit New Loan Facility, and the Nonprofit Expanded Loan Facility. Like the existing Main Street facilities open to small and medium-sized businesses, the proposed Main Street nonprofit facilities would be supported by the Department’s $75 billion investment of loss-protecting capital under authority provided by the CARES Act. Terms for loans in the proposed nonprofit lending facilities are the same as for Main Street loans to for-profit businesses, but borrower eligibility requirements would be modified to correspond with the operational and accounting practices of the nonprofit sector.”",
+        "verification": "confirmed",
+        "version": 6
+      }
+    },
+    {
+      "name": "main-street-v12",
+      "snapshot": {
+        "action": "lending program",
+        "event_at": null,
+        "event_id": "E588bdfe5a7104f2896fd50abc76d85a5",
+        "evidence": [
+          {
+            "article_id": "A22fb6c7263fbbee58a6af6db",
+            "excerpt": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 9,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1089
+          },
+          {
+            "article_id": "Abcba6de35cd42bb30fb67137",
+            "excerpt": "WASHINGTON – U.S. Treasury Secretary Steven T. Mnuchin issued the following statement on the expansion of the Main Street Lending Program to provide greater access to credit for nonprofit organizations: “I have sent letters to Federal Reserve Board Chairman Jerome Powell approving the expansion of the Main Street Lending Program to include the Nonprofit Organization New Loan Facility and the Nonprofit Organization Expanded Loan Facility. As detailed in the term sheets released today by the Board of Governors of the Federal Reserve System, borrower eligibility requirements for the new facilities differ from those of Main Street business loans. However, loan terms and our broader objectives are consistent across all Main Street Lending Facilities. Main Street is designed to provide a safety net for small and medium-sized businesses and nonprofit organizations that were in sound financial condition before the pandemic and could benefit from additional liquidity to manage through this challenging period. Nonprofit organizations, from colleges and universities to healthcare providers, community groups and veterans’ organizations, play a vital role in our society and employ millions of hard working Americans. We are very pleased that the program now includes options to support lending to eligible nonprofits and can help these vital organizations continue their important work.”",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 8,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1393
+          },
+          {
+            "article_id": "A4a1d8096e14750dbcb41f6cb",
+            "excerpt": "The Federal Reserve Board on Friday updated its frequently asked questions (FAQs) to clarify the Board and Department of Treasury's expectations regarding lender underwriting for the Main Street Lending Program. The revised FAQs emphasize that lender underwriting should look back to the borrower's pre-pandemic condition and forward to their post-pandemic prospects. The FAQs also clarify supervisory expectations for lenders originating Main Street loans.\n\nThe program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. The program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits to allow borrower's time to recover from the pandemic",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 5,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 869
+          },
+          {
+            "article_id": "Aaccbba5ee29cab1640132c87",
+            "excerpt": "The Federal Reserve Board on Friday adjusted the terms of the Main Street Lending Program in two important ways to better target support to smaller businesses that employ millions of workers and are facing continued revenue shortfalls due to the pandemic. In particular, the minimum loan size for three Main Street facilities available to for-profit and non-profit borrowers has been reduced from $250,000 to $100,000 and the fees have been adjusted to encourage the provision of these smaller loans. The Board and Department of the Treasury also issued a new frequently asked question clarifying that Paycheck Protection Program loans of up to $2 million may be excluded for purposes of determining the maximum loan size under the Main Street Lending Program, if certain requirements are met, which should also help smaller businesses access Main Street loans.\n\nThe Main Street Lending Program supports lending to small and medium-sized for-profit businesses and nonprofit organizations that were in sound financial condition before the COVID-19 pandemic but lack access to credit on reasonable terms. To allow borrowers time to recover from the pandemic, the program offers several five-year loan options, with deferred principal and interest payments for qualified businesses and nonprofits. Loan documents reflecting the new terms are expected to be available to registered lenders within the next week.",
+            "kind": "new_development",
+            "development_at": null,
+            "source_range": {
+              "end": 6,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 1407
+          },
+          {
+            "article_id": "A206bceb6440240e8d322eefa",
+            "excerpt": "In order to allow more time to process and fund loans that were submitted to the Main Street lender portal on or before December 14, 2020, the Federal Reserve Board on Tuesday extended the termination date of the Main Street Lending Program facilities to January 8, 2021.\n\nAs described in new frequently asked questions and program term sheets, the extension is consistent with section 1005 of the Consolidated Appropriations Act and was also approved by the Secretary of the Treasury.",
+            "kind": "new_development",
+            "development_at": "2020-12-29T00:00:00Z",
+            "source_range": {
+              "end": 2,
+              "start": 1
+            },
+            "source_start": 0,
+            "source_end": 485
+          }
+        ],
+        "excerpt": "The Federal Reserve Board on Thursday announced it is expanding the scope and eligibility for the Main Street Lending Program. As part of its broad effort to support the economy, the Federal Reserve developed the Main Street Lending Program to help credit flow to small and medium-sized businesses that were in sound financial condition before the pandemic.\n\nWhen the initial terms of Main Street were announced, the Board indicated that, because the financial needs of businesses vary widely, it was seeking feedback from the public on potential refinements. More than 2,200 letters from individuals, businesses, and nonprofits were received. In response to the public input, the Board decided to expand the loan options available to businesses, and increased the maximum size of businesses that are eligible for support under the program. The changes include:\n\nCreating a third loan option, with increased risk sharing by lenders for borrowers with greater leverage;\n\nLowering the minimum loan size for certain loans to $500,000; and\n\nExpanding the pool of businesses eligible to borrow.",
+        "identifier": null,
+        "known_at": "2020-12-29T23:00:28+00:00",
+        "last_development_at": "2020-12-29T00:00:00Z",
+        "lifecycle": "ongoing",
+        "location": null,
+        "material_article_id": "A206bceb6440240e8d322eefa",
+        "material_at": "2020-12-29T00:00:00+00:00",
+        "material_known_at": "2020-12-29T23:00:28+00:00",
+        "needs_reconciliation": false,
+        "open_questions": [],
+        "pending_claims": [],
+        "scope": "Main Street Lending Program",
+        "source_end": 1089,
+        "source_ids": [
+          "A22fb6c7263fbbee58a6af6db",
+          "Afef8f177d78872caa885ace6",
+          "A656c6a87d92f6048e52c694b",
+          "Adace21e331e909169c6ffdd8",
+          "Aada4287df3d2c7086f7d01c6",
+          "Aeab28dd196c4b1f1727213f2",
+          "A07807ef3d13557ce6836c7a3",
+          "A38750fbc6fc71b1b8f12fbb1",
+          "Abcba6de35cd42bb30fb67137",
+          "A4a1d8096e14750dbcb41f6cb",
+          "Aaccbba5ee29cab1640132c87",
+          "A206bceb6440240e8d322eefa"
+        ],
+        "source_range": {
+          "end": 9,
+          "start": 1
+        },
+        "source_start": 0,
+        "subject": "Main Street Lending Program",
+        "summary": "In order to allow more time to process and fund loans that were submitted to the Main Street lender portal on or before December 14, 2020, the Federal Reserve Board on Tuesday extended the termination date of the Main Street Lending Program facilities to January 8, 2021.\n\nAs described in new frequently asked questions and program term sheets, the extension is consistent with section 1005 of the Consolidated Appropriations Act and was also approved by the Secretary of the Treasury.",
+        "verification": "confirmed",
+        "version": 12
+      }
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+/* Decision-flow layout: sticky context bar, four numbered steps, collapsed reference. Base card/chip styles: styles.css. */
+.treasury-dashboard{max-width:1800px}
+.treasury-dashboard .top{grid-template-columns:auto 1fr;margin-bottom:10px}
+.proto-tag{vertical-align:middle;font-size:10px;margin-left:10px}
+
+/* Context bar: the forecast in view and its key figures stay visible while scrolling. */
+.context-bar{position:sticky;top:0;z-index:6;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 14px rgba(20,35,75,.08);padding:10px 14px;margin-bottom:6px}
+.context-main{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.context-forecast{display:flex;flex-direction:column;gap:2px;min-width:220px;max-width:360px;flex:0 1 320px}
+.context-forecast span,.context-kpis span{font-size:10.5px;color:var(--muted)}
+.context-forecast select{border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:600 12.5px inherit;padding:5px 7px;text-overflow:ellipsis}
+.context-kpis{display:flex;gap:4px 22px;flex-wrap:wrap;flex:1}
+.context-kpis>div{display:flex;flex-direction:column;min-width:0}
+.context-kpis b{font-size:16px;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}.context-kpis b.neg{color:var(--red)}.context-kpis b.pos{color:var(--green)}
+.context-kpis small{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.context-delta{padding-left:18px;border-left:1px solid var(--line)}
+.context-steps{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.context-steps a{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;color:var(--navy);text-decoration:none;font-size:12px;font-weight:600}
+.context-steps a:hover,.context-steps a:focus-visible{background:var(--bg)}
+.context-steps a span,.dash-section-no{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--navy);color:var(--card);font-size:10px;font-weight:700}
+.context-steps .context-ref{color:var(--muted);font-weight:500;margin-left:auto}.context-steps .ghost{margin-left:6px}
+
+/* Steps */
+.dash-section{scroll-margin-top:140px;margin:26px 0 0;display:flex;flex-direction:column;gap:12px}
+.dash-section-head{display:flex;align-items:center;gap:10px}.dash-section-no{width:28px;height:28px;font-size:14px;flex:none}
+.dash-section-head h2{font-size:20px;color:var(--navy)}
+.dash-section.reference .dash-section-no{background:var(--muted)}.dash-section.reference .dash-section-head h2{color:var(--muted);font-size:17px}
+.dash-grid{display:grid;gap:12px;align-items:start}.dash-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-grid.three{grid-template-columns:1fr 1.2fr 1fr;align-items:stretch}
+.stack-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.tool-card>.advanced-tool-panel,.tool-card .advanced-tool-panel{border:0;padding:0;margin:0}
+
+.stress-test{display:flex;flex-direction:column;gap:12px}.stress-head{gap:16px;flex-wrap:wrap}.stress-head h3{font-size:16px;color:var(--navy)}.stress-head .sub{margin-bottom:0}
+.stress-summary{margin:0;font-size:12.5px}.stress-summary b{color:var(--navy)}
+.stress-grid{display:grid;grid-template-columns:1.1fr 1fr 1.1fr;gap:12px;align-items:start}
+
+/* Expandable panels */
+.expandable>summary{cursor:pointer;display:flex;flex-direction:column;gap:2px;color:var(--navy)}.expandable>summary small{color:var(--muted);font-weight:400}
+.expandable>summary b::before{content:"▸";display:inline-block;width:14px;transition:transform .15s}.expandable[open]>summary b::before{transform:rotate(90deg)}
+.expandable[open]>summary{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.expandable .wide-card{margin-top:12px}.expandable>.card{box-shadow:none}.sensitivity-modules{margin-top:12px}.sensitivity-modules .presets{margin-top:8px}
+
+
+@media(max-width:1200px){.dash-grid.three,.stress-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-grid.three>.stack-col,.stress-grid>.stack-col{grid-column:1/-1}}
+@media(max-width:800px){.context-bar{position:static}.dash-section{scroll-margin-top:8px}.context-delta{padding-left:0;border-left:0}.context-steps .context-ref{margin-left:0}
+  .dash-grid.two,.dash-grid.three,.stress-grid{grid-template-columns:minmax(0,1fr)}.context-forecast{max-width:none;flex:1 1 100%}}
+.rec-progress{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:8px 0 0}
+.spinner{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--navy);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+
+/* Four-column board: market data | News ↔ Event impact (aligned rows) | liquidity + recommendation. */
+.board-grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,2.3fr) minmax(0,1.05fr);align-items:start}
+.board-grid>.stack-col{display:flex;flex-direction:column;gap:12px}
+.news-impact .ni-head,.news-impact .ni-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.news-impact .ni-head .hd{margin-bottom:6px}.news-impact .ni-head .hd .sub{font-size:11px;color:var(--muted)}
+.ni-rows{display:flex;flex-direction:column;gap:6px}
+.ni-row{align-items:stretch}
+.ni-row .ni-news{margin:0;height:100%}
+.ni-impact{display:flex;flex-direction:column;justify-content:center;gap:4px;position:relative;cursor:pointer;border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:8px;padding:8px 26px 8px 10px;background:var(--card)}
+.ni-impact:hover,.ni-row .ni-news:hover{border-color:var(--blue)}.ni-impact:focus-visible{outline:2px solid var(--blue)}
+.ni-impact .chev{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.ni-impact.is-excluded{opacity:.55}
+.ni-event{display:flex;flex-direction:column}.ni-event small{font-size:10.5px;color:var(--muted)}
+.ni-amount{font-size:15px}.ni-impact b.neg,.dx b.neg,.liquidity-card b.neg{color:var(--red)}.ni-impact b.pos,.dx b.pos,.liquidity-card b.pos{color:var(--green)}
+/* Detail explanation pages (News impact, liquidity) — modelled on the market detail pages. */
+.dx{display:flex;flex-direction:column;gap:12px}
+.dx-top{display:grid;grid-template-columns:2fr repeat(3,minmax(0,1fr));gap:12px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:10px}
+.dx-top>div>span{display:block;font-size:11px;color:var(--muted)}.dx-big{font-size:22px}
+.dx-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.dx-cols>div{display:flex;flex-direction:column;gap:12px}
+.dx-info{background:color-mix(in srgb,var(--blue) 8%,var(--card));border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;font-size:12.5px}
+.dx-box{border:1px solid var(--line);border-radius:8px;padding:10px 12px}.dx-box h3{margin:0 0 8px;font-size:14px;color:var(--navy)}
+.dx-box ul{margin:0;padding-left:18px;font-size:12.5px}.dx-box p{margin:4px 0;font-size:12.5px}
+.dx-table th{text-align:left;width:34%;font-weight:600;vertical-align:top}.dx-table td{font-size:12px}
+.dx-impact{display:flex;flex-direction:column;gap:8px;border-radius:8px;padding:12px;background:var(--bg);border:1px solid var(--line)}
+.dx-impact.neg{background:var(--redbg)}.dx-impact.pos{background:var(--greenbg)}
+.dx-impact>div{display:flex;flex-direction:column}.dx-impact span{font-size:12px;font-weight:600}.dx-impact small{font-size:11px;color:var(--muted)}
+.dx-context{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dx-context h3{grid-column:1/-1}
+.dx-context>div{display:flex;flex-direction:column;text-align:center}.dx-context span{font-size:11px;color:var(--muted)}.dx-context small{font-size:10.5px;color:var(--muted)}
+.dx-sources .warn{color:var(--orange)}
+.dx-foot{display:flex;gap:10px;align-items:center;justify-content:flex-end;border-top:1px solid var(--line);padding-top:10px}.dx-foot>span{flex:1}
+@media(max-width:1200px){.board-grid{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}.board-grid>.stack-col{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.board-grid,.board-grid>.stack-col,.dx-cols,.dx-top{grid-template-columns:minmax(0,1fr)}.news-impact .ni-head>.hd:last-child{display:none}.news-impact .ni-row{grid-template-columns:minmax(0,1fr);gap:4px;border-bottom:1px solid var(--line);padding-bottom:6px}}
+.news-impact .ni-head .hd{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;min-width:0}
+.news-impact .ni-head .news-tools{display:flex;gap:8px}
+.news-impact .ni-head{column-gap:18px}
+.market-sim{margin-bottom:12px}.market-sim .stress-summary{margin:6px 2px 0;color:var(--muted)}
+/* Cash chart with the market-data simulation sliders on its right. */
+.position-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:12px;align-items:start}
+.position-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.position-grid .market-sim{margin:0;position:sticky;top:120px;max-height:calc(100vh - 140px);overflow:auto}
+.position-grid .market-sim .sliders{grid-template-columns:minmax(0,1fr)}
+.position-grid .market-sim>.card,.position-grid .market-sim .card{box-shadow:none;border:0;padding:0}
+@media(max-width:1100px){.position-grid{grid-template-columns:minmax(0,1fr)}.position-grid .market-sim{position:static;max-height:none}.position-grid .market-sim .sliders{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Main chart: baseline + one line per News Event scenario + all News combined. */
+.scenario-lines-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:6px 0}.scenario-lines-head small{color:var(--muted);font-size:11px;flex:1 1 260px}
+.scenario-lines-area{position:relative;cursor:pointer}.scenario-lines svg{width:100%;height:auto;display:block}
+.scenario-lines .grid{stroke:var(--line)}.scenario-lines .axis{font-size:10px;fill:var(--muted)}
+.scenario-lines .baseline{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:2 3}.scenario-lines .reserve{fill:none;stroke:var(--orange);stroke-width:1.2;stroke-dasharray:5 4}
+.scenario-lines .transition{stroke:var(--muted);stroke-dasharray:3 3}.scenario-lines .cursor{stroke:var(--navy)}
+.scenario-lines-tip{position:absolute;top:6px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:11px;display:flex;flex-direction:column;gap:2px;pointer-events:none;box-shadow:var(--shadow);max-width:380px}
+.scenario-lines-tip i,.scenario-lines-legend i{display:inline-block;width:12px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.scenario-lines-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;margin-top:4px}.scenario-lines-legend button{text-align:left}
+.scenario-lines .key-baseline{background:var(--muted)}.scenario-lines .key-reserve{background:var(--orange)}.scenario-lines-legend i.dashed{background:repeating-linear-gradient(90deg,#1b2a52 0 4px,transparent 4px 7px)}
+.scenario-lines b.neg{color:var(--red)}.scenario-lines b.pos{color:var(--green)}
+/* Market metric: how it reaches cash, and the assumptions on it. */
+.metric-assumptions{margin-bottom:12px}.metric-assumptions .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+.asm-table td{vertical-align:top}.asm-table .asm-control{text-align:right;white-space:nowrap;min-width:220px}
+.asm-table .asm-control input[type=range]{width:120px;vertical-align:middle;margin-right:8px;accent-color:var(--navy)}
+.asm-table tr.set b{color:var(--orange)}
+
+/* Board: market metric ↔ cash-flow impact | News ↔ Event impact | liquidity & recommendation. */
+.board-grid{grid-template-columns:minmax(0,1.75fr) minmax(0,2.1fr) minmax(0,1fr)}
+.market-impact .mi-head,.market-impact .mi-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.market-impact .mi-head h2{margin:0}.market-impact .mi-rows{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.market-impact .mi-row{align-items:stretch}.market-impact .mi-row>.metric,.market-impact .mi-row>.cfrow{margin:0;height:100%}
+/* Impact cells keep the original Cash-Flow Impact row layout (name + shock, value, signed bar, headroom at risk)
+   and sit in a bordered tile so they line up with the metric tiles on the left. */
+.market-impact .mi-row>.cfrow{border:1px solid var(--line);border-radius:8px;padding:8px 24px 8px 10px;align-content:center;background:var(--card)}
+.market-impact .mi-head .colhead{margin-top:6px}
+.market-impact .mi-row>.metric{margin:0}
+.market-impact .mi-empty{display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);border-radius:8px;padding:8px}
+.market-impact .mi-total{margin-top:6px}
+@media(max-width:1400px){.board-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.board-grid>.stack-col{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.board-grid,.market-impact .mi-head,.market-impact .mi-row{grid-template-columns:minmax(0,1fr)}}
+/* Row 1: market ↔ cash-flow impact | News ↔ Event impact. Row 2: liquidity position | recommendation. */
+.board-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+.board-grid>.stack-col{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+@media(max-width:900px){.board-grid>.stack-col{grid-template-columns:minmax(0,1fr)}}
+/* Market ↔ cash-flow impact and News ↔ Event impact: same width and same height. */
+.board-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch}
+.board-grid>.market-impact,.board-grid>.news-impact{height:100%;box-sizing:border-box;margin:0}
+.board-grid>.stack-col{align-items:start}
+/* Final board: market ↔ impact on the left; News ↔ impact with the liquidity position below it on the right;
+   the recommendation on its own row. */
+.board-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}
+.board-grid>.news-impact{height:auto}
+.board-right{display:flex;flex-direction:column;gap:12px;min-width:0}
+.board-full{grid-column:1/-1;min-width:0}
+@media(max-width:900px){.board-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Current-engine additions: horizon in the context bar, liquidity forecast card, model-call prompt, actions row. */
+.context-kpis>label{display:flex;flex-direction:column;min-width:0}
+.context-horizon select{border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--text);font:600 12.5px inherit;padding:4px 7px;margin-top:2px}
+.liquidity-forecast>.hd{align-items:flex-start;gap:12px;flex-wrap:wrap}.lf-actions{display:flex;gap:8px;flex-wrap:wrap}.lf-actions button{margin-top:0}
+.lf-note{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin:8px 0;color:var(--muted)}
+.ni-model-note{color:var(--orange)}
+.ni-news .nmeta .chip{margin-left:5px}
+.rec-card>.hd{align-items:flex-start;gap:12px}
+.rec-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rec-grid .action{margin:0;height:100%}
+.dx-table td.r{text-align:right;font-variant-numeric:tabular-nums}.dx-table td.neg{color:var(--red)}.dx-table td.pos{color:var(--green)}
+.dx-top .a-areas{margin-top:6px}
+@media(max-width:900px){.rec-grid{grid-template-columns:minmax(0,1fr)}}
+/* Both board cards use the same head (title / sub / column header) so their first rows sit level. */
+.news-impact .ni-head .hd{margin-bottom:0}.news-impact .ni-head h2{margin:0}.news-impact .ni-head .colhead{margin-top:6px}
+.news-impact .ni-head .sub,.market-impact .mi-head .sub{font-size:11.5px;margin:2px 0 0}
+.market-impact .mi-head .colhead,.news-impact .ni-head .colhead{margin:6px 0 4px}
+.news-impact .ni-rows{margin-top:6px}
+.news-impact>.news-refresh-message,.news-impact>.news-refresh-progress{margin:10px 0 0}
+.market-impact .mi-head .colhead,.news-impact .ni-head .colhead{line-height:12px;height:12px}
+.scenario-lines-area.static{cursor:default}
+.advanced-tool-grid.single{grid-template-columns:minmax(0,1fr)}
+/* Charts are SVGs that scale with their box; in full-width panels cap the box (not the SVG, whose hover maps to it). */
+.wide-card .spark.block:has(.pathchart){max-width:960px}.expandable .spark.block:has(.debtchart){max-width:480px}
+@media(max-width:760px){.news-impact .ni-head{grid-template-columns:minmax(0,1fr)}}
+.scenario-lines-legend i.dashed{background:repeating-linear-gradient(90deg,var(--navy) 0 4px,transparent 4px 7px)}
+
+
+/* Direct cash flows in the cash-impact card */
+.direct-cash .direct-flows{margin:4px 0 0;padding-left:16px;color:var(--muted)}.direct-cash .direct-flows li{line-height:1.4}
+/* Working capital: under the market card in the left column of step 2; timing detail collapsed */
+.board-left{display:flex;flex-direction:column;gap:12px;min-width:0}
+.working-capital h2{font-size:16px;color:var(--navy);margin:0 0 6px}
+.wc-stack{display:flex;flex-direction:column;gap:8px}.wc-stack h3{font-size:13.5px;color:var(--navy);margin:0}
+.wc-lever{margin:4px 0 8px}.wc-lever label{display:block;font-size:12.5px;margin-bottom:6px}.wc-lever input{width:100%}.wc-lever .sl-foot{display:flex;justify-content:space-between}
+.wc-stack .x-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+.wc-timing-open{display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--navy);text-align:left;cursor:pointer;font:inherit}.wc-timing-open>span:first-child{display:flex;flex-direction:column;gap:2px}.wc-timing-open small{color:var(--muted);font-weight:400}.wc-timing-open:hover{border-color:var(--blue)}
+.card.custom{border-color:var(--orange)}
+/* The What-if side panel is narrow: one forecast input per row so its value and rationale stay readable. */
+.market-sim .forecast-inputs{grid-template-columns:minmax(0,1fr)}
+/* Step 2 columns share one height: the last card of each column stretches, so the bottoms line up. */
+.board-grid{align-items:stretch}
+.board-left,.board-right{display:flex;flex-direction:column;gap:12px;min-width:0}
+.board-left>.card:last-child,.board-right>.card:last-child{flex:1 1 auto}
+.board-full{align-self:start}
+/* Hedge recommendation agent */
+.hedge-agent>.hd{align-items:flex-start;gap:12px}
+.ha-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 2px}.ha-controls label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--navy);font-weight:600}
+.ha-controls input[type=date],.ha-controls select{font:inherit;font-size:12.5px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text)}
+.ha-controls .primary{margin-top:0}.ha-check{font-weight:400!important}
+.ha-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 6px}.ha-meta .chip{margin-left:0}
+.ha-diag{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.ha-diag>div{display:flex;flex-direction:column}.ha-diag span{font-size:11px;color:var(--muted)}.ha-diag b{color:var(--navy);font-variant-numeric:tabular-nums}.ha-diag b.neg{color:var(--red)}.ha-diag small{font-size:10.5px;color:var(--muted)}
+.ha-summary,.ha-cands{margin:6px 0 8px;font-size:12.5px}.ha-summary>summary,.ha-cands>summary{cursor:pointer;color:var(--navy);font-weight:600}.ha-summary p{white-space:pre-line;margin:6px 0}
+.ha-cands table{margin-top:6px}.ha-cands th.r,.ha-cands td.r{text-align:right}.ha-cands .chip{margin-left:0;margin-right:4px}
+.ha-rec .atitle .chip{margin-left:6px}
+.dx code{font-size:11px;word-break:break-all}
+@media(max-width:760px){.ha-diag{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.a-text,.ha-summary p,.dx-box p,.dx-box li{font-size:14px;line-height:1.75;overflow-wrap:break-word}
+.a-text{white-space:pre-wrap;max-width:68ch}
+.chat .turn{margin:22px 0}.chat .a{padding:18px}.chat .q{margin-bottom:12px;line-height:1.6}
+.dx-cols{gap:24px}.dx-box{padding:20px;margin-bottom:16px;min-width:0}
+.dx-box h3{font-size:16px;margin-bottom:14px}.dx-box p{margin:12px 0}.dx-box li+li{margin-top:10px}
+.dx-table th,.dx-table td{padding:12px 10px;line-height:1.65;font-size:13px}
+.ha-diag{gap:20px;padding:20px}.ha-diag>div{gap:8px}.ha-diag span{font-size:13px}.ha-diag b{font-size:20px}.ha-diag small{font-size:12px}
+.ha-rec{padding:18px;min-width:0}.ha-rec .atitle{font-size:15px;line-height:1.6;margin-bottom:10px}.ha-rec .atext{font-size:14px;line-height:1.7;margin-bottom:12px}.ha-rec .small{line-height:1.6}
+.ha-summary{padding:14px 0}.ha-summary p{max-width:85ch}.ha-meta{gap:12px;margin:16px 0}
+.cash-detail-table table{font-size:13px}.cash-detail-table th,.cash-detail-table td{padding:12px}.cash-detail-table small{font-size:11px}
+.cash-detail-table+section .inp{display:block;width:100%;margin:12px 0}.cash-detail-table+section textarea{min-height:100px}
+@media(max-width:1000px){.dx-cols{grid-template-columns:1fr}.rec-grid{grid-template-columns:1fr}.ha-diag{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.ha-diag{grid-template-columns:1fr}.dx-box{padding:16px}.dx-table th{width:48%}.dx-table td{overflow-wrap:anywhere}}
+
+.ha-rec .atext{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ha-rec .atext::after{content:""}.dx-box p{white-space:pre-line}
+
+.mcards{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.mcard{padding:16px;gap:9px}.mc-licence{font-size:12px;line-height:1.6}.integ{padding:16px 0;line-height:1.7}
+.news-category{--category-color:#64748b;--category-bg:#f1f5f9;min-width:0;display:flex;flex-direction:column;gap:10px;margin:8px 0 14px}
+.category-regulatory{--category-color:#7652a3;--category-bg:#f3eef9}
+.category-macroeconomics{--category-color:#2563a6;--category-bg:#edf4fc}
+.category-industry{--category-color:#13796c;--category-bg:#eaf6f2}
+.news-category-heading{display:flex;align-items:center;gap:12px;margin:0;padding:10px 14px;border-left:4px solid var(--category-color);background:var(--category-bg);color:var(--category-color);font-size:14px;line-height:1.5;border-radius:4px}
+.news-category-heading span{font-size:12px;font-weight:400}
+.news-category .ni-news{border-left:3px solid var(--category-color)}
+.news-category .category-dot{background:var(--category-color)}
+
+.agent-bullets{padding-left:20px;margin:10px 0;line-height:1.75;font-size:14px;overflow-wrap:break-word}.agent-bullets li+li{margin-top:9px}.agent-bullets.a-text{white-space:normal}.rec-takeaways{font-size:13px;text-align:left}.ha-summary .agent-bullets{max-width:85ch}

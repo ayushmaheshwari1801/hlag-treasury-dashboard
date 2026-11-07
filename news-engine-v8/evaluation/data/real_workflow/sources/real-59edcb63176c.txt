@@ -1,0 +1,5 @@
+Broadcom, a leading US-based technology company, makes and sells hardware components – such as network interface cards (NICs) and storage adapters – used in computer servers. VMware sells software products and services, including server virtualisation software, which enables servers to be used more efficiently by separating them into multiple virtualised servers. Broadcom’s hardware and VMware’s software are relied upon by thousands of businesses and public bodies in the UK, including major banks, major retailers, telecoms firms, UK government departments and other public institutions.
+
+Following its initial Phase 1 investigation , the Competition and Markets Authority (CMA) identified competition concerns warranting in-depth review and referred the deal to a Phase 2 inquiry.
+
+After examining the evidence gathered from Broadcom, VMware and other interested parties, an independent CMA panel has provisionally found the deal would not substantially reduce competition in the supply of server hardware components in the UK.

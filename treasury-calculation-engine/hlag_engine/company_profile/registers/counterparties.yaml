@@ -1,0 +1,13 @@
+# Counterparty register (3.4, D22). ASSUMPTION: relationship banks are not disclosed.
+# Generic names (P20). aliases link real names later for the demo; label ASSUMPTION when filled.
+label: ASSUMPTION
+note: "Assumed register of relationship banks; names, countries and shares are not disclosed."
+counterparties:
+  - {id: BANK_A, name: BANK_A, country: DE, credit_line_share: 0.20, deposit_share: 0.20, hedge_counterparty: true, aliases: []}
+  - {id: BANK_B, name: BANK_B, country: DE, credit_line_share: 0.15, deposit_share: 0.15, hedge_counterparty: true, aliases: []}
+  - {id: BANK_C, name: BANK_C, country: FR, credit_line_share: 0.15, deposit_share: 0.10, hedge_counterparty: true, aliases: []}
+  - {id: BANK_D, name: BANK_D, country: NL, credit_line_share: 0.10, deposit_share: 0.10, hedge_counterparty: false, aliases: []}
+  - {id: BANK_E, name: BANK_E, country: GB, credit_line_share: 0.10, deposit_share: 0.15, hedge_counterparty: true, aliases: []}
+  - {id: BANK_F, name: BANK_F, country: US, credit_line_share: 0.15, deposit_share: 0.15, hedge_counterparty: true, aliases: []}
+  - {id: BANK_G, name: BANK_G, country: JP, credit_line_share: 0.10, deposit_share: 0.05, hedge_counterparty: false, aliases: []}
+  - {id: BANK_H, name: BANK_H, country: SG, credit_line_share: 0.05, deposit_share: 0.10, hedge_counterparty: false, aliases: []}

@@ -1,0 +1,37 @@
+Broadcom, a leading US-based technology company, makes and sells specialist hardware components – such as network interface cards (NICs) and storage adapters – used in servers. VMware specialises in software products and services, including server virtualisation software, which enables servers to be used more efficiently by separating them into multiple virtualised servers. VMware’s customers include major banks, telecom firms, UK government departments and other public institutions.
+
+The Competition and Market Authority’s (CMA) Phase 1 investigation looked at how the deal to buy VMware for $61 billion may impact the supply of these software and hardware products and whether this would then give Broadcom the ability to disadvantage its competitors.
+
+The CMA found that VMware has a leading position in server virtualisation software and that compatibility with its software is critical for the server hardware components sold by Broadcom and its rivals. The CMA is concerned that the deal could enable Broadcom to harm its rivals by preventing them from being able to supply VMware-compatible hardware components – such as NICs and storage adapters – reducing competition and ultimately choice for customers.
+
+The investigation also found that the merger may result in Broadcom obtaining commercially sensitive information (such as details of new planned products) that its hardware rivals currently supply to VMware. The CMA is concerned that this could damage innovation and leave customers worse off, including fewer product updates or new features.
+
+David Stewart, Executive Director at the CMA, said:
+
+Computing infrastructure underpins the services that public and private organisations rely on to support their operations and to support their users and customers – that is to say, all of us. Servers are a vital building block, functioning largely thanks to hardware products made by firms like Broadcom, working in unison with virtualisation software from firms like VMware.
+
+We are concerned this deal could allow Broadcom to cut out competitors from the supply of hardware components to the server market and lead to less innovation at a time when most firms want fast, responsive, and affordable IT systems. It’s now up to Broadcom to respond to our concerns or face a more in-depth investigation.
+
+Broadcom has 5 working days to offer legally binding proposals to the CMA to address the concerns identified. The CMA would then have a further 5 working days to consider whether this address its concerns, or if the case should be referred to the next stage, Phase 2 investigation.
+
+More information can be found via the Broadcom / VMWare case page.
+
+The CMA’s investigation focused on six products sold by Broadcom (Ethernet NICs, Smart NICs, Fibre Channel Host Bus Adapters (FC HBAs), storage adapters, FC switches and top-of-rack (TOR) switching chips) and VMware’s server virtualisation software. The CMA believes that the merger gives rise to a realistic prospect of a substantial lessening of competition (a) in the supply of Ethernet NICs, FC HBAs, storage adapters and FC switches, and (b) as a result of the exchange of commercially sensitive information between Broadcom’s rivals and VMware in respect of Ethernet NICs, FC HBAs, and storage adapters.
+
+The CMA’s investigation focused on six products sold by Broadcom (Ethernet NICs, Smart NICs, Fibre Channel Host Bus Adapters (FC HBAs), storage adapters, FC switches and top-of-rack (TOR) switching chips) and VMware’s server virtualisation software. The CMA believes that the merger gives rise to a realistic prospect of a substantial lessening of competition (a) in the supply of Ethernet NICs, FC HBAs, storage adapters and FC switches, and (b) as a result of the exchange of commercially sensitive information between Broadcom’s rivals and VMware in respect of Ethernet NICs, FC HBAs, and storage adapters.
+
+The Broadcom / VMware deal is valued at $61 billion, making it the second largest acquisition to be investigated by the CMA since it was established. The highest deal at $69 billion is Microsoft’s acquisition of games publisher Activision, which is currently investigated by the CMA in Phase 2.
+
+The Broadcom / VMware deal is valued at $61 billion, making it the second largest acquisition to be investigated by the CMA since it was established. The highest deal at $69 billion is Microsoft’s acquisition of games publisher Activision, which is currently investigated by the CMA in Phase 2.
+
+The CMA is, in most cases, required to issue a Phase 1 decision within 40 working days. Merging parties are required to formally offer proposed remedies (undertakings in lieu of a referral to a Phase 2 investigation (UILs)) within 5 working days after receiving the CMA’s Phase 1 decision and the CMA then decides, within 10 working days after the Phase 1 decision, whether to provisionally accept the UILs offered. The CMA then has 50 working days (subject to an extension of up to 40 working days) to consider whether to finally accept these remedies.
+
+The CMA is, in most cases, required to issue a Phase 1 decision within 40 working days. Merging parties are required to formally offer proposed remedies (undertakings in lieu of a referral to a Phase 2 investigation (UILs)) within 5 working days after receiving the CMA’s Phase 1 decision and the CMA then decides, within 10 working days after the Phase 1 decision, whether to provisionally accept the UILs offered. The CMA then has 50 working days (subject to an extension of up to 40 working days) to consider whether to finally accept these remedies.
+
+For more information, journalists should contact the CMA press office by email on press@cma.gov.uk or by phone on 020 3738 6460.
+
+For more information, journalists should contact the CMA press office by email on press@cma.gov.uk or by phone on 020 3738 6460.
+
+All enquiries from the general public are directed to the CMA’s General Enquiries team on general.enquiries@cma.gov.uk or 020 3738 6000.
+
+All enquiries from the general public are directed to the CMA’s General Enquiries team on general.enquiries@cma.gov.uk or 020 3738 6000.

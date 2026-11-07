@@ -1,0 +1,159 @@
+# Versioned defaults. Every figure here is either a spec value (marked) or an
+# explicit synthetic placeholder. Nothing is a verified company figure.
+defaults_version: "defaults-1.0"
+formula_version: "formulas-1.0"
+timezone: Asia/Singapore
+
+thresholds:
+  version: "demo-thresholds-1.0"
+  liquidity_high: "0.01"        # spec s8: impact >= 1% of comparable liquidity -> HIGH
+  liquidity_critical: "0.03"    # spec s8: impact >= 3% -> CRITICAL
+  limit_high: "0.80"            # spec s8: approved-limit utilisation >= 80% -> HIGH
+  limit_critical: "1.00"        # utilisation >= 100% is a limit breach -> CRITICAL
+  note: "Demonstration thresholds (1% / 3% / 80%), NOT company policy."
+
+liquidity:
+  # Hapag-Lloyd Investor Report H1 2026, pp. 14-16: liquidity reserve USD 5,909m at 30 June 2026
+  # (cash 3,150 + special fund securities 2,035 + unused credit lines 725; the report notes rounding).
+  source: "Hapag-Lloyd Investor Report H1 2026, pp. 14-16"
+  balance_date: "2026-06-30"
+  items_usd_m: {cash_and_equivalents: 3150, financial_assets: 2035, credit_lines: 725}
+  reported_total_usd_m: 5909
+  balance_date_eurusd: "1.1396"        # USD per EUR, closing rate 30.6.2026 (report p. 16): gives EUR 5,185m
+  minimum_liquidity_eur_m: 3500        # ILLUSTRATIVE: taken from the supplied layout; the H1 2026 report states no minimum
+  provenance: DISCLOSED HISTORICAL
+  info_age_days: 31                    # older than this: visible warning
+  max_age_days: 200                    # older than this: treated as unavailable (a quarterly balance is always somewhat old)
+  note: "Reported liquidity reserve at 30 June 2026; not a current or payment-date balance."
+
+debt_maturity:
+  unit: "EUR m"
+  provenance: ILLUSTRATIVE
+  source: "Layout supplied by the user (illustrative). The H1 2026 report gives no maturity profile by year."
+  reported_total_usd_m: 7153           # financial debt and lease liabilities at 30.6.2026 (report p. 14)
+  categories: [Bonds, Bank loans, Lease liabilities, Other]
+  years: ["2026", "2027", "2028", "2029", "2030", ">2030"]
+  values:                              # split by category is an eyeball estimate of the layout; totals match it
+    "2026": [280, 380, 300, 88]
+    "2027": [650, 560, 330, 78]
+    "2028": [430, 470, 320, 66]
+    "2029": [180, 190, 190, 35]
+    "2030": [100, 170, 170, 32]
+    ">2030": [900, 600, 600, 79]
+
+dashboard:
+  horizon_months_days: {"3": 91, "6": 182, "12": 365}
+  default_horizon_months: 6
+  baseline_horizon_days: 182           # exposure, consumption and volume assumptions are stated for six months
+  headroom_note: "Headroom at risk = adverse cash impact / (reported liquidity reserve - minimum liquidity)"
+
+horizons:                       # days
+  three_months: 91
+  thirteen_weeks: 91
+  six_months: 182
+  twelve_months: 365
+
+compound:
+  target_horizon_days: 182
+  bunker_surcharge_in_freight_rate: true
+
+fx:
+  default_currency: CAD
+  currencies:
+    CAD: {series: FX_CADUSD, position_set: CAD_PAYABLE_13W, direction: payable, horizon_days: 91, quote: "USD per CAD"}
+    EUR: {series: FX_EURUSD, position_set: EUR_RECEIVABLE_6M, direction: receivable, horizon_days: 182, quote: "USD per EUR"}
+    GBP: {series: FX_GBPUSD, position_set: GBP_PAYABLE_6M, direction: payable, horizon_days: 182, quote: "USD per GBP"}
+    CNY: {series: FX_CNYUSD, position_set: CNY_PAYABLE_6M, direction: payable, horizon_days: 182, quote: "USD per CNY"}
+  eurusd_series: FX_EURUSD
+  shock_grid_pct: [-10, -5, 0, 5, 10]
+  shock_bounds_pct: [-20, 20]   # spec s4
+  headline_shock_pct: 10
+  hedge_quota_cap: "0.80"       # spec s4: CAD 13-week forward hedging quota up to 80%
+  maturity_tolerance_days: 7
+  disclosed_earnings_sensitivities:
+    # Values intentionally null: not supplied in the specification attachments.
+    - {currency: EUR, plus_10pct: null, minus_10pct: null, unit: "EUR m", source: "Annual Report FY2025 pp. 215-216, 220", verified: false}
+    - {currency: CNY, plus_10pct: null, minus_10pct: null, unit: "USD m", source: "Annual Report FY2025 pp. 215-216, 220", verified: false}
+    - {currency: GBP, plus_10pct: null, minus_10pct: null, unit: "USD m", source: "Annual Report FY2025 pp. 215-216, 220", verified: false}
+
+interest:
+  series: ECB_DFR               # deposit facility rate; alternative ECB_ESTR
+  alt_series: [ECB_DFR, ECB_ESTR]
+  currency: EUR
+  default_mode: A
+  disclosed_up_per_100bps: "-20.8"     # EUR m, FY2025 disclosure claim (unverified page reconciliation)
+  disclosed_down_per_100bps: "21.5"    # EUR m, applies when change < 0
+  disclosed_source: "FY2025 disclosure claim supplied in spec s5; page-level reconciliation required"
+  shock_bounds_bps: [-200, 200]
+  fallback_shock_bps: "25"
+  table_multipliers: [0, 0.5, 1, 2]
+  table_labels: ["No change", "Partial reversal", "Latest move", "Additional stress"]
+  horizon_months_days: {"3": 91, "6": 182, "12": 365}
+  default_horizon_months: 6
+  mode_b:
+    principal_eur_m: null       # NO DEFAULT: debt schedule not supplied -> Mode B is UNAVAILABLE until given
+    hedged_fraction: "0"
+    position_type: floating_debt
+  volatility_window: 60
+
+bunker:
+  series: VLSFO_ROTTERDAM
+  currency: USD
+  horizon_days: 182
+  consumption_mt: "2.4"         # Q, million tonnes (spec s6 illustrative)
+  recovery_fraction: "0.20"     # r
+  cash_factor: "1.00"           # t
+  shock_bounds_usd_t: [-300, 300]
+  fallback_shock_usd_t: "50"
+  table_multipliers: [0, 0.5, 1, 1.5]
+  table_labels: ["No change", "Partial reversal", "Latest move", "Additional stress"]
+  disclosed_reference:
+    - {label: "H1 2026 Q1 company consumption price", value: "485", unit: "USD/t"}
+    - {label: "H1 2026 Q2 company consumption price", value: "700", unit: "USD/t"}
+    - {label: "Middle East-related cash costs", value: "600", unit: "USD m"}
+    - {label: "of which inventory build-up", value: "200", unit: "USD m"}
+  disclosed_source: "User-supplied H1 2026 references (Investor Report H1 2026); verify cited pages before publication"
+
+freight:
+  series: SCFI
+  currency: USD
+  horizon_days: 182
+  transmission_k: "1.00"
+  cash_collection_c: "1.00"
+  volume_m_teu: "6.7"           # V, horizon-matched
+  realised_rate_usd_teu: "1406" # F0
+  shock_bounds_pct: [-50, 50]
+  fallback_shock_pct: "8"
+  table_multipliers: [0, 0.5, 1, 1.5]
+  table_labels: ["No change", "Partial reversal", "Latest move", "Additional upside"]
+  downside_pct: [-4, -8, -12]   # engine addition: spec rows are upside-only; falling rates are the adverse case
+  disclosed_reference:
+    - {label: "H1 2026 realised freight rate", value: "1406", unit: "USD/TEU"}
+    - {label: "H1 2026 transport volume (approx.)", value: "6.7", unit: "m TEU"}
+    - {label: "Q2 2026 realised freight rate", value: "1475", unit: "USD/TEU"}
+    - {label: "Q2 2026 transport volume (approx.)", value: "3.5", unit: "m TEU"}
+  disclosed_source: "User-supplied H1 2026 references; confirm pages before treating as verified"
+
+scenario_presets:
+  # ILLUSTRATIVE stress sets for the what-if panel. Shock sizes are demonstration choices, not forecasts or company policy.
+  # Keys are slider ids; FX values are % change of that currency against USD (negative = USD stronger).
+  - id: observed
+    label: "This week's moves"
+    description: "Each slider at its observed 1-week move (the default view)."
+    shocks: {}
+  - id: red_sea
+    label: "Red Sea escalation"
+    description: "Rerouting lifts bunker and spot freight; safe-haven USD demand."
+    shocks: {bunker: 100, freight: 25, fx_eur: -3, fx_gbp: -3, fx_cny: -1}
+  - id: ecb_hike
+    label: "ECB hikes 50 bps"
+    description: "Policy rate +50 bps; euro firms modestly."
+    shocks: {interest: 50, fx_eur: 2}
+  - id: usd_rally
+    label: "USD rally"
+    description: "Broad dollar strength against all exposure currencies."
+    shocks: {fx_eur: -5, fx_gbp: -5, fx_cny: -3, fx_cad: -5}
+  - id: freight_slump
+    label: "Freight slump"
+    description: "Overcapacity pushes spot rates down; bunker eases."
+    shocks: {freight: -20, bunker: -50}

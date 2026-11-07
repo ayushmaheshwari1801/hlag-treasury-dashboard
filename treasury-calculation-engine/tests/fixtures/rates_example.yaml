@@ -1,0 +1,58 @@
+# Worked example 8.14: Fed cutting cycle (spec 5.5, 8.14). USD only; no maturities, fixed debt,
+# leases or ZIM. Exposures are explicit because the resets fall on the 15th (P42). Each item's
+# resets/rolls list the dates inside the horizon; the period running at T0 started one quarter
+# before the first. Amounts in USD; expected figures in USD m as written in the spec.
+as_of: 2026-10-31
+market:
+  SOFR: {value: 4.0, unit: "%", value_date: 2026-10-30}
+exposures:
+  - {sub_id: "rates:float:USD:A", owner_spec: rates, kind: float, currency: USD, label: ASSUMPTION,
+     sizing_note: "Debt A 300 at SOFR + 2.00%", quantities: {notional: 300000000, spread_bp: 200, reset_months: 3},
+     dates: {resets: [2026-11-15, 2027-02-15, 2027-05-15, 2027-08-15]}}
+  - {sub_id: "rates:float:USD:B", owner_spec: rates, kind: float, currency: USD, label: ASSUMPTION,
+     sizing_note: "Debt B 300 at SOFR + 2.00%", quantities: {notional: 300000000, spread_bp: 200, reset_months: 3},
+     dates: {resets: [2026-12-15, 2027-03-15, 2027-06-15, 2027-09-15]}}
+  - {sub_id: "rates:float:USD:C", owner_spec: rates, kind: float, currency: USD, label: ASSUMPTION,
+     sizing_note: "Debt C 300 at SOFR + 2.00%", quantities: {notional: 300000000, spread_bp: 200, reset_months: 3},
+     dates: {resets: [2027-01-15, 2027-04-15, 2027-07-15, 2027-10-15]}}
+  - {sub_id: "rates:deposit:USD:1", owner_spec: rates, kind: deposit, currency: USD, label: ASSUMPTION,
+     sizing_note: "Cash 1 500 at SOFR - 0.10%", quantities: {balance_usd: 500000000, spread_below_bp: 10, roll_months: 3},
+     dates: {rolls: [2026-12-01, 2027-03-01, 2027-06-01, 2027-09-01]}}
+  - {sub_id: "rates:deposit:USD:2", owner_spec: rates, kind: deposit, currency: USD, label: ASSUMPTION,
+     sizing_note: "Cash 2 500 at SOFR - 0.10%", quantities: {balance_usd: 500000000, spread_below_bp: 10, roll_months: 3},
+     dates: {rolls: [2027-01-01, 2027-04-01, 2027-07-01, 2027-10-01]}}
+  - {sub_id: "rates:deposit:USD:3", owner_spec: rates, kind: deposit, currency: USD, label: ASSUMPTION,
+     sizing_note: "Cash 3 500 at SOFR - 0.10%", quantities: {balance_usd: 500000000, spread_below_bp: 10, roll_months: 3},
+     dates: {rolls: [2027-02-01, 2027-05-01, 2027-08-01]}}
+scenario:
+  name: "Fed cutting cycle"
+  start_date: 2026-11-01
+  source: custom
+  preset_id: fed_cutting_cycle
+  rates:
+    rate_path:
+      USD: [{date: 2026-12-10, step_bp: -25}, {date: 2027-01-28, step_bp: -25},
+            {date: 2027-03-18, step_bp: -25}, {date: 2027-04-29, step_bp: -25}]
+expected:
+  rows:   # sub_id, payment date, period start, days, delta rate fixed at start (%), delta (USD m)
+    - [rates:float:USD:A, 2027-05-15, 2027-02-15, 89, "-0.50", "0.3708"]
+    - [rates:float:USD:A, 2027-08-15, 2027-05-15, 92, "-1.00", "0.7667"]
+    - [rates:float:USD:B, 2027-03-15, 2026-12-15, 90, "-0.25", "0.1875"]
+    - [rates:float:USD:B, 2027-06-15, 2027-03-15, 92, "-0.50", "0.3833"]
+    - [rates:float:USD:B, 2027-09-15, 2027-06-15, 92, "-1.00", "0.7667"]
+    - [rates:float:USD:C, 2027-04-15, 2027-01-15, 90, "-0.25", "0.1875"]
+    - [rates:float:USD:C, 2027-07-15, 2027-04-15, 91, "-0.75", "0.5688"]
+    - [rates:float:USD:C, 2027-10-15, 2027-07-15, 92, "-1.00", "0.7667"]
+    - [rates:deposit:USD:1, 2027-06-01, 2027-03-01, 92, "-0.50", "-0.6389"]
+    - [rates:deposit:USD:1, 2027-09-01, 2027-06-01, 92, "-1.00", "-1.2778"]
+    - [rates:deposit:USD:2, 2027-04-01, 2027-01-01, 90, "-0.25", "-0.3125"]
+    - [rates:deposit:USD:2, 2027-07-01, 2027-04-01, 91, "-0.75", "-0.9479"]
+    - [rates:deposit:USD:2, 2027-10-01, 2027-07-01, 92, "-1.00", "-1.2778"]
+    - [rates:deposit:USD:3, 2027-05-01, 2027-02-01, 89, "-0.50", "-0.6181"]
+    - [rates:deposit:USD:3, 2027-08-01, 2027-05-01, 92, "-1.00", "-1.2778"]
+  debt_side: "3.9979"      # +1,439.25 / 360
+  cash_side: "-6.3507"     # -2,286.25 / 360
+  net: "-2.3528"           # -847 / 360
+  first_cash_effect: 2027-03-15
+  gross_adverse: {value: "6.3507", date: 2027-10-01, side: cash}
+  unchanged_through: 2027-02-01

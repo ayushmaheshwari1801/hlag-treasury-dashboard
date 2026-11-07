@@ -1,0 +1,58 @@
+# Worked example 9B.13: EUR rally (spec 5.5, 9B.13). T0 = 31 Oct 2026; base USD per EUR 1.15, USD per CAD 0.72.
+# The fx-owned lines come from explicit exposure items run through the FX module (P42); the rates and freight
+# EUR lines are listed explicitly (other_lines). History holds the CAD spot on the start date of the hedge for
+# 30 Nov (31 Aug 2026, before T0). Amounts in native units; expected figures in USD m as written in the spec.
+as_of: 2026-10-31
+profile_values:
+  fx.hedge_ratio.cad: 0.7
+  fx.hedge_ratio.eur_debt: 1.0
+  fx.hedge_ratio.eur_operating_costs: 0.0
+  fx.hedge_ratio.eur_dividend: 0.0
+market:
+  FX_USD_PER_EUR: {value: 1.15, unit: USD per unit, value_date: 2026-10-30}
+  FX_USD_PER_CAD: {value: 0.72, unit: USD per unit, value_date: 2026-10-30}
+history:
+  FX_USD_PER_CAD: [[2026-08-31, 0.71], [2026-10-30, 0.72]]
+  FX_USD_PER_EUR: [[2026-10-30, 1.15]]
+exposures:
+  - {sub_id: "fx:opex:EUR:2026-11-30", owner_spec: fx, kind: opex, currency: EUR, label: ASSUMPTION,
+     sizing_note: "EUR operating cost", quantities: {amount: 30000000}, dates: {payment_date: 2026-11-30}}
+  - {sub_id: "fx:dividend:EUR:2026-12-15", owner_spec: fx, kind: dividend, currency: EUR, label: ASSUMPTION,
+     sizing_note: "EUR dividend (fixture date)", quantities: {amount: 50000000}, dates: {payment_date: 2026-12-15}}
+  - {sub_id: "fx:maturity:EUR:2026-12", owner_spec: fx, kind: maturity, currency: EUR, label: ASSUMPTION,
+     sizing_note: "EUR debt principal", quantities: {amount: 20000000, amount_usd_at_disclosure: 22792000, floating_share: 1.0},
+     dates: {maturity_date: 2026-12-20}}
+  - {sub_id: "fx:opex:CAD:2026-11-30", owner_spec: fx, kind: opex, currency: CAD, label: DERIVED,
+     sizing_note: "CAD operating cost", quantities: {amount: 13000000}, dates: {payment_date: 2026-11-30}}
+  - {sub_id: "fx:opex:CAD:2027-02-28", owner_spec: fx, kind: opex, currency: CAD, label: DERIVED,
+     sizing_note: "CAD operating cost", quantities: {amount: 13000000}, dates: {payment_date: 2027-02-28}}
+other_lines:   # owned by rates and freight
+  - {sub_id: "rates:float:EUR:1", date: 2026-12-15, currency: EUR, amount: "-2000000.00", owner_spec: rates,
+     line_code: INTEREST_EXPENSE, label: ASSUMPTION}
+  - {sub_id: "freight:spot:ASIA_EUROPE:arr", date: 2026-12-15, currency: EUR, amount: "12000000.00", owner_spec: freight,
+     line_code: FREIGHT_REVENUE, label: ASSUMPTION}
+scenario:
+  name: "EUR rally"
+  start_date: 2026-11-01
+  default_shape: step
+  source: preset
+  preset_id: eur_rally
+  fx: {move_pct: {EUR: 10, GBP: 5, CAD: 3}}
+expected:
+  lines:   # sub_id, line code, base USD, scenario USD, delta (USD m)
+    - ["fx:opex:EUR:2026-11-30", FX_OPERATING_COST, "-34.50", "-37.95", "-3.45"]
+    - ["fx:dividend:EUR:2026-12-15", DIVIDEND, "-57.50", "-63.25", "-5.75"]
+    - ["rates:float:EUR:1", INTEREST_EXPENSE, "-2.30", "-2.53", "-0.23"]
+    - ["freight:spot:ASIA_EUROPE:arr", FREIGHT_REVENUE, "13.80", "15.18", "1.38"]
+    - ["fx:maturity:EUR:2026-12", DEBT_PRINCIPAL, "-23.00", "-25.30", "-2.30"]
+    - ["fx:opex:CAD:2026-11-30", FX_OPERATING_COST, "-9.36", "-9.6408", "-0.2808"]
+    - ["fx:opex:CAD:2027-02-28", FX_OPERATING_COST, "-9.36", "-9.6408", "-0.2808"]
+  hedges:  # hedged sub_id, notional (native m), K base, K scenario, base USD, scenario USD, delta
+    - ["fx:maturity:EUR:2026-12", "20", "1.15", "1.15", "0.00", "2.30", "2.30"]
+    - ["fx:opex:CAD:2026-11-30", "9.1", "0.71", "0.71", "0.091", "0.28756", "0.19656"]
+    - ["fx:opex:CAD:2027-02-28", "9.1", "0.72", "0.7416", "0.00", "0.00", "0.00"]
+  total_delta: "-8.41504"
+  fx_bar: "-8.41504"
+  net_eur_need_2026_12_15: "-40.00"
+  unhedged_eur_window: {amount: "70.00", delta: "-8.05"}
+  eur_principal_net: "0.00"

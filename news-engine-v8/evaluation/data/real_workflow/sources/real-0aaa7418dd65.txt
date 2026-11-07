@@ -1,0 +1,5 @@
+In the wake of the European Commission’s announcement that it is investigating Illumina’s $7.1 billion proposed acquisition of DNA sequencing provider Illumina, the Federal Trade Commission has authorized staff to dismiss its federal court complaint for Preliminary Injunction and Temporary Restraining Order. Acting Bureau of Competition Director Maribeth Petrizzi issued this statement on the Commission’s action:
+
+“The FTC sought preliminary relief in federal court to prevent Illumina and GRAIL from merging while the case is being decided on the merits in administrative court. At the time, a district court order was necessary to prevent the parties from consummating their merger. The administrative trial is scheduled to begin on August 24, 2021. Now that the European Commission is investigating, Illumina and GRAIL cannot implement the transaction without obtaining clearance from the European Commission.”
+
+Dismissing the complaint for Preliminary Injunction and Temporary Restraining Order when preliminary relief is no longer necessary would conserve FTC and judicial resources, Acting Director Petrizzi added.

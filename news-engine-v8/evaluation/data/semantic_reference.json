@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "annotation_provenance": "Source-first annotations by Codex evaluation author; not human-adjudicated independent ground truth. Labels frozen before updated model outputs and never supplied to production.",
+  "source_hashes": {
+    "real-5e84489fdd4c": "405c8e351aa3c3b9bf8b96e97e5d5e3fa0374f3c7dfba3a15c27d3729f6de9d2",
+    "real-50339f5e620a": "551dda8b96fc8090c000c86267b9551c30312078cd890e28782b5bde50cf6cb9",
+    "real-a114d8803587": "8f4d6497242a8264f61f7a3a923bf0cef312005dea5beed02458b3239242fc10",
+    "real-7645ea4d8dda": "5fab8b62de5c62dc596c9874a6725a3dcfa1a70bea1f869f086c5be3d33ef308",
+    "real-405b3123823f": "4fec1458add7822a1a797514f0ec76c4cdc4c11fd77dcaee1ca5357f7f69670c",
+    "fed-20240828-final-capital": "e5886b6481ca275a9ea058651bbd68afb5e522abdf79fc217e5d545569d27726"
+  },
+  "claims": [
+    {
+      "case_id": "facility_plan",
+      "source_id": "real-7645ea4d8dda",
+      "anchor": "will establish a facility to provide term financing backed by PPP loans",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced"
+      ],
+      "categories": [
+        "regulatory",
+        "macroeconomics"
+      ],
+      "rationale": "The facility is announced for establishment, not yet operational."
+    },
+    {
+      "case_id": "capital_neutrality",
+      "source_id": "real-a114d8803587",
+      "anchor": "neutralize the regulatory capital effects",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "This is an interim FINAL rule and the source explicitly states effective immediately; open comments do not make it a proposal."
+    },
+    {
+      "case_id": "zero_weight",
+      "source_id": "real-a114d8803587",
+      "anchor": "zero percent risk weight applies",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Present legal effect within an immediately effective interim final rule."
+    },
+    {
+      "case_id": "immediate_effect",
+      "source_id": "real-a114d8803587",
+      "anchor": "effective immediately",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Explicit immediate legal effectiveness."
+    },
+    {
+      "case_id": "relative_comment",
+      "source_id": "real-a114d8803587",
+      "anchor": "30 days after publication",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced",
+        "actual"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Comment acceptance is future; a combined immediate-effect/comment Change mixes statuses and requires adjudication."
+    },
+    {
+      "case_id": "facility_operation",
+      "source_id": "real-50339f5e620a",
+      "anchor": "fully operational and available",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual"
+      ],
+      "categories": [
+        "regulatory",
+        "macroeconomics"
+      ],
+      "rationale": "Source explicitly establishes actual operation."
+    },
+    {
+      "case_id": "facility_collateral",
+      "source_id": "real-50339f5e620a",
+      "anchor": "using such loans as collateral",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced",
+        "actual"
+      ],
+      "categories": [
+        "regulatory",
+        "macroeconomics"
+      ],
+      "rationale": "Will support/extend describes the announced mechanism; operational context permits actual interpretation."
+    },
+    {
+      "case_id": "board_temporary",
+      "source_id": "real-5e84489fdd4c",
+      "anchor": "will temporarily modify the Board's rules",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Future announced Board action, not completed implementation."
+    },
+    {
+      "case_id": "sba_clarification",
+      "source_id": "real-5e84489fdd4c",
+      "anchor": "The SBA recently clarified",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Explicit prior completed SBA clarification, distinct from future Board action."
+    },
+    {
+      "case_id": "board_sba_alignment",
+      "source_id": "real-5e84489fdd4c",
+      "anchor": "consistent with SBA's rules and restrictions",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Qualifications attach to the announced Board change."
+    },
+    {
+      "case_id": "board_only",
+      "source_id": "real-5e84489fdd4c",
+      "anchor": "The change only applies to PPP loans",
+      "claim_type": "announced",
+      "acceptable_claim_types": [
+        "announced"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Explicit restriction on announced Board change, not proof of operation."
+    },
+    {
+      "case_id": "nonprofit_proposal",
+      "source_id": "real-405b3123823f",
+      "anchor": "the proposed expansion would offer loans",
+      "claim_type": "proposed",
+      "acceptable_claim_types": [
+        "proposed"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "The new expansion is explicitly a proposal under public feedback, not finalized."
+    },
+    {
+      "case_id": "adopted_future_effective",
+      "source_id": "fed-20240828-final-capital",
+      "anchor": "announced final individual capital requirements for all large banks, effective on October 1",
+      "claim_type": "actual",
+      "acceptable_claim_types": [
+        "actual",
+        "announced"
+      ],
+      "categories": [
+        "regulatory"
+      ],
+      "rationale": "Final requirements are adopted despite future effective date. Actual adoption or announced final decision are defensible; proposed is incorrect."
+    }
+  ],
+  "coverage_gaps": [
+    "Reference includes an official final-future-effective release and an explicit proposal. Four-source replay does not exercise these extra sources; report them unexercised unless separately supplied.",
+    "Industry and macro-only category recall not established by PPP/regulatory sample.",
+    "No exhaustive gold for atomicity, total completeness, scoring consistency or summary fidelity; require manual/judge assessment."
+  ],
+  "additional_sources": {
+    "fed-20240828-final-capital": {
+      "source_id": "fed-20240828-final-capital",
+      "source": {
+        "title": "Federal Reserve Board announces final individual capital requirements for all large banks, effective on October 1",
+        "body": "Following its stress test earlier this year, the Federal Reserve Board on Wednesday announced final individual capital requirements for all large banks, effective on October 1.",
+        "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20240828a.htm",
+        "source": "Federal Reserve Board",
+        "published_at": "2024-08-28T00:00:00+00:00"
+      },
+      "provenance": {
+        "body_sha256": "e5886b6481ca275a9ea058651bbd68afb5e522abdf79fc217e5d545569d27726",
+        "text_mode": "Exact selected first paragraph; verified primary official release by separate audit context."
+      }
+    }
+  },
+  "workflow_source_ids": [
+    "real-7645ea4d8dda",
+    "real-a114d8803587",
+    "real-50339f5e620a",
+    "real-5e84489fdd4c"
+  ]
+}

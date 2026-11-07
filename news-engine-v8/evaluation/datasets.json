@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "datasets": [
+    {
+      "id": "article-gold",
+      "path": "tests/fixtures/article_gold.json",
+      "scope": "W2/W3 article contract labels; synthetic"
+    },
+    {
+      "id": "watch-gold",
+      "path": "tests/fixtures/watch_gold.json",
+      "scope": "Manual Watch and article matching; synthetic"
+    },
+    {
+      "id": "workflow-robustness",
+      "path": "tests/fixtures/workflow_robustness.json",
+      "scope": "Fixed-response offline workflow cases; not model accuracy"
+    },
+    {
+      "id": "events-v3",
+      "path": "tests/fixtures/event_sequences_v3.json",
+      "scope": "Seven synthetic sources; frozen W2; occurrence/development labels"
+    },
+    {
+      "id": "events-legacy",
+      "path": "tests/fixtures/event_sequences.json",
+      "scope": "Preserved earlier labels for the same synthetic event sources"
+    },
+    {
+      "id": "events-real-v1",
+      "path": "tests/fixtures/event_sequences_real_v1.json",
+      "scope": "72 real official releases; 23 occurrences; assistant labels; development benchmark"
+    },
+    {
+      "id": "events-real-sources-v1",
+      "path": "tests/fixtures/event_real_sources_v1.json",
+      "scope": "Source archive and provenance for the frozen 72-release corpus"
+    },
+    {
+      "id": "w3-news-context-v4",
+      "path": "tests/fixtures/major_changes_news_context_v4.json",
+      "scope": "120 synthetic cases from 20 correlated templates; frozen W2"
+    },
+    {
+      "id": "w3-major-v3",
+      "path": "tests/fixtures/major_changes_v3.json",
+      "scope": "Preserved shorter-input major-change benchmark"
+    },
+    {
+      "id": "w3-legacy-v2",
+      "path": "tests/fixtures/live_robustness_v2.json",
+      "scope": "Preserved earlier extraction benchmark"
+    },
+    {
+      "id": "real-workflow-txt-csv-v1",
+      "path": "evaluation/data/real_workflow/manifest.json",
+      "scope": "72 authentic news passages and original archives as TXT; source/provenance, historical intake scenarios, Event gold and service contracts as CSV; no frozen W2 inputs to full pipeline"
+    },
+    {
+      "id": "major-change-draft-v1",
+      "path": "evaluation/labels/major_change_subset_v1.json",
+      "scope": "Six authentic-source MajorChange draft annotations plus four explicitly synthetic boundary cases; not independently adjudicated, never model inputs"
+    }
+  ]
+}

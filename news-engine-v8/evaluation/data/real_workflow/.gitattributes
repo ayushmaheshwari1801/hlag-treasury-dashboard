@@ -1,0 +1,5 @@
+# Preserve byte hashes on platforms configured with automatic newline conversion.
+sources/*.txt -text
+archive/*.txt -text
+*.csv text eol=lf
+manifest.json text eol=lf

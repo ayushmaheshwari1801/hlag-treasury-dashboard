@@ -1,0 +1,611 @@
+{
+  "as_of": "2026-10-21T14:00:00+08:00",
+  "status": "partial",
+  "articles": [
+    {
+      "article_id": "A32c2267b6f07abd3868f1c89",
+      "group_id": "20f3ad1d-dc0a-48a9-adba-42e9e49f1fc0",
+      "title": "MPA synthetic operational reopening notice",
+      "url": "https://www.mpa.gov.sg/media-centre/details/synthetic-v3-test",
+      "published_at": "2026-10-21T00:00:00Z",
+      "revision": 1,
+      "category": "Industry",
+      "summary": "Port Delta authority confirmed that cargo handling has resumed.",
+      "facts": [
+        "Port Delta authority confirmed that cargo handling has resumed."
+      ],
+      "score": 88,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "port_reopening_notice",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "A32c2267b6f07abd3868f1c89"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "A32c2267b6f07abd3868f1c89"
+      ],
+      "sources": [
+        {
+          "article_id": "A32c2267b6f07abd3868f1c89",
+          "title": "MPA synthetic operational reopening notice",
+          "url": "https://www.mpa.gov.sg/media-centre/details/synthetic-v3-test",
+          "source": "www.mpa.gov.sg",
+          "revision": 1,
+          "published_at": "2026-10-21T00:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "scores": {
+        "potential_impact": 5,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: Port Delta authority confirmed that cargo handling has resumed.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 1,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "A43f4407269115675c8e33308",
+      "group_id": "442c0a99-dfe7-4a8a-a8fd-c6b6064b83d1",
+      "title": "Port Delta strike extended",
+      "url": "https://independent.example.org/strike-extension",
+      "published_at": "2026-10-20T01:00:00Z",
+      "revision": 2,
+      "category": "Industry",
+      "summary": "The planned strike at Port Delta was extended from 24 hours to 72 hours. The port authority has now confirmed that cargo handling has resumed.",
+      "facts": [
+        "The planned strike at Port Delta was extended from 24 hours to 72 hours.",
+        "The port authority has now confirmed that cargo handling has resumed."
+      ],
+      "score": 88,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 72,
+          "unit": "hours",
+          "change": {
+            "previous": 24.0,
+            "delta": 48.0,
+            "unit": "hours"
+          },
+          "direction": "increase",
+          "source_ids": [
+            "A43f4407269115675c8e33308"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "Abe236bcb9f4a9ed08e79cf81",
+        "A43f4407269115675c8e33308"
+      ],
+      "sources": [
+        {
+          "article_id": "Abe236bcb9f4a9ed08e79cf81",
+          "title": "Port Delta strike extended",
+          "url": "https://independent.example.org/strike-extension",
+          "source": "independent.example.org",
+          "revision": 1,
+          "published_at": "2026-10-20T01:00:00+00:00"
+        },
+        {
+          "article_id": "A43f4407269115675c8e33308",
+          "title": "Port Delta strike extended",
+          "url": "https://independent.example.org/strike-extension",
+          "source": "independent.example.org",
+          "revision": 2,
+          "published_at": "2026-10-20T01:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "scores": {
+        "potential_impact": 5,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: The planned strike at Port Delta was extended from 24 hours to 72 hours.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 2,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "A57a7a4d9ef6f9024e1e39358",
+      "group_id": "b99a8104-6e48-4970-98d3-600f39b09835",
+      "title": "Fuel and freight observations",
+      "url": "https://shipping-data.example.org/weekly",
+      "published_at": "2026-10-21T01:00:00Z",
+      "revision": 1,
+      "category": "Industry",
+      "summary": "The shipping bulletin reported bunker fuel at 600 USD per tonne. It also reported a freight rate of 1200 USD per TEU.",
+      "facts": [
+        "The shipping bulletin reported bunker fuel at 600 USD per tonne.",
+        "It also reported a freight rate of 1200 USD per TEU."
+      ],
+      "score": 80,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "bunker_fuel_price",
+          "level": "numeric",
+          "value": 600,
+          "unit": "USD per tonne",
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "A57a7a4d9ef6f9024e1e39358"
+          ]
+        },
+        {
+          "indicator": "freight_rate",
+          "level": "numeric",
+          "value": 1200,
+          "unit": "USD per TEU",
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "A57a7a4d9ef6f9024e1e39358"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "A57a7a4d9ef6f9024e1e39358"
+      ],
+      "sources": [
+        {
+          "article_id": "A57a7a4d9ef6f9024e1e39358",
+          "title": "Fuel and freight observations",
+          "url": "https://shipping-data.example.org/weekly",
+          "source": "shipping-data.example.org",
+          "revision": 1,
+          "published_at": "2026-10-21T01:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "bunker_prices",
+        "freight_rates"
+      ],
+      "scores": {
+        "potential_impact": 4,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: The shipping bulletin reported bunker fuel at 600 USD per tonne.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 3,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "Aa42b0e2a04215c013c5b9c4d",
+      "group_id": "95a0ed8f-3e65-45f6-baf6-ccfd340542f5",
+      "title": "Market B raises policy rate",
+      "url": "https://market-b.example.org/rate",
+      "published_at": "2026-10-19T03:00:00Z",
+      "revision": 1,
+      "category": "Macroeconomic",
+      "summary": "Market B central bank announced that its policy rate increased by 50 basis points.",
+      "facts": [
+        "Market B central bank announced that its policy rate increased by 50 basis points."
+      ],
+      "score": 80,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "policy_rate_adjustment",
+          "level": "numeric",
+          "value": 50,
+          "unit": "basis points",
+          "change": null,
+          "direction": "increase",
+          "source_ids": [
+            "Aa42b0e2a04215c013c5b9c4d"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "Aa42b0e2a04215c013c5b9c4d"
+      ],
+      "sources": [
+        {
+          "article_id": "Aa42b0e2a04215c013c5b9c4d",
+          "title": "Market B raises policy rate",
+          "url": "https://market-b.example.org/rate",
+          "source": "market-b.example.org",
+          "revision": 1,
+          "published_at": "2026-10-19T03:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "general"
+      ],
+      "scores": {
+        "potential_impact": 4,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: Market B central bank announced that its policy rate increased by 50 basis points.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 4,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "A207e7c48aded206de3be487c",
+      "group_id": "fceef647-8811-4570-b90e-05f3432866ae",
+      "title": "Port Delta announces planned strike",
+      "url": "https://port-delta.example.org/strike",
+      "published_at": "2026-10-19T01:00:00Z",
+      "revision": 1,
+      "category": "Industry",
+      "summary": "Port Delta authority announced a planned strike lasting 24 hours.",
+      "facts": [
+        "Port Delta authority announced a planned strike lasting 24 hours."
+      ],
+      "score": 80,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "planned_strike_duration",
+          "level": "numeric",
+          "value": 24,
+          "unit": "hours",
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "A207e7c48aded206de3be487c"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "A207e7c48aded206de3be487c",
+        "Ab4f3e1116afe2e634041da15"
+      ],
+      "sources": [
+        {
+          "article_id": "A207e7c48aded206de3be487c",
+          "title": "Port Delta announces planned strike",
+          "url": "https://port-delta.example.org/strike",
+          "source": "port-delta.example.org",
+          "revision": 1,
+          "published_at": "2026-10-19T01:00:00+00:00"
+        },
+        {
+          "article_id": "Ab4f3e1116afe2e634041da15",
+          "title": "Port Delta kündigt Streik an",
+          "url": "https://shipping-wire.example.de/streik",
+          "source": "shipping-wire.example.de",
+          "revision": 1,
+          "published_at": "2026-10-20T00:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "scores": {
+        "potential_impact": 4,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: Port Delta authority announced a planned strike lasting 24 hours.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 5,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "A708ec01c3c6b0bb6bcc62283",
+      "group_id": "6718656c-fd24-4902-a13c-52fb460859f9",
+      "title": "Unofficial post alleges strike ended",
+      "url": "https://rumor.example.org/reopening",
+      "published_at": "2026-10-20T03:00:00Z",
+      "revision": 1,
+      "category": "Industry",
+      "summary": "An unverified unofficial post alleges that the Port Delta strike has ended.",
+      "facts": [
+        "An unverified unofficial post alleges that the Port Delta strike has ended."
+      ],
+      "score": 72,
+      "review_status": "pending",
+      "signals": [],
+      "member_article_ids": [
+        "A708ec01c3c6b0bb6bcc62283"
+      ],
+      "sources": [
+        {
+          "article_id": "A708ec01c3c6b0bb6bcc62283",
+          "title": "Unofficial post alleges strike ended",
+          "url": "https://rumor.example.org/reopening",
+          "source": "rumor.example.org",
+          "revision": 1,
+          "published_at": "2026-10-20T03:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "port_delta_strike"
+      ],
+      "scores": {
+        "potential_impact": 3,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: An unverified unofficial post alleges that the Port Delta strike has ended.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 6,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "Aa0b2f678beb83183a7c32b51",
+      "group_id": "759c2dc6-2f92-450c-a9c5-d34aab20b77a",
+      "title": "Customs introduces clearance documentation rule",
+      "url": "https://customs.example.org/clearance",
+      "published_at": "2026-10-20T02:00:00Z",
+      "revision": 1,
+      "category": "Regulatory",
+      "summary": "The customs authority adopted a new requirement for electronic clearance documents.",
+      "facts": [
+        "The customs authority adopted a new requirement for electronic clearance documents."
+      ],
+      "score": 72,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "clearance_document_rule",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "Aa0b2f678beb83183a7c32b51"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "Aa0b2f678beb83183a7c32b51"
+      ],
+      "sources": [
+        {
+          "article_id": "Aa0b2f678beb83183a7c32b51",
+          "title": "Customs introduces clearance documentation rule",
+          "url": "https://customs.example.org/clearance",
+          "source": "customs.example.org",
+          "revision": 1,
+          "published_at": "2026-10-20T02:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "general"
+      ],
+      "scores": {
+        "potential_impact": 3,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: The customs authority adopted a new requirement for electronic clearance documents.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 7,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "A77a0244ad160b1754bbf016e",
+      "group_id": "e590c5ac-aea0-46b7-ab03-66021792ff76",
+      "title": "Market A proposes repatriation rule",
+      "url": "https://market-a.example.org/proposal",
+      "published_at": "2026-10-19T02:00:00Z",
+      "revision": 1,
+      "category": "Regulatory",
+      "summary": "Market A regulator published a proposal to change the approval process for corporate repatriation payments.",
+      "facts": [
+        "Market A regulator published a proposal to change the approval process for corporate repatriation payments."
+      ],
+      "score": 72,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "repatriation_rule_proposal",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "A77a0244ad160b1754bbf016e"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "A77a0244ad160b1754bbf016e"
+      ],
+      "sources": [
+        {
+          "article_id": "A77a0244ad160b1754bbf016e",
+          "title": "Market A proposes repatriation rule",
+          "url": "https://market-a.example.org/proposal",
+          "source": "market-a.example.org",
+          "revision": 1,
+          "published_at": "2026-10-19T02:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "general"
+      ],
+      "scores": {
+        "potential_impact": 3,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: Market A regulator published a proposal to change the approval process for corporate repatriation payments.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 8,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    },
+    {
+      "article_id": "Aee0cef5e9eed6eabe20c2dfc",
+      "group_id": "fe644d90-a7f9-400f-a36d-8d02034e8cb5",
+      "title": "MPA and CCS sign cooperation agreement",
+      "url": "https://maritime.example.org/agreement",
+      "published_at": "2026-10-19T04:00:00Z",
+      "revision": 1,
+      "category": "Industry",
+      "summary": "MPA and CCS signed an agreement covering green shipping. The same agreement also covers digitization of maritime services.",
+      "facts": [
+        "MPA and CCS signed an agreement covering green shipping.",
+        "The same agreement also covers digitization of maritime services."
+      ],
+      "score": 64,
+      "review_status": "confirmed",
+      "signals": [
+        {
+          "indicator": "maritime_cooperation_agreement",
+          "level": "factual_only",
+          "value": null,
+          "unit": null,
+          "change": null,
+          "direction": null,
+          "source_ids": [
+            "Aee0cef5e9eed6eabe20c2dfc"
+          ]
+        }
+      ],
+      "member_article_ids": [
+        "Aee0cef5e9eed6eabe20c2dfc"
+      ],
+      "sources": [
+        {
+          "article_id": "Aee0cef5e9eed6eabe20c2dfc",
+          "title": "MPA and CCS sign cooperation agreement",
+          "url": "https://maritime.example.org/agreement",
+          "source": "maritime.example.org",
+          "revision": 1,
+          "published_at": "2026-10-19T04:00:00+00:00"
+        }
+      ],
+      "event_labels": [
+        "general"
+      ],
+      "scores": {
+        "potential_impact": 2,
+        "company_relevance": 4,
+        "urgency_materiality": 4
+      },
+      "score_reasons": {
+        "potential_impact": "Synthetic test label for this reported fact: MPA and CCS signed an agreement covering green shipping.",
+        "company_relevance": "Synthetic fixture: relevance is fixed at 4 for replay and ranking tests; this is not a live company-exposure assessment.",
+        "urgency_materiality": "Synthetic fixture: urgency is fixed at 4 for replay tests; no live deadline assessment was performed."
+      },
+      "rank": 9,
+      "event_ids": [],
+      "areas": [
+        "EU"
+      ]
+    }
+  ],
+  "coverage_gaps": [
+    "Workflow E incomplete for 11 article revisions",
+    "EU / Regulatory: latest discovery returned no readable articles; coverage remains uncertain",
+    "EU / Macroeconomic: latest discovery returned no readable articles; coverage remains uncertain",
+    "Latest collection is partial"
+  ],
+  "tracked_events": [
+    {
+      "event_label": "bunker_prices",
+      "status": "monitoring",
+      "summary": "The shipping bulletin reported bunker fuel at 600 USD per tonne.",
+      "last_updated_at": "2026-10-21T14:00:00+08:00",
+      "supporting_article_ids": [
+        "A57a7a4d9ef6f9024e1e39358"
+      ],
+      "open_questions": []
+    },
+    {
+      "event_label": "freight_rates",
+      "status": "monitoring",
+      "summary": "The shipping bulletin reported bunker fuel at 600 USD per tonne.",
+      "last_updated_at": "2026-10-21T14:00:00+08:00",
+      "supporting_article_ids": [
+        "A57a7a4d9ef6f9024e1e39358"
+      ],
+      "open_questions": []
+    },
+    {
+      "event_label": "port_delta_strike",
+      "status": "resolved",
+      "summary": "Port Delta authority confirmed that cargo handling has resumed.",
+      "last_updated_at": "2026-10-21T14:00:00+08:00",
+      "supporting_article_ids": [
+        "A207e7c48aded206de3be487c",
+        "Abe236bcb9f4a9ed08e79cf81",
+        "A32c2267b6f07abd3868f1c89"
+      ],
+      "open_questions": []
+    }
+  ],
+  "automatic_events": [],
+  "watch_event_links": [],
+  "event_definitions": {
+    "general": "Fallback; no state tracking",
+    "port_delta_strike": "Track the October 2026 Port Delta strike duration and confirmed reopening; exclude later unrelated strikes.",
+    "bunker_prices": "Continuously monitor bunker fuel prices.",
+    "freight_rates": "Continuously monitor freight rates."
+  },
+  "reporting_horizon_days": 7
+}

@@ -1,0 +1,435 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen observed failure evidence for extraction coverage and qualification regressions; not revised gold labels or a model-quality oracle.",
+  "provenance": {
+    "repository": "yuguocc/agentic-treasury-dashboard",
+    "workflow_run_id": 41177003252,
+    "head_sha": "867ad640720525572b1d6c6da98840e633b31d98",
+    "workflow_run_url": "https://github.com/yuguocc/agentic-treasury-dashboard/actions/runs/41177003252",
+    "artifact_id": 13033453197,
+    "artifact_name": "unified-service-smoke-41177003252",
+    "requested_model": "deepseek/deepseek-v4-flash",
+    "reasoning_enabled": false,
+    "source_manifest": "evaluation/data/real_workflow/sources.csv",
+    "source_manifest_sha256": "0a05149dcee55b753f1b4757d991ddf06c659a18c75cbd7322a03acfd8d5b810",
+    "report_sha256": "6943502978cf1763ea173935636580c966e02b4ae3c52190227bc7294639dfee",
+    "raw_extraction_drafts_saved": false,
+    "extraction_record": "Accepted canonical extraction exported by each first intake result; this is not a raw ExtractionDraft response.",
+    "review_record": "Verbatim structured semantic_reviews record from the intake process monitoring artifact, joined by its exact fact_id set.",
+    "source_record": "Public source TXT files are referenced without duplication; their bytes and source CSV are pinned by SHA-256.",
+    "limitations": "The legacy review did not assess missing Event coverage. Coverage repair tests must supply an explicit scripted coverage finding and cannot claim that a prompt change improves model accuracy."
+  },
+  "cases": [
+    {
+      "source_id": "real-a114d8803587",
+      "source": {
+        "title": "Federal bank regulators issue interim final rule for Paycheck Protection Program Facility",
+        "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20200409a.htm",
+        "publisher": "Federal Reserve",
+        "published_at": "2020-04-09T00:00:00+00:00",
+        "discovered_at": "2020-04-09T23:00:05+00:00",
+        "path": "evaluation/data/real_workflow/sources/real-a114d8803587.txt",
+        "sha256": "8f4d6497242a8264f61f7a3a923bf0cef312005dea5beed02458b3239242fc10"
+      },
+      "article_id": "Ae82c57105c208803e5e2c1d0",
+      "revision": 1,
+      "cohort": "2020-04-06",
+      "artifact_records": {
+        "result": {
+          "path": "2020-04-06-intake-result.json",
+          "sha256": "bd16459053524c07b7ee4d295af06c90ee5b765c779439194feeb1407cdab5ee"
+        },
+        "monitoring": {
+          "path": "service/96c8a30b-2fc1-4053-8223-60f7dd1b5166/monitoring_6e8cb900-44a8-462a-b302-c2bca3cd40e0.json",
+          "sha256": "e3289c666fafb0043f660b9ca17c6bf530f259395a7d2b6e99d76c5ed370aeab"
+        }
+      },
+      "accepted_extraction": {
+        "article_id": "Ae82c57105c208803e5e2c1d0",
+        "category": "Regulatory",
+        "diagnostics": [],
+        "event_candidates": [],
+        "facts": [
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "Ae82c57105c208803e5e2c1d0",
+                "revision": 1,
+                "source_range": {
+                  "end": 1,
+                  "start": 1
+                }
+              }
+            ],
+            "fact_id": "Fe5da3027e7dba53b04f43250",
+            "kind": "conditional",
+            "observation": null,
+            "statement": "Federal bank regulators issued an interim final rule modifying capital rules for PPP facility participation.",
+            "verification": "confirmed"
+          },
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "Ae82c57105c208803e5e2c1d0",
+                "revision": 1,
+                "source_range": {
+                  "end": 5,
+                  "start": 5
+                }
+              }
+            ],
+            "fact_id": "F47874814dee28ea39e352da0",
+            "kind": "conditional",
+            "observation": null,
+            "statement": "The rule is effective immediately with comments accepted for 30 days after publication in the Federal Register.",
+            "verification": "confirmed"
+          }
+        ],
+        "followup_questions": [],
+        "review_status": "confirmed",
+        "revision": 1,
+        "schema_version": 1,
+        "summary": "Federal bank regulators issued an interim final rule to modify capital rules for PPP facility participation, effective immediately with a 30-day comment period."
+      },
+      "review_record": {
+        "response_schema": "ExtractionReview",
+        "contract_attempt": 1,
+        "response": {
+          "facts": [
+            {
+              "fact_id": "Fe5da3027e7dba53b04f43250",
+              "supported": true,
+              "reason": "Source segment 1 states that federal bank regulatory agencies announced an interim final rule to encourage lending through the PPP; the statement correctly reflects that the rule modifies capital rules for PPP participation."
+            },
+            {
+              "fact_id": "F47874814dee28ea39e352da0",
+              "supported": true,
+              "reason": "Source segment 5 states the rule is effective immediately and comments will be accepted for 30 days after publication in the Federal Register, matching the statement exactly."
+            }
+          ],
+          "candidates": [],
+          "summary_supported": true,
+          "review_status_supported": true,
+          "reason": "All facts are fully supported by the cited source segments. The summary accurately captures the regulatory action and its effective/comment period. The review status 'confirmed' matches the clear, explicit statements in the source."
+        },
+        "status": "accepted_contract"
+      },
+      "observed_event_ids": []
+    },
+    {
+      "source_id": "real-7645ea4d8dda",
+      "source": {
+        "title": "Federal Reserve will establish a facility to facilitate lending to small businesses via the Small Business Administration's Paycheck Protection Program (PPP) by providing term financing backed by PPP loans",
+        "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200406a.htm",
+        "publisher": "Federal Reserve",
+        "published_at": "2020-04-06T00:00:00+00:00",
+        "discovered_at": "2020-04-06T23:00:04+00:00",
+        "path": "evaluation/data/real_workflow/sources/real-7645ea4d8dda.txt",
+        "sha256": "5fab8b62de5c62dc596c9874a6725a3dcfa1a70bea1f869f086c5be3d33ef308"
+      },
+      "article_id": "A278b612a31bad7004a4178c1",
+      "revision": 1,
+      "cohort": "2020-04-06",
+      "artifact_records": {
+        "result": {
+          "path": "2020-04-06-intake-result.json",
+          "sha256": "bd16459053524c07b7ee4d295af06c90ee5b765c779439194feeb1407cdab5ee"
+        },
+        "monitoring": {
+          "path": "service/96c8a30b-2fc1-4053-8223-60f7dd1b5166/monitoring_6e8cb900-44a8-462a-b302-c2bca3cd40e0.json",
+          "sha256": "e3289c666fafb0043f660b9ca17c6bf530f259395a7d2b6e99d76c5ed370aeab"
+        }
+      },
+      "accepted_extraction": {
+        "article_id": "A278b612a31bad7004a4178c1",
+        "category": "Macroeconomic",
+        "diagnostics": [],
+        "event_candidates": [
+          {
+            "action": "establish a facility",
+            "development_at": null,
+            "event_at": "2020-04-06T00:00:00Z",
+            "fact_ids": [
+              "F7045ea87cfa6d1ceb2d7e4de"
+            ],
+            "identifier": null,
+            "lifecycle": "announced",
+            "location": null,
+            "open_questions": [
+              "What are the detailed terms of the facility (e.g., interest rate, maturity, leverage)?",
+              "When exactly will the facility become operational?",
+              "What is the total size or cap of the facility? How will it be funded? When will additional details be announced?"
+            ],
+            "scope": "term financing backed by PPP loans for small businesses through the SBA's Paycheck Protection Program",
+            "source_range": {
+              "end": 2,
+              "start": 1
+            },
+            "subject": "Federal Reserve",
+            "verification": "confirmed"
+          }
+        ],
+        "facts": [
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "A278b612a31bad7004a4178c1",
+                "revision": 1,
+                "source_range": {
+                  "end": 2,
+                  "start": 1
+                }
+              }
+            ],
+            "fact_id": "F7045ea87cfa6d1ceb2d7e4de",
+            "kind": "conditional",
+            "observation": null,
+            "statement": "The Federal Reserve will establish a facility to provide term financing backed by PPP loans to facilitate lending via the Paycheck Protection Program.",
+            "verification": "confirmed"
+          }
+        ],
+        "followup_questions": [
+          "What are the detailed terms of the facility (e.g., interest rate, maturity, leverage)?",
+          "When exactly will the facility become operational?",
+          "What is the total size or cap of the facility? How will it be funded? When will additional details be announced?"
+        ],
+        "review_status": "confirmed",
+        "revision": 1,
+        "schema_version": 1,
+        "summary": "The Federal Reserve announced it will create a facility that provides term financing backed by PPP loans to support small-business lending through the SBA's Paycheck Protection Program. Further details are expected later in the week."
+      },
+      "review_record": {
+        "response_schema": "ExtractionReview",
+        "contract_attempt": 1,
+        "response": {
+          "facts": [
+            {
+              "fact_id": "F7045ea87cfa6d1ceb2d7e4de",
+              "supported": true,
+              "reason": "Source segment 1 explicitly states the Federal Reserve will establish a facility providing term financing backed by PPP loans to facilitate lending via the Paycheck Protection Program, matching the statement and source range (1–2)."
+            }
+          ],
+          "candidates": [
+            {
+              "candidate_index": 0,
+              "supported": true,
+              "reason": "Source segment 1 directly supports the Federal Reserve's action to establish the facility with the stated scope on the publication date (2020-04-06), which is carried as event_at. All other fields (subject, action, scope, lifecycle) are grounded in the source."
+            }
+          ],
+          "summary_supported": true,
+          "review_status_supported": true,
+          "reason": "Both the fact and event candidate are fully supported by the source segments; the summary and confirmed review status accurately reflect the provided text."
+        },
+        "status": "accepted_contract"
+      },
+      "observed_event_ids": [
+        "E842dbf4dc3a74036aebeb0fee0928e5d"
+      ]
+    },
+    {
+      "source_id": "real-5e84489fdd4c",
+      "source": {
+        "title": "Federal Reserve Board announces rule change to bolster the effectiveness of the Small Business Administration's Paycheck Protection Program",
+        "url": "https://www.federalreserve.gov/newsevents/pressreleases/bcreg20200417a.htm",
+        "publisher": "Federal Reserve",
+        "published_at": "2020-04-17T00:00:00+00:00",
+        "discovered_at": "2020-04-17T23:00:07+00:00",
+        "path": "evaluation/data/real_workflow/sources/real-5e84489fdd4c.txt",
+        "sha256": "405c8e351aa3c3b9bf8b96e97e5d5e3fa0374f3c7dfba3a15c27d3729f6de9d2"
+      },
+      "article_id": "A4ed69a068439d6e681e09be7",
+      "revision": 1,
+      "cohort": "2020-04-13",
+      "artifact_records": {
+        "result": {
+          "path": "2020-04-13-intake-result.json",
+          "sha256": "c3495cb18d6b82bb48c69a320b2376820f48bb87fc42f404de0969ddf5ef895e"
+        },
+        "monitoring": {
+          "path": "service/c814355d-f6bd-4f1c-b421-2e755f2ce1d9/monitoring_fb97122a-d6d5-45ea-9e0b-447f3de8f281.json",
+          "sha256": "1a73d1868db050fd868b79960e011cf1bd84dabcca831804ca2d15dc3da850e9"
+        }
+      },
+      "accepted_extraction": {
+        "article_id": "A4ed69a068439d6e681e09be7",
+        "category": "Regulatory",
+        "diagnostics": [],
+        "event_candidates": [],
+        "facts": [
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "A4ed69a068439d6e681e09be7",
+                "revision": 1,
+                "source_range": {
+                  "end": 1,
+                  "start": 1
+                }
+              }
+            ],
+            "fact_id": "F16bda030866524919f0b02e5",
+            "kind": "factual",
+            "observation": null,
+            "statement": "The Federal Reserve Board announced a rule change.",
+            "verification": "unverified"
+          },
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "A4ed69a068439d6e681e09be7",
+                "revision": 1,
+                "source_range": {
+                  "end": 2,
+                  "start": 2
+                }
+              }
+            ],
+            "fact_id": "F7d4498dd9e2534379e82869e",
+            "kind": "factual",
+            "observation": null,
+            "statement": "The change will temporarily modify the Board's rules so that certain bank directors and shareholders can apply for PPP loans for their small businesses.",
+            "verification": "unverified"
+          },
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "A4ed69a068439d6e681e09be7",
+                "revision": 1,
+                "source_range": {
+                  "end": 7,
+                  "start": 7
+                }
+              }
+            ],
+            "fact_id": "Ff654a7c7a5af14ad9fbe1bdd",
+            "kind": "factual",
+            "observation": null,
+            "statement": "The change only applies to PPP loans.",
+            "verification": "unverified"
+          }
+        ],
+        "followup_questions": [],
+        "review_status": "pending",
+        "revision": 1,
+        "schema_version": 1,
+        "summary": "The Federal Reserve Board announced a rule change to allow certain bank directors and shareholders to apply for PPP loans, consistent with SBA rules, with the change applying only to PPP loans."
+      },
+      "review_record": {
+        "response_schema": "ExtractionReview",
+        "contract_attempt": 1,
+        "response": {
+          "facts": [
+            {
+              "fact_id": "F16bda030866524919f0b02e5",
+              "supported": true,
+              "reason": "Source segment 1 directly states 'The Federal Reserve Board on Friday announced a rule change', matching the fact's statement exactly."
+            },
+            {
+              "fact_id": "F7d4498dd9e2534379e82869e",
+              "supported": true,
+              "reason": "Source segment 2 contains the identical language: 'The change will temporarily modify the Board's rules so that certain bank directors and shareholders can apply for PPP loans for their small businesses.'"
+            },
+            {
+              "fact_id": "Ff654a7c7a5af14ad9fbe1bdd",
+              "supported": true,
+              "reason": "Source segment 7 states 'The change only applies to PPP loans', matching the fact verbatim."
+            }
+          ],
+          "candidates": [],
+          "summary_supported": true,
+          "review_status_supported": false,
+          "reason": "All facts are directly supported by the source segments, so the summary is supported. However, the extraction states review_status 'pending' without any basis in the article or company background; the article contains no information about review status (e.g., pending review or any review process), so review_status_supported is false."
+        },
+        "status": "accepted_contract"
+      },
+      "observed_event_ids": []
+    },
+    {
+      "source_id": "real-50339f5e620a",
+      "source": {
+        "title": "Federal Reserve announces its Paycheck Protection Program Liquidity Facility is fully operational and available to provide liquidity to eligible financial institutions",
+        "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200416a.htm",
+        "publisher": "Federal Reserve",
+        "published_at": "2020-04-16T00:00:00+00:00",
+        "discovered_at": "2020-04-16T23:00:06+00:00",
+        "path": "evaluation/data/real_workflow/sources/real-50339f5e620a.txt",
+        "sha256": "551dda8b96fc8090c000c86267b9551c30312078cd890e28782b5bde50cf6cb9"
+      },
+      "article_id": "A4f26b5bc68c38cac94a288f6",
+      "revision": 1,
+      "cohort": "2020-04-13",
+      "artifact_records": {
+        "result": {
+          "path": "2020-04-13-intake-result.json",
+          "sha256": "c3495cb18d6b82bb48c69a320b2376820f48bb87fc42f404de0969ddf5ef895e"
+        },
+        "monitoring": {
+          "path": "service/c814355d-f6bd-4f1c-b421-2e755f2ce1d9/monitoring_fb97122a-d6d5-45ea-9e0b-447f3de8f281.json",
+          "sha256": "1a73d1868db050fd868b79960e011cf1bd84dabcca831804ca2d15dc3da850e9"
+        }
+      },
+      "accepted_extraction": {
+        "article_id": "A4f26b5bc68c38cac94a288f6",
+        "category": "Macroeconomic",
+        "diagnostics": [
+          "Source review did not establish article qualification; retained as pending"
+        ],
+        "event_candidates": [],
+        "facts": [
+          {
+            "direction": null,
+            "evidence": [
+              {
+                "article_id": "A4f26b5bc68c38cac94a288f6",
+                "revision": 1,
+                "source_range": {
+                  "end": 1,
+                  "start": 1
+                }
+              }
+            ],
+            "fact_id": "F20c6613ffef08e159253b6bc",
+            "kind": "conditional",
+            "observation": null,
+            "statement": "The Federal Reserve's Paycheck Protection Program Liquidity Facility is fully operational and available to provide liquidity to eligible financial institutions.",
+            "verification": "confirmed"
+          }
+        ],
+        "followup_questions": [
+          "What are the detailed terms of the facility (e.g., interest rate, maturity, leverage)?",
+          "What is the total size or cap of the facility? How will it be funded? When will additional details be announced?",
+          "When exactly did the facility become operational?"
+        ],
+        "review_status": "pending",
+        "revision": 1,
+        "schema_version": 1,
+        "summary": "The Federal Reserve announces that its Paycheck Protection Program Liquidity Facility is fully operational and available to provide liquidity to eligible financial institutions to support the SBA's PPP."
+      },
+      "review_record": {
+        "response_schema": "ExtractionReview",
+        "contract_attempt": 1,
+        "response": {
+          "facts": [
+            {
+              "fact_id": "F20c6613ffef08e159253b6bc",
+              "supported": true,
+              "reason": "The fact directly restates the source segment 1: 'The Federal Reserve on Thursday announced that its Paycheck Protection Program Liquidity Facility is fully operational and available to provide liquidity to eligible financial institutions'. The observation is null, so no numeric/unit/period issues arise. Company context does not affect this macroeconomic fact."
+            }
+          ],
+          "candidates": [],
+          "summary_supported": true,
+          "review_status_supported": false,
+          "reason": "Summary is supported as it accurately reflects the announcement in segments 1-3. However, review_status is 'confirmed' but the article only contains an announcement (a conditional/operational statement), not an actual confirmed event such as a completed disbursement or regulatory approval. The source does not provide evidence of confirmation beyond the announcement itself, so review_status is unsupported."
+        },
+        "status": "accepted_contract"
+      },
+      "observed_event_ids": []
+    }
+  ]
+}

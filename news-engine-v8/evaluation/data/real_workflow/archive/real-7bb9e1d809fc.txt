@@ -1,0 +1,19 @@
+In an Initial Decision announced on Sept. 1, 2022, Chief Administrative Law Judge D. Michael Chappell dismissed the antitrust charges in a complaint brought by the Federal Trade Commission staff against DNA sequencing provider Illumina, Inc., and GRAIL, Inc., which makes a multi-cancer early detection, or MCED test. These tests are non-invasive, early detection liquid biopsy tests that can screen for multiple types of cancer in asymptomatic patients at very early stages using DNA sequencing.
+
+The FTC’s March 2021 complaint alleged that Illumina’s $7.1 billion proposed acquisition of Grail would diminish innovation in the U.S. market for MCED tests. These tests could be used to detect up to 50 types of cancer, most of which are not screened for at all today, saving millions of lives around the world. Grail is one of several competitors racing to develop these liquid biopsy tests, which analyze a sample of a patient’s blood or other fluid through DNA sequencing.
+
+In dismissing the complaint, Judge Chappell concluded that “Complaint Counsel has failed to prove its asserted prima facie case – that Illumina’s post-acquisition ability and incentive to advantage Grail to the disadvantage of Grail’s alleged rivals is likely to result in a substantial lessening of competition in the relevant market for the research, development, and commercialization of MCED tests.”
+
+Judge Chappell also noted that:
+
+The FTC staff’s evidence falls far short of proving its factual assertions that “Grail’s rivals are poised to imminently launch their products commercially in direct competition with Grail.”
+
+Even if the tests in development could be expected to launch earlier than a 5-to-7-year range, the evidence fails to prove the FTC staff’s assertion that the MCED tests under development are “reasonably interchangeable” with Grail’s MCED test, known as Galleri.
+
+Now and in the near future, Illumina is the only viable supplier of NGS platforms that meet the requirements of MCED test developers.
+
+Illumina’s status as the only viable supplier of next-generation sequencing, or NGS, instruments appropriate for MCED tests existed before the acquisition – and therefore Illumina’s asserted abilities to raise prices, withhold supply, or decrease the quality of products or services also existed before the acquisition.
+
+Illumina’s standardized, long-term supply agreement, Open Offer, is available to all U.S. oncology testing customers who purchase NGS products for developing and/or commercializing oncology tests. The Open Offer constrains Illumina from harming Grail’s alleged rivals, and the FTC staff’s argument to the contrary is unconvincing.
+
+The Appeals Process. The Judge’s Initial Decision is subject to review by the full Federal Trade Commission on its own motion, or at the request of any party, and Complaint Counsel filed a Notice of Appeal on Sept. 2. The Initial Decision will become the final decision of the Commission 30 days after it is served upon the parties unless, prior to that date, Complaint Counsel perfect their appeal by filing an Appeal Brief or the Commission places the case on its own docket for review.
