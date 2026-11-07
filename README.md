@@ -80,6 +80,16 @@ dated on T0 itself is outside the liquidity path (it starts the day after T0) an
 `/api/v1/engine/assumptions`. Demo mode is not available with `spec`; a demo request runs the real engine and logs a
 warning.
 
+Row Methodology view (`spec` only, read-only): clicking a row of Estimated Cash-Flow Impact opens how that figure was
+built. `POST /api/v1/engine/methodology` (`{row_id, run_id, horizon_months}`) returns the engine's own text, formulas
+with current values, the row's components (inside the selected horizon, after it, after the engine horizon),
+assumptions with override status, market and disclosed sources, playbook entries and limitations, all from
+`hlag_engine.engine.methodology`. `POST /api/v1/engine/sensitivity` (`{row_id: freight|bunker, ...page scenario}`) makes
+five real engine runs with only that driver's shock set to −20/−10/0/+10/+20% (bunker: that % of VLSFO Rotterdam as
+USD/t on every grade, as the slider does); results are cached. The view's header reads the engine store's T0 snapshot
+(real prints only, each with its published date and source name); the page tiles keep their own market reading.
+Direct cash flows are not part of any driver row and are left out of the view's breakdown.
+
 ## News to forecast to cash
 
 1. Normal startup searches news, generates Events and prepares their cash impacts before opening the dashboard. **Refresh news** updates the collection later. File import is not available in the webpage.

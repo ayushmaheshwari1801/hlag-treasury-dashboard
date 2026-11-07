@@ -54,13 +54,13 @@ function MetricCell({ m, r, v, onDetails }: { m: any; r: MarketRisk; v: RiskView
 }
 
 /** One driver's estimated cash-flow impact from the market simulation. */
-function ImpactCell({ x, r, v, maxAbs, onDetails }: { x: any; r: MarketRisk; v: RiskView; maxAbs: number; onDetails: (id: string) => void }) {
+function ImpactCell({ x, r, v, maxAbs, onDetails, rowTitle }: { x: any; r: MarketRisk; v: RiskView; maxAbs: number; onDetails: (id: string) => void; rowTitle?: string }) {
   const was = v.baseRows[x.id], changed = r.custom && was != null && x.impact_eur_m != null && Math.abs(was - x.impact_eur_m) >= 0.05;
   const sl = v.sliderOf(x.id);
   const memoOnly = memoOnlyText(x.memo), memo = memoLine(x.memo);
   const tip = `${x.label ?? ROW_LABEL[x.id]}: ${memoOnly || eur(x.impact_eur_m)}${memo ? `\n${memo}, at ${x.memo.horizon_end}; position × FX move, not on the liquidity path (D19)` : ""}\nScenario: ${sl ? shockText(sl.value, sl.unit) : x.scenario}\n${x.impact_type}\nStatus ${x.status} · ${x.provenance}${changed ? `\nObserved-move value: ${eur(was)}` : ""}`;
   const open = () => onDetails(x.id);
-  return <div className={`cfrow${v.cls(x.module)}`} role="button" tabIndex={0} onClick={open} onKeyDown={keyAct(open)}>
+  return <div className={`cfrow${v.cls(x.module)}`} role="button" tabIndex={0} title={rowTitle} onClick={open} onKeyDown={keyAct(open)}>
     <div className="cfname">{x.label ?? ROW_LABEL[x.id]}{!x.cash && <small> annualised earnings proxy</small>}<span className="shock">{sl ? shockText(sl.value, sl.unit) : ""}</span>{memo && <small className="memo-line">{memo}</small>}</div>
     {memoOnly ? <div className="cfval memo-only">{memoOnly}</div>
       : <div className={`cfval ${cashImpactTone(x.impact_eur_m) ?? ""}`}>{eur(x.impact_eur_m)}{changed && <small className="was">was {eur(was)}</small>}</div>}
@@ -93,7 +93,7 @@ function ImpactTotal({ v }: { v: RiskView }) {
 
 /** Market metrics and their estimated cash-flow impact on one aligned row each; every cell opens the metric's
  *  explanation with its model assumptions. Drivers without a market metric (e.g. CAD) follow below. */
-export function MarketImpactCard({ r, v, onDetails, onCashDetails }: { r: MarketRisk; v: RiskView; onDetails: (id: string) => void; onCashDetails: (id: string) => void }) {
+export function MarketImpactCard({ r, v, onDetails, onCashDetails, rowTitle }: { r: MarketRisk; v: RiskView; onDetails: (id: string) => void; onCashDetails: (id: string) => void; rowTitle?: string }) {
   const { f, ci } = v, months = r.months;
   const direct = ci.direct?.flows?.length ? ci.direct : null;
   const maxAbs = Math.max(...ci.rows.map((x: any) => Math.abs(x.impact_eur_m ?? 0)), Math.abs(direct?.impact_eur_m ?? 0), 1);
@@ -110,10 +110,10 @@ export function MarketImpactCard({ r, v, onDetails, onCashDetails }: { r: Market
       {v.f.market_metrics.map((m: any) => { const x = ci.rows.find((row: any) => row.id === m.id);
         return <div className="mi-row" key={m.id}>
           <MetricCell m={m} r={r} v={v} onDetails={onDetails} />
-          {x ? <ImpactCell x={x} r={r} v={v} maxAbs={maxAbs} onDetails={onCashDetails} /> : <div className="cfrow mi-empty"><span className="muted small">No cash-flow row for this metric</span></div>}
+          {x ? <ImpactCell x={x} r={r} v={v} maxAbs={maxAbs} onDetails={onCashDetails} rowTitle={rowTitle} /> : <div className="cfrow mi-empty"><span className="muted small">No cash-flow row for this metric</span></div>}
         </div>; })}
       {extra.map((x: any) => <div className="mi-row" key={x.id}><div className="metric mi-empty"><div className="mname">{x.label ?? ROW_LABEL[x.id]}</div></div>
-        <ImpactCell x={x} r={r} v={v} maxAbs={maxAbs} onDetails={onCashDetails} /></div>)}
+        <ImpactCell x={x} r={r} v={v} maxAbs={maxAbs} onDetails={onCashDetails} rowTitle={rowTitle} /></div>)}
       {direct && <DirectCashRow d={direct} maxAbs={maxAbs} />}
     </div>
     <div className="mi-row mi-total"><span /><ImpactTotal v={v} /></div>

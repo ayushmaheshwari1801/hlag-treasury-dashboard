@@ -152,11 +152,46 @@ def direct_cash(run,as_of,cutoff,usd,convert):
                    'not reported figures). They reach the liquidity path in full; market-driver rows exclude them.'}
 
 
+def row_of_line(line)->str:
+    """The card row whose FX part a line's currency belongs to (fx_eur takes EUR, INR, BRL and the rest)."""
+    currency=line['currency']
+    if line['owner']=='fx' and currency=='USD': currency=_currency_for_hedge(line)
+    return {'GBP':'fx_gbp','CNY':'fx_cny','CAD':'fx_cad'}.get(currency,'fx_eur')
+
+
+def _native_change(line)->float:
+    return (line['amount_native_scenario_m']-line['amount_native_base_m'])*line['fx_rate_base']
+
+
+def row_amounts(lines)->dict:
+    """USD m per card row from paired lines (already cut to the horizon). Driver rows take the native change at
+    base FX; the FX rows take the rest of each line's change by currency, and the full change of FX-owned lines.
+    Direct lines (owner direct, USD) are not a card row: they are reported on their own (cash_impact.direct)."""
+    out=dict.fromkeys(ROWS,0.)
+    for line in lines:
+        if line['owner']=='direct': continue
+        native=_native_change(line)
+        delta=line['delta_usd_m']
+        if line['owner']=='fx':
+            out[row_of_line(line)]+=delta
+        else:
+            out[ROW_OF_DRIVER[line['owner']]]+=native
+            out[row_of_line(line)]+=delta-native
+    return out
+
+
+def horizon_cutoff(as_of:date,months:int)->str:
+    return month_end(add_months(as_of,months)).isoformat()
+
+
+ROW_OF_DRIVER={'freight':'freight','bunker':'bunker','rates':'interest'}
+
+
 def compose_cash_dashboard(template:dict,run:dict,market:dict,months:int,shocks:dict,as_of:date)->dict:
     """Adapt one immutable run, with optional real history in market['history'][series_id]."""
     if months not in {3,6,12}: raise ValueError('horizon_months must be 3, 6 or 12')
     if run.get('as_of') != as_of.isoformat(): raise ValueError('Run and dashboard as_of must match')
-    cutoff=month_end(add_months(as_of,months)).isoformat()
+    cutoff=horizon_cutoff(as_of,months)
     n_days=(date.fromisoformat(cutoff)-as_of).days
     profile=run.get('profile',{}); values=profile.get('values',{})
     def value(key): return values.get(key,{}).get('value')
@@ -173,22 +208,12 @@ def compose_cash_dashboard(template:dict,run:dict,market:dict,months:int,shocks:
     hb=baseline_min['headroom_usd_m'] if baseline_min else None
     hs=scenario_min['headroom_usd_m'] if scenario_min else None
     consumed=(hb-hs)/hb*100 if hb is not None and hb>0 and hs is not None else None
-    attribution=dict.fromkeys(('freight','bunker','rates','direct'),0.)  # direct: USD lines, so no FX part
-    fx=defaultdict(float); total=0.
-    for line in lines:
-        native=(line['amount_native_scenario_m']-line['amount_native_base_m'])*line['fx_rate_base']
-        delta=line['delta_usd_m']; total+=delta
-        currency=line['currency']
-        if line['owner']=='fx':
-            currency=_currency_for_hedge(line) if currency=='USD' else currency
-            fx[currency]+=delta
-        else:
-            attribution[line['owner']]+=native
-            fx[currency]+=delta-native
-    fx_total=sum(fx.values())
-    amounts={**{k:fx.get(c,0.) for k,c in [('fx_gbp','GBP'),('fx_cny','CNY'),('fx_cad','CAD')]},
-             'fx_eur':fx_total-fx.get('GBP',0)-fx.get('CNY',0)-fx.get('CAD',0),
-             'interest':attribution['rates'],'bunker':attribution['bunker'],'freight':attribution['freight']}
+    amounts=row_amounts(lines)
+    # direct: USD lines, so no FX part; they are their own entry, not a card row
+    direct_usd=sum(_native_change(l) for l in lines if l['owner']=='direct')
+    attribution={'freight':amounts['freight'],'bunker':amounts['bunker'],'rates':amounts['interest'],'direct':direct_usd}
+    fx_total=sum(amounts[r] for r in ROWS if r.startswith('fx_'))
+    total=sum(l['delta_usd_m'] for l in lines)
     missing=run.get('missing_inputs',[])
     def affected(rid):
         driver=DRIVER[rid]

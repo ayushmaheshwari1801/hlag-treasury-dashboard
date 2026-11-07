@@ -572,10 +572,69 @@ class EngineAdapter:
             'memo_positions': {'CNY_long_usd_m': float(memo.get('CNY', 0)) / 1e6,
                                'GBP_short_usd_m': -float(memo.get('GBP', 0)) / 1e6, 'on_liquidity_path': False},
             'engine': {'name': 'hlag_engine', 'store': self.store.path, 'read_only': True},
+            # Engine-computed row components (hlag_engine.engine.methodology.breakdown), USD m: read by the row
+            # Methodology view without running the engine again.
+            'breakdown': run_breakdown(res),
         }
 
 
 # ---------------------------------------------------------------- data for the /api/v1/engine endpoints
+
+
+def run_breakdown(res: RunResult) -> dict:
+    """The engine's breakdown() of the run's market-driver lines. Direct cash flows (owner direct) are left out:
+    they are not part of any driver row (cash_impact.direct shows them), and the engine's classify() has no
+    component for them. The engine is unchanged; only the pairs passed to it are filtered."""
+    from types import SimpleNamespace
+    from hlag_engine.engine.methodology import breakdown
+    drivers_only = SimpleNamespace(outputs=res.outputs, record=res.record, liquidity=res.liquidity,
+                                   pairs=[p for p in res.pairs if p.ref.owner_spec.value != 'direct'])
+    b = breakdown(drivers_only)
+    def usd_m(item):
+        return {**{k: v for k, v in item.items() if k != 'usd'}, 'usd_m': _m(item['usd'])}
+    return {**b, 'unit': 'USD m', 'items': [usd_m(i) for i in b['items']],
+            'beyond_horizon': [usd_m(i) for i in b['beyond_horizon']]}
+
+
+def previous_print(prints, frequency):
+    """The comparison print for the 1-week change (engine Tier A "1w" window): the previous print for weekly
+    series, the print on or before 7 days before the last one for daily series."""
+    from hlag_engine.data.series import Frequency
+    if not prints:
+        return None
+    last = prints[-1]
+    if frequency is Frequency.WEEKLY:
+        return prints[-2] if len(prints) > 1 else None
+    return next((q for q in reversed(prints[:-1]) if q.date <= last.date - timedelta(days=7)), None)
+
+
+def page_market(shared: _Shared, as_of: date) -> dict:
+    """The page's market data from the engine (one source for tiles, sparklines, sliders and the Methodology view):
+    the engine's T0 snapshot (stale flags from the engine's limits), real prints only (no forward-filled days) and
+    the engine's 1-week comparison print."""
+    from hlag_engine.engine.methodology import SERIES_SOURCE
+    from hlag_engine.engine.snapshot import build_snapshot
+    with shared.lock:
+        snapshot = build_snapshot(shared.store, as_of)
+        series, history, weekly = [], {}, {}
+        for sid, spec in SERIES.items():
+            rows = shared.store.get_series(sid, as_of - timedelta(days=800), as_of, include_filled=False)
+            history[sid] = [{'date': r.date.isoformat(), 'value': r.value} for r in rows]
+            snap, row = snapshot.get(sid), shared.store.latest_on_or_before(sid, as_of)
+            if snap is None:
+                series.append({'series_id': sid, 'unit': spec.unit, 'status': 'MISSING', 'value': None})
+                continue
+            series.append({'series_id': sid, 'unit': spec.unit, 'value': snap.value, 'date': snap.value_date.isoformat(),
+                           'label': snap.label.value, 'confirmed': snap.confirmed, 'stale': snap.stale,
+                           'status': 'STALE' if snap.stale else 'OK', 'days_since_print': snap.days_since_print,
+                           'source': SERIES_SOURCE.get(sid) or (row.source if row else None),
+                           'source_ref': row.source_ref if row else None})
+            prev = previous_print(rows, spec.frequency)
+            if prev is not None:
+                weekly[sid] = {'date': prev.date.isoformat(), 'value': prev.value,
+                               'last_date': rows[-1].date.isoformat(), 'last_value': rows[-1].value}
+    return {'as_of': as_of.isoformat(), 'series': series, 'history': history, 'weekly': weekly,
+            'source': 'hlag_engine market store', 'demo': False}
 
 
 def market_overview(shared: _Shared, as_of: date | None = None) -> dict:

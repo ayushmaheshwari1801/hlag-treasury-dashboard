@@ -10,6 +10,8 @@ import { Drawer } from "./Drawer";
 import { eur, num } from "./format";
 import MetricDetail from "./MetricDetail";
 import CashDetails from "./CashDetails";
+import Methodology from "./Methodology";
+import { headroomChange } from "./methodologyUi";
 import WhatIf from "./WhatIf";
 import { CashFlows } from "./EnginePanels";
 import { groupEnginePresets, presetFromOption } from "./enginePresets";
@@ -17,6 +19,7 @@ import { useMarketRisk } from "./dashboard/useMarketRisk";
 import { useEventImpact } from "./dashboard/useEventImpact";
 import { ContextBar, STEPS, scenarioLabel } from "./dashboard/ContextBar";
 import { LiquidityPositionCard, MarketImpactCard, MonitoringCard, WaterfallCard, riskView } from "./dashboard/MarketCards";
+import { methodologyOn } from "./dashboard/rowDetail";
 import { NewsImpactCard, NewsImpactDetail, type NewsRow } from "./dashboard/EventImpactBoard";
 import { LINE_COLORS, LiquidityForecastCard, useRunPaths, type LiquidityLine } from "./dashboard/LiquidityForecast";
 import { METRIC_EXPLAIN, modelAssumptions, newsDriversByMetric } from "./dashboard/metricAssumptions";
@@ -102,7 +105,7 @@ export default function TreasuryDashboard() {
       <div className="board-grid">
         {/* Market data with Working capital (collections timing) directly below it. */}
         <div className="board-left">
-          {v ? <MarketImpactCard r={r} v={v} onDetails={setMetricDetail} onCashDetails={setModal} /> : pending}
+          {v ? <MarketImpactCard r={r} v={v} onDetails={setMetricDetail} onCashDetails={setModal} rowTitle={methodologyOn(f?.calculation) ? "How this figure was built" : undefined} /> : pending}
           {v && <WorkingCapitalCard r={r} v={v} params={params} />}
         </div>
         <div className="board-right">
@@ -116,7 +119,13 @@ export default function TreasuryDashboard() {
 
     <button className="sparkle" onClick={() => setDrawer("brief")} aria-label="Open assistant" title="Assistant: briefing and questions">{"✦"} Ask</button>
 
-    {modal && f?.calculation?.run_id && <CashDetails runId={f.calculation.run_id} rowId={modal} rowLabel={v?.ci.rows.find((x: any) => x.id === modal)?.label} horizonEnd={f.calculation.horizon_end} onClose={() => setModal(null)} />}
+    {/* hlag_engine runs: rows open the Methodology view; other runs keep the cash-flow detail drawer. */}
+    {modal && f?.calculation?.run_id && methodologyOn(f.calculation) && v && <Methodology rowId={modal} runId={f.calculation.run_id} months={r.months} busy={r.busy}
+      slider={v.sliderOf(modal)} shock={r.shocks[modal]} onShock={r.setShock} request={r.scenarioRequest}
+      currentFigure={{ impact_eur_m: v.ci.rows.find((x: any) => x.id === modal)?.impact_eur_m ?? null, headroom_change_eur_m: headroomChange(f.calculation, v.rate) }}
+      onApply={() => { setModal(null); r.setWiOpen(true); document.getElementById("market-sim")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+      onClose={() => setModal(null)} />}
+    {modal && f?.calculation?.run_id && !methodologyOn(f.calculation) && <CashDetails runId={f.calculation.run_id} rowId={modal} rowLabel={v?.ci.rows.find((x: any) => x.id === modal)?.label} horizonEnd={f.calculation.horizon_end} onClose={() => setModal(null)} />}
     {metricDetail && f && <MetricDetail rowId={metricDetail} finance={f} busy={r.busy} onClose={() => setMetricDetail(null)} onCashDetail={() => { setModal(metricDetail); setMetricDetail(null); }} {...metricProps(metricDetail)} />}
     {drawer === "cashflows" && f?.calculation?.run_id && <Drawer title="Cash-flow detail" modal wide onClose={() => setDrawer(null)}>
       <CashFlows runId={f.calculation.run_id} rate={v!.rate} horizonEnd={f.calculation.horizon_end} scenarioName={f.scenario?.full_scenario?.name} /></Drawer>}

@@ -53,6 +53,8 @@ export const api = {
   engineAssumptions: () => call<any>("GET", "/api/v1/engine/assumptions"),
   engineHedgeOptions: () => call<any>("GET", "/api/v1/engine/hedge-test/options"),
   engineHedgeTest: (body: Record<string, unknown>) => call<any>("POST", "/api/v1/engine/hedge-test", body),
+  engineMethodology: (rowId: string, runId: string, months: number) => call<any>("POST", "/api/v1/engine/methodology", { row_id: rowId, run_id: runId, horizon_months: months }),
+  engineSensitivity: (body: Record<string, unknown>) => call<any>("POST", "/api/v1/engine/sensitivity", body),
   recommendationAgent: (body: Record<string, unknown>) => call<any>("POST", "/api/v1/recommendations/agent", body),
   recommendationSessions: (limit = 20) => call<any>("GET", `/api/v1/recommendations/agent?limit=${limit}`),
   recommendationSession: (id: string) => call<any>("GET", `/api/v1/recommendations/agent/${encodeURIComponent(id)}`),

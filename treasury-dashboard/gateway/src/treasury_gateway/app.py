@@ -56,6 +56,22 @@ class HedgeTestRequest(StrictModel):
     horizon_months: int | None = None                  # accepted for symmetry with the dashboard; not used
 
 
+class MethodologyRequest(StrictModel):
+    row_id: Literal["freight", "bunker", "interest", "fx_eur", "fx_gbp", "fx_cny", "fx_cad"]
+    run_id: str = Field(min_length=1)
+    horizon_months: Literal[3, 6, 12] = 6
+
+
+class SensitivityRequest(StrictModel):
+    row_id: Literal["freight", "bunker"]
+    horizon_months: Literal[3, 6, 12] = 6
+    shocks: dict[str, float] = Field(default_factory=dict)
+    forecast_id: str | None = None
+    scenario: dict | None = None
+    as_of: date | None = None
+    overrides: dict[str, float | bool | str] = Field(default_factory=dict)
+
+
 class RecommendationAgentRequest(StrictModel):
     """Treasury recommendation agent session. News is chosen by publication window (and optionally by Event ID), or by a
     saved forecast. as_of defaults to news_to, so neither news nor market data after it is used."""
@@ -316,6 +332,70 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
             return adapter.hedge_test(day, params, body.hedge.model_dump(mode='json'), adjustments)
         except (ValueError, KeyError) as exc:
             raise HTTPException(422, str(exc)) from None
+
+    # ------------------------------------------------------------------ row Methodology view (read-only)
+    @app.post("/api/v1/engine/methodology", dependencies=protected, tags=["hlag engine"])
+    def row_methodology(body: MethodologyRequest):
+        """How one card row was built, from the engine: text, formulas with current values, the row's components
+        by horizon, assumptions with override status, sources, playbook and limitations. Reads the saved run."""
+        from .engine_adapter import page_market as engine_page_market
+        from .methodology import methodology
+        adapter = spec_only()
+        try:
+            run = cash_routes.run_store.get(body.run_id)
+        except (KeyError, LookupError):
+            raise HTTPException(404, 'Unknown run') from None
+        if run is None:
+            raise HTTPException(404, 'Unknown run')
+        try:
+            # The view's header reads the engine store (its snapshot and real prints); the page tiles are unchanged.
+            return methodology(adapter.shared, run, body.row_id, body.horizon_months,
+                               engine_page_market(adapter.shared, date.fromisoformat(run['as_of'])))
+        except LookupError as exc:
+            raise HTTPException(409, str(exc)) from None
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+
+    sensitivity_cache: dict[str, dict] = {}
+
+    @app.post("/api/v1/engine/sensitivity", dependencies=protected, tags=["hlag engine"])
+    def row_sensitivity(body: SensitivityRequest):
+        """Five real engine runs of the page's current scenario with only this driver's shock set to a fixed move
+        (-20%, -10%, 0, +10%, +20%); everything else held. Nothing is written to the engine store. Cached."""
+        import os
+        from .methodology import SENSITIVITY_STEPS, row_value, sensitivity_cache_key, sensitivity_shock
+        adapter = spec_only()
+        day = body.as_of or service.clock().astimezone(service.tz).date()
+        adjustments = [a for a in intelligence.adjustments() if a['status'] == 'approved' and a['review_date'] > day.isoformat()]
+        # The page's market (the one the card's run uses), so the bunker step matches the bunker slider.
+        _, market, _ = page_scenario(day, body.shocks, body.scenario, body.forecast_id, body.overrides)
+        key = sensitivity_cache_key(body.model_dump(mode='json'), day, adjustments, adapter.shared.profile.content_hash,
+                                    os.path.getmtime(adapter.store.path))
+        if key in sensitivity_cache:
+            return {**sensitivity_cache[key], 'cached': True}
+        points = []
+        try:
+            for step in SENSITIVITY_STEPS:
+                slider = sensitivity_shock(body.row_id, step, market)
+                params, _, _ = page_scenario(day, {**body.shocks, body.row_id: slider}, body.scenario, body.forecast_id,
+                                             body.overrides)
+                run = adapter.run(day, params, adjustments)
+                points.append({'step_pct': step, 'slider_value': slider, **row_value(run, body.row_id, body.horizon_months)})
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(422, str(exc)) from None
+        vlsfo = next((r.get('value') for r in market['series'] if r.get('series_id') == 'VLSFO_RTM'), None)
+        result = {'row_id': body.row_id, 'as_of': day.isoformat(), 'horizon_months': body.horizon_months,
+                  'points': points, 'unit': 'EUR m', 'slider_unit': '%' if body.row_id == 'freight' else 'USD/t',
+                  'basis': ('Route rate move on every trade (WCI), in %.' if body.row_id == 'freight' else
+                            f'Fuel move of the stated % of VLSFO Rotterdam at T0 (USD {vlsfo:,.0f}/t), applied as the '
+                            'same USD/t to every grade and hub, as the bunker slider does.'),
+                  'note': 'Each point is a separate engine run of the current scenario with only this shock changed; '
+                          'other drivers, overrides and adjustments are held. Nothing is written to the engine store.',
+                  'read_only': True}
+        if len(sensitivity_cache) >= 32:
+            sensitivity_cache.pop(next(iter(sensitivity_cache)))
+        sensitivity_cache[key] = result
+        return {**result, 'cached': False}
 
     # ------------------------------------------------------------------ hedge recommendation agent (read-only)
     def recommendation_store():

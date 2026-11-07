@@ -204,3 +204,34 @@ button.primary,.row-actions button,.review button,.integ button{border:1px solid
 .hedge-tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.x-tile.bad{border-color:var(--red);background:var(--redbg)}.x-tile.bad b{color:var(--red)}.desk-raised{display:block;color:var(--red);font-weight:700}
 .warnline{color:var(--orange);margin:6px 0}.desk-measure{display:block;font-weight:400;color:var(--muted);font-size:10px;margin-top:2px}
 .info-tip{cursor:help}.info-tip i{font-style:normal;font-size:10px}.colhead .info-tip[data-tip]:hover::after{left:auto;right:0;transform:none}
+
+/* ---- row Methodology view */
+.cfrow{cursor:pointer}
+.method section{margin-top:14px}.method.is-busy{opacity:.85}
+.method h3{margin:4px 0 8px;font-size:13.5px;color:var(--navy)}.method h4{margin:12px 0 6px;font-size:12px;color:var(--navy)}
+.mh{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:0}
+.mh-pick select{font:inherit;margin-left:6px;max-width:100%}.mh-pick .presets{flex-wrap:wrap}
+.mh-main{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:flex-end;margin:10px 0 4px}
+.mh-main .chip{margin-left:0;margin-right:4px}
+.mh-val{font-size:22px;font-weight:800;color:var(--text)}.mh-chg{font-size:15px;font-weight:700}.mh-chg.up{color:var(--green)}.mh-chg.down{color:var(--red)}
+.mh-src{flex:1 1 220px;min-width:0;overflow-wrap:anywhere}
+.mh-chart{margin-top:8px}.mh-chart .presets{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.m-bd{width:100%}.m-bd td small,.m-bd th small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
+.m-bd tr.clickable{cursor:pointer}.m-bd tr.sub td{color:var(--muted);padding-left:18px}.m-bd tr.here td{background:var(--orangebg)}
+.m-bd tfoot td{border-top:1px solid var(--line);font-weight:700}
+.m-p{margin:0 0 6px;line-height:1.45}
+.m-formula{border-left:3px solid var(--line);padding:4px 0 4px 10px;margin:10px 0}.m-formula.approx{border-left-color:var(--orange)}
+.m-fname{font-weight:700;font-size:12px;margin-bottom:3px}.m-formula>code{display:block;white-space:pre-wrap;font-size:12.5px;padding:4px 0}
+.m-sym{width:100%;font-size:12px;border-collapse:collapse}.m-sym td{padding:2px 8px 2px 0;vertical-align:top;border-top:1px solid var(--line)}
+.m-sym td:nth-child(3){font-weight:600;overflow-wrap:anywhere}
+.cash-detail-table tr.chg td{background:var(--orangebg)}
+.m-play{margin:6px 0}.m-play ol,.m-list{margin:4px 0 0 18px;padding:0}
+.m-sens{margin-top:10px}
+.m-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:10px;border-top:1px solid var(--line)}
+@media(max-width:700px){.mh-main{gap:8px 16px}.mh-val{font-size:18px}}
+/* ---- row Methodology view: one column; compact Sensitivity section (slider + table, left-aligned) */
+.method>section>.slider,.m-sens{max-width:640px}
+.m-sens-table{width:100%;max-width:640px;margin:0}
+.m-sens-table th.r,.m-sens-table td.r,.m-sens-table td:first-child{white-space:nowrap}.m-sens-table th.r,.m-sens-table td.r{text-align:right}
+.m-sens-table .m-use{font-size:11px;padding:2px 8px;white-space:nowrap}
+.m-sens-table tr.current td{font-style:italic}

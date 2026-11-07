@@ -1,8 +1,10 @@
-/** Match the original dashboard's fixed-order native/FX attribution and selected horizon. */
-export function cashDetailRows(lines: any[], rowId: string, horizonEnd?: string) {
+/** Match the dashboard row: the original fixed-order native/FX attribution, lines dated after T0 and inside the
+ *  selected horizon (lines on or before T0 are not in the row figure, so they are not listed either). */
+export function cashDetailRows(lines: any[], rowId: string, horizonEnd?: string, asOf?: string) {
   const fxRow = rowId.startsWith("fx_");
   const owner = rowId === "interest" ? "rates" : rowId;
-  return lines.filter(line => !horizonEnd || line.date <= horizonEnd).flatMap(line => {
+  const t0 = asOf?.slice(0, 10);
+  return lines.filter(line => (!horizonEnd || line.date <= horizonEnd) && (!t0 || line.date > t0)).flatMap(line => {
     const native = (line.amount_native_scenario_m - line.amount_native_base_m) * line.fx_rate_base;
     let currency = line.currency;
     if (line.owner === "fx" && currency === "USD") {
