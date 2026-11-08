@@ -68,6 +68,9 @@ def main():
     except Exception:
         print('Startup stopped: news or cash-impact preparation did not complete. Check service availability and restart. Completed work is preserved.', file=sys.stderr, flush=True)
         raise SystemExit(1) from None
+    # Recommendations are prepared in the background (fact pack, then one session: with the model when configured).
+    # Read-only; the page shows the latest session and its prepared time. A failure does not stop startup.
+    app.state.prepare_recommendations_later()
     app.mount('/v8', create_news_app(database=Path(os.environ['NEWS_V8_DATABASE']),
                                     env_file=ROOT / 'news-engine-v8/.env', token=os.environ['NEWS_API_TOKEN']))
     DashboardServer(uvicorn.Config(app, host='127.0.0.1', port=args.port)).run()

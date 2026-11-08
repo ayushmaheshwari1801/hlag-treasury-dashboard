@@ -1,8 +1,9 @@
 """Treasury API: shared market store, v8 news, signal routing and deterministic cash engine."""
 import argparse
+import threading
 import hmac
 import os
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -73,20 +74,23 @@ class SensitivityRequest(StrictModel):
 
 
 class RecommendationAgentRequest(StrictModel):
-    """Treasury recommendation agent session. News is chosen by publication window (and optionally by Event ID), or by a
-    saved forecast. as_of defaults to news_to, so neither news nor market data after it is used."""
+    """One Treasury recommendation set for the whole situation (recommendation-agent/3). News is the active Event
+    pool: event_ids is the ticked set (default: the top Events by score). No date window: news_from / news_to are
+    accepted for older clients and ignored."""
+    event_ids: list[str] | None = None
+    as_of: date | None = None
+    horizon_months: Literal[3, 6, 12] = 6
+    mode: Literal["auto", "model", "rule_based"] = "auto"
+    max_runs: int = Field(default=10, ge=4, le=20)
     news_from: date | None = None
     news_to: date | None = None
-    event_ids: list[str] | None = None
-    forecast_id: str | None = None
-    as_of: date | None = None
-    horizon_days: int = Field(default=90, ge=1, le=365)
-    forecast_mode: Literal["rule_based", "model", "auto"] = "rule_based"
-    mode: Literal["auto", "model", "rule_based"] = "auto"
-    shocks: dict[str, float] = Field(default_factory=dict)
-    overrides: dict[str, float | bool | str] = Field(default_factory=dict)
-    scenario: dict | None = None
-    max_runs: int = Field(default=20, ge=4, le=20)
+
+
+class RecommendationDecision(StrictModel):
+    decision_id: str = Field(min_length=1)
+    decision: Literal["approve", "defer", "reject"]
+    reviewer: str = Field(min_length=1, max_length=200)
+    comment: str = Field(default="", max_length=2000)
 
 
 class RunReview(StrictModel):
@@ -405,73 +409,214 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
             app.state.recommendation_sessions = RecommendationSessions(intelligence)
         return app.state.recommendation_sessions
 
-    @app.post("/api/v1/recommendations/agent", dependencies=protected, tags=["recommendations"])
-    def recommendation_agent(body: RecommendationAgentRequest):
-        """Run the Treasury recommendation agent: pick news by publication window, build the news scenario, let the model
-        test hypothetical hedges with the engine (write=False) and judge their effect. Nothing is executed."""
-        from .forecast import ForecastAgent, ForecastRequest
+    fact_cache: dict = {}
+    fact_lock = threading.RLock()
+    # Part of the fact pack cache key: changes when the engine store changes (market refresh). Tests may fix it.
+    app.state.store_version = lambda adapter: os.path.getmtime(adapter.store.path)
+    fact_state = {"building": False, "last_error": None}
+
+    def recommendation_key(day: date, months: int, event_ids: list[str] | None):
+        """Active Events, ticked set, saved forecasts and approved adjustments, plus the cache key of the fact pack."""
+        import hashlib as _h
+        import json as _j
+        import os as _os
+        from .dashboard_adapter import horizon_cutoff
+        from .fact_pack import select_active_events
+        from .forecast import ForecastAgent
         adapter = spec_only()
-        from .recommendation_agent import HedgeLab, RecommendationAgent, event_digest, select_events
-        sessions = recommendation_store()
-        if body.news_from and body.news_to and body.news_from > body.news_to:
-            raise HTTPException(422, "news_from must not be after news_to")
-        day = body.as_of or body.news_to or service.clock().astimezone(service.tz).date()
-        if body.news_to and body.news_to > day:
-            raise HTTPException(422, "news_to must not be after as_of (no look-ahead)")
-        forecaster = ForecastAgent(intelligence, news)
-        notes = []
-        if body.forecast_id:
-            forecast = forecaster.get(body.forecast_id)
-            if forecast is None:
-                raise HTTPException(404, "Unknown saved forecast")
-            day = body.as_of or date.fromisoformat(forecast["as_of"])
-            if day < date.fromisoformat(forecast["as_of"]):
-                raise HTTPException(422, "as_of must not precede the saved forecast (no look-ahead)")
-            if body.news_to and body.news_to > day:
-                raise HTTPException(422, "news_to must not be after as_of (no look-ahead)")
-            payload = news.saved_run(forecast.get("source_run_id", ""))
-            if payload is None:
-                raise HTTPException(409, "The saved forecast's news snapshot is unavailable")
-            events, notes = select_events(payload, None, None,
-                                          forecast.get("selected_event_ids") or forecast.get("event_ids") or [])
-        else:
-            payload, _ = news.cumulative()
-            events, notes = select_events(payload, body.news_from, body.news_to, body.event_ids)
-            if not events:
-                raise HTTPException(422, "No v8 Events were published in the selected window. " + " ".join(notes))
-            if body.scenario is not None:
-                forecast = {"forecast_id": None, "mode": "manual", "predictions": [],
-                            "label": "Selected dashboard scenario", "scenario": body.scenario}
-            else:
-                try:
-                    forecast = forecaster.predict(ForecastRequest(event_ids=[e["event_id"] for e in events], as_of=day,
-                                                                  horizon_days=body.horizon_days, mode=body.forecast_mode))
-                except ValueError as exc:
-                    raise HTTPException(422, str(exc)) from None
-                except RuntimeError as exc:
-                    raise HTTPException(409, str(exc)) from None
-        params, _, _ = page_scenario(day, body.shocks, body.scenario, forecast["forecast_id"], body.overrides)
+        pool, _ = news.cumulative()
+        if not pool or not pool.get("events"):
+            raise HTTPException(409, "No news Events are available; collect or import news first")
+        events = select_active_events(pool)
+        known = {e["event_id"] for e in events["included"] + events["not_included"]}
+        ticked = list(event_ids) if event_ids is not None else [e["event_id"] for e in events["included"]]
+        unknown = sorted(set(ticked) - known)
+        if unknown:
+            raise HTTPException(422, "Unknown or unscored Events: " + ", ".join(unknown))
+        if not ticked:
+            raise HTTPException(422, "Tick at least one Event")
+        horizon = min(365, (date.fromisoformat(horizon_cutoff(day, months)) - day).days)
+        forecasts = ForecastAgent(intelligence, news).forecasts()
         adjustments = [a for a in intelligence.adjustments() if a['status'] == 'approved' and a['review_date'] > day.isoformat()]
+        key = _h.sha256(_j.dumps([day.isoformat(), months, sorted(ticked), pool.get("run_id"),
+                                  sorted(f["forecast_id"] for f in forecasts), app.state.store_version(adapter),
+                                  adapter.shared.profile.content_hash, adjustments], default=str).encode()).hexdigest()
+        return {"adapter": adapter, "pool": pool, "events": events, "ticked": ticked, "horizon": horizon,
+                "forecasts": forecasts, "adjustments": adjustments, "key": key}
+
+    def recommendation_inputs(day: date, months: int, event_ids: list[str] | None):
+        """The fact pack for one situation, built once and cached (read-only): the combined news forecast (saved model
+        forecasts first, rules for the rest), the baseline, situation and trend runs, the situation's mirror for the
+        hedge lab, market alerts, the 7-day market moves and the engine playbook."""
+        import json as _j
+        import os as _os
+        import time as _t
+        from hlag_engine.company_profile.registers import load_registers
+        from .engine_adapter import page_market as engine_page_market
+        from .fact_pack import (build_fact_pack, combine_event_forecasts, market_alerts, market_moves_7d,
+                                playbook_entries, situation_runs)
+        from .recommendation_agent import HedgeLab
+        k = recommendation_key(day, months, event_ids)
+        with fact_lock:
+            if k["key"] in fact_cache:
+                return {**fact_cache[k["key"]], "cached": True}
+            started = _t.perf_counter()
+            adapter, pool, ticked = k["adapter"], k["pool"], k["ticked"]
+            chosen = [e for e in pool["events"] if e["event_id"] in set(ticked)]
+            try:
+                combined = combine_event_forecasts(chosen, pool, k["forecasts"], day, k["horizon"])
+            except ValueError as exc:
+                raise HTTPException(422, f"The combined news forecast is invalid: {exc}") from None
+            _, market, _ = page_scenario(day)
+            runs = situation_runs(adapter, day, combined["scenario"], k["adjustments"], market=market)
+            mkey = ("moves", day.isoformat(), app.state.store_version(adapter), adapter.shared.profile.content_hash,
+                    _j.dumps(k["adjustments"], default=str))
+            if mkey not in fact_cache:
+                fact_cache[mkey] = market_moves_7d(adapter, day, k["adjustments"])
+            mirror_lab = HedgeLab(adapter, day, combined["scenario"], k["adjustments"], max_runs=20)
+            mirror_lab.seed(runs["situation_result"])
+            _, mirror = mirror_lab._ensure_base()          # the situation's mirror, once, for every session's lab
+            pack = build_fact_pack(as_of=day, months=months, runs=runs, market=engine_page_market(adapter.shared, day),
+                                   events=k["events"], ticked=ticked, combined=combined, pool=pool,
+                                   profile=adapter.shared.profile, registers=load_registers(),
+                                   alerts=market_alerts(adapter, day), market_moves=fact_cache[mkey],
+                                   playbook=playbook_entries(adapter))
+            pack["engine_runs"] = 4  # baseline, situation, trend continues, situation mirror
+            meta = {"as_of": day.isoformat(), "built_at": datetime.now(timezone.utc).isoformat(),
+                    "build_seconds": round(_t.perf_counter() - started, 1), "ticked": ticked}
+            out = {"adapter": adapter, "pack": pack, "combined": combined, "adjustments": k["adjustments"],
+                   "events": k["events"], "situation_result": runs["situation_result"], "mirror_result": mirror,
+                   "meta": meta}
+            if len(fact_cache) > 16:
+                fact_cache.pop(next(iter(fact_cache)))
+            fact_cache[k["key"]] = out
+            return {**out, "cached": False}
+
+    def run_recommendation_session(day: date, months: int, event_ids, mode: str, max_runs: int = 10,
+                                   prepared: bool = False) -> dict:
+        import time as _t
+        from .recommendation_agent import HedgeLab, RecommendationAgent
+        started = _t.perf_counter()
+        inputs = recommendation_inputs(day, months, event_ids)
         try:
-            lab = HedgeLab(adapter, day, params, adjustments, max_runs=body.max_runs)
+            lab = HedgeLab(inputs["adapter"], day, inputs["combined"]["scenario"], inputs["adjustments"], max_runs=max_runs)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from None
-        window = {"from": body.news_from.isoformat() if body.news_from else None,
-                  "to": body.news_to.isoformat() if body.news_to else None}
-        context = {"as_of": day.isoformat(), "news_window": window,
-                   "events": event_digest(events, payload or {}),
-                   "forecast": {k: forecast.get(k) for k in ("forecast_id", "source_run_id", "mode", "predictions", "outlook", "label")},
-                   # dashboard slider moves on top of the news forecast: user assumptions, not news facts
-                   "page_shocks": dict(body.shocks), "page_overrides": dict(body.overrides),
-                   "scenario_inputs": {k: params.get(k) for k in ("name", "start_date", "duration_days",
-                                                                   "freight", "bunker", "rates", "fx", "direct")}}
+        lab.seed(inputs["situation_result"], inputs["mirror_result"])   # no repeat of the fact pack's runs
         agent = RecommendationAgent(assistant.config, transport=assistant.transport)
-        result = agent.run(lab, context, body.mode)
-        return sessions.save({**result, "as_of": day.isoformat(), "news_window": window,
-                              "event_ids": [e["event_id"] for e in events], "events": context["events"],
-                              "forecast_id": forecast["forecast_id"], "forecast": context["forecast"],
-                              "page_shocks": context["page_shocks"], "page_overrides": context["page_overrides"],
-                              "selection_notes": notes})
+        result = agent.run(lab, inputs["pack"], mode)
+        extra = {"prepared": True, "prepared_at": datetime.now(timezone.utc).isoformat()} if prepared else {"prepared": False}
+        return recommendation_store().save({**result, **extra, "horizon_months": months,
+                                            "fact_pack": {**inputs["meta"], "cached": inputs["cached"]},
+                                            "session_seconds": round(_t.perf_counter() - started, 1)})
+
+    def prepare_recommendations(months: int = 6, session: bool = True):
+        """Build the default fact pack and one complete recommendation session ahead of time (startup, after a news
+        refresh): with the model when one is configured, otherwise rule-based. Read-only; never raises."""
+        try:
+            fact_state["building"] = True
+            day = service.clock().astimezone(service.tz).date()
+            recommendation_inputs(day, months, None)
+            if session:
+                fact_state["session_id"] = run_recommendation_session(day, months, None, "auto", prepared=True)["session_id"]
+            fact_state["last_error"] = None
+        except Exception as exc:  # a missing pool or engine store must not stop the dashboard
+            fact_state["last_error"] = f"{type(exc).__name__}: {getattr(exc, 'detail', exc)}"
+        finally:
+            fact_state["building"] = False
+    app.state.prepare_recommendations = prepare_recommendations
+    app.state.recommendation_fact_state = fact_state
+
+    def prepare_recommendations_later():
+        """Start the preparation in the background; returns the thread (None when one is already running)."""
+        if cash_engine != 'spec' or fact_state["building"]:
+            return None
+        fact_state["building"] = True
+        thread = threading.Thread(target=prepare_recommendations, daemon=True)
+        fact_state["thread"] = thread
+        thread.start()
+        return thread
+    app.state.prepare_recommendations_later = prepare_recommendations_later
+
+    @app.middleware("http")
+    async def rebuild_after_news_refresh(request, call_next):
+        response = await call_next(request)
+        if (request.method == "POST" and response.status_code == 200
+                and request.url.path in ("/api/v1/intelligence/collect", "/api/v1/intelligence/import-result")):
+            prepare_recommendations_later()
+        return response
+
+    def fact_pack_status(day: date, months: int = 6) -> dict:
+        try:
+            k = recommendation_key(day, months, None)
+        except HTTPException as exc:
+            return {"status": "unavailable", "reason": exc.detail}
+        entry = fact_cache.get(k["key"])
+        if entry:
+            return {"status": "ready", **entry["meta"]}
+        return {"status": "building" if fact_state["building"] else "not_built", "as_of": day.isoformat(),
+                "last_error": fact_state["last_error"]}
+
+    @app.get("/api/v1/recommendations/agent/latest", dependencies=protected, tags=["recommendations"])
+    def recommendation_latest():
+        """The latest recommendation session (a prepared one shows its prepared_at), for the page to show on opening."""
+        spec_only()
+        store = recommendation_store()
+        listed = store.list(1)
+        if not listed:
+            return {"session": None, "preparing": fact_state["building"], "last_error": fact_state["last_error"]}
+        return {"session": store.get(listed[0]["session_id"]), "preparing": fact_state["building"],
+                "last_error": fact_state["last_error"]}
+
+    @app.get("/api/v1/recommendations/active-events", dependencies=protected, tags=["recommendations"])
+    def recommendation_active_events(as_of: date | None = None, horizon_months: Literal[3, 6, 12] = 6):
+        """The active Events (top by score, ticked by default), the rest as "not included", and which have a saved
+        model forecast prepared at startup."""
+        from .dashboard_adapter import horizon_cutoff
+        from .fact_pack import saved_model_forecast, select_active_events
+        from .forecast import ForecastAgent
+        spec_only()
+        day = as_of or service.clock().astimezone(service.tz).date()
+        pool, _ = news.cumulative()
+        events = select_active_events(pool)
+        horizon = min(365, (date.fromisoformat(horizon_cutoff(day, horizon_months)) - day).days)
+        forecasts = ForecastAgent(intelligence, news).forecasts()
+        for e in events["included"] + events["not_included"]:
+            e["forecast"] = "model_saved" if saved_model_forecast(forecasts, e["event_id"], day.isoformat(), horizon,
+                                                                  events["pool_run_id"]) else "rule_based"
+        return {**events, "as_of": day.isoformat(), "limit": len(events["included"]),
+                "more_count": len(events["not_included"]), "fact_pack": fact_pack_status(day, horizon_months)}
+
+    @app.post("/api/v1/recommendations/agent", dependencies=protected, tags=["recommendations"])
+    def recommendation_agent(body: RecommendationAgentRequest):
+        """One Treasury recommendation set for the whole situation, grounded in a fact pack and checked item by item.
+        Hedges are tested by the engine (write=False) against the baseline plus the combined news forecast. Nothing is
+        executed."""
+        day = body.as_of or service.clock().astimezone(service.tz).date()
+        return run_recommendation_session(day, body.horizon_months, body.event_ids, body.mode, body.max_runs)
+
+    @app.post("/api/v1/recommendations/agent/{session_id}/decisions", dependencies=protected, tags=["recommendations"])
+    def recommendation_decision(session_id: str, body: RecommendationDecision):
+        """Approve / Defer / Reject one decision. Recorded in the audit log only; no scenario, assumption, profile or
+        adjustment changes."""
+        spec_only()
+        store = recommendation_store()
+        s = store.get(session_id)
+        if s is None:
+            raise HTTPException(404, "Unknown recommendation session")
+        if body.decision_id not in {d.get("decision_id") for d in s.get("decisions", [])}:
+            raise HTTPException(404, "Unknown decision in this session")
+        if not body.reviewer.strip():
+            raise HTTPException(422, "A reviewer name is required")
+        return store.record_decision(session_id, body.decision_id, body.decision, body.reviewer.strip(), body.comment)
+
+    @app.get("/api/v1/recommendations/agent/{session_id}/decisions", dependencies=protected, tags=["recommendations"])
+    def recommendation_decisions(session_id: str):
+        spec_only()
+        store = recommendation_store()
+        if store.get(session_id) is None:
+            raise HTTPException(404, "Unknown recommendation session")
+        return {"decisions": store.decisions(session_id)}
 
     @app.get("/api/v1/recommendations/agent", dependencies=protected, tags=["recommendations"])
     def recommendation_sessions(limit: Annotated[int, Query(ge=1, le=100)] = 20):
@@ -555,7 +700,11 @@ def main():
     if a.host not in {"127.0.0.1", "::1", "localhost"} and not token:
         p.error("Set DASHBOARD_API_TOKEN before listening on a non-loopback address")
     import uvicorn
-    uvicorn.run(create_app(token=token, allowed_origins=a.allow_origin), host=a.host, port=a.port)
+    app = create_app(token=token, allowed_origins=a.allow_origin)
+    # Recommendations are prepared in the background (fact pack, then one session: with the model when configured),
+    # as run_dashboard.py does; the page shows the latest session and its prepared time.
+    app.state.prepare_recommendations_later()
+    uvicorn.run(app, host=a.host, port=a.port)
 
 
 if __name__ == "__main__":

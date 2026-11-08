@@ -9,7 +9,7 @@ from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from pydantic import Field, ValidationError, model_validator
 
-from .assistant import Assistant, provider_config
+from .assistant import Assistant, cost_stage, provider_config
 from .news_v8 import Strict
 
 
@@ -316,7 +316,8 @@ class ForecastAgent:
                         {"role": "user", "content": json.dumps(context, ensure_ascii=False)}]
             for attempt in range(2):
                 # Provider failures are not validation failures and are never retried.
-                raw = client._chat(messages)
+                with cost_stage("forecast"):
+                    raw = client._chat(messages)
                 try:
                     output = ForecastOutput.model_validate_json(server_labels(raw))
                     compile_scenario(output, as_of, request.horizon_days, selected)

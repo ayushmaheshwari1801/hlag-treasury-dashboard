@@ -58,6 +58,11 @@ export const api = {
   recommendationAgent: (body: Record<string, unknown>) => call<any>("POST", "/api/v1/recommendations/agent", body),
   recommendationSessions: (limit = 20) => call<any>("GET", `/api/v1/recommendations/agent?limit=${limit}`),
   recommendationSession: (id: string) => call<any>("GET", `/api/v1/recommendations/agent/${encodeURIComponent(id)}`),
+  recommendationLatest: () => call<any>("GET", "/api/v1/recommendations/agent/latest"),
+  activeEvents: () => call<any>("GET", "/api/v1/recommendations/active-events"),
+  recommendationDecision: (sessionId: string, body: { decision_id: string; decision: string; reviewer: string; comment: string }) =>
+    call<any>("POST", `/api/v1/recommendations/agent/${encodeURIComponent(sessionId)}/decisions`, body),
+  recommendationDecisions: (sessionId: string) => call<any>("GET", `/api/v1/recommendations/agent/${encodeURIComponent(sessionId)}/decisions`),
   engineRefreshMarket: (actor: string) => call<any>("POST", "/api/v1/engine/market/refresh", { actor }),
   articles: (limit = 50) => call<any>("GET", `/api/v1/news/articles?limit=${limit}`),
   article: (id: string) => call<any>("GET", `/api/v1/news/articles/${encodeURIComponent(id)}`),

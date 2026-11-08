@@ -1,6 +1,12 @@
 """Existing tests were written against the mock RiskEngine and use their own fixture market databases, so they run
 with CASH_ENGINE=mock. Tests marked spec_engine run on hlag_engine."""
+import os
+import tempfile
+
 import pytest
+
+# Module-scoped fixtures run before the per-test fixture below: keep their cost lines out of data/ too.
+os.environ.setdefault("LLM_COST_LOG", os.path.join(tempfile.mkdtemp(prefix="llm-costs-"), "llm-costs.jsonl"))
 
 
 def pytest_configure(config):
@@ -10,3 +16,9 @@ def pytest_configure(config):
 @pytest.fixture(autouse=True)
 def _cash_engine(request, monkeypatch):
     monkeypatch.setenv('CASH_ENGINE', 'spec' if request.node.get_closest_marker('spec_engine') else 'mock')
+
+
+@pytest.fixture(autouse=True)
+def _cost_log(tmp_path, monkeypatch):
+    """Model-call cost lines go to a per-test file, never to the workspace's data/llm-costs.jsonl."""
+    monkeypatch.setenv('LLM_COST_LOG', str(tmp_path / 'llm-costs.jsonl'))

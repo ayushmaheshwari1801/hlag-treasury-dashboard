@@ -1,8 +1,10 @@
-"""Hedge recommendation agent: news time window, engine hedge tools, effect grading, model tool loop and API.
+"""Treasury recommendation engine (recommendation-agent/3): engine hedge tools, effect grading, the v3 model loop
+(per-item checks, repair, removal), the rule fallback and the API.
 
 Engine tests run hlag_engine read-only (write=False) against its default store; the model is a scripted mock
 transport, so no provider is called."""
 import json
+import re
 import sqlite3
 from datetime import date, datetime
 from pathlib import Path
@@ -49,19 +51,12 @@ def test_grade_rules():
     assert grade_effect(30, 100, None, None, ok)[0] == 'material'
     assert grade_effect(10, 100, None, None, ok)[0] == 'marginal'
     assert grade_effect(0, 100, None, None, ok)[0] == 'no_effect'
+    # a margin shortfall counts against the hedge only when the hedge itself posts margin (team snapshot fix)
+    assert grade_effect(0, 100, '2027-02-28', '2027-02-28', {'passed': False, 'hedge_posts_margin': False})[0] == 'no_effect'
+    assert grade_effect(0, 100, None, None, {'passed': False, 'hedge_posts_margin': True})[0] == 'counterproductive'
 
 
 # ---------------------------------------------------------------- engine tools
-@pytest.mark.parametrize('rec', [None, 'invalid', {'candidate_id': []},
-    {'candidate_id': 'cand_1', 'conditions': None, 'alternatives': []},
-    {'candidate_id': 'cand_1', 'conditions': [], 'alternatives': [42]}])
-def test_model_rejects_malformed_recommendations(rec):
-    from types import SimpleNamespace
-    from treasury_gateway.recommendation_agent import RecommendationAgent
-    final, problems = RecommendationAgent(None)._accept(
-        SimpleNamespace(candidates={}), {'summary': 'Review hedges.', 'recommendations': [rec]}, [])
-    assert problems and final == {}
-
 
 spec = pytest.mark.spec_engine
 
@@ -176,101 +171,13 @@ def _scripted(steps):
         assert body['tools'] and body['model'] == 'test-model'
         step = steps[len(seen)]
         seen.append(body['messages'])
-        return httpx.Response(200, json={'choices': [{'message': step(body['messages'])}]})
+        return httpx.Response(200, json={'choices': [{'message': step(body['messages'])}],
+                                         'usage': {'prompt_tokens': 100, 'completion_tokens': 10, 'cost': 0.001}})
     return httpx.MockTransport(handler), seen
 
 
 def _last_tool(messages):
     return json.loads([m for m in messages if m['role'] == 'tool'][-1]['content'])
-
-
-@spec
-def test_model_tests_hedges_and_numbers_are_attached_by_the_engine(adapter):
-    from treasury_gateway.recommendation_agent import HedgeLab, RecommendationAgent
-
-    def submit(text, cid):
-        return {'summary': text, 'recommendations': [{
-            'candidate_id': cid, 'title': 'Review a fuel swap', 'rationale': 'Fuel purchases drive the headroom loss.',
-            'why_now': 'Headroom is lowest at the binding date.', 'conditions': ['Verify fuel commitments.'],
-            'alternatives': ['Keep monitoring.']}]}
-
-    steps = [
-        lambda m: {'content': None, 'tool_calls': [_call(1, 'test_hedge', {'module': 'bunker', 'instrument': 'swap',
-                                                                           'target': 'fuel_all', 'coverage_pct': 25, 'tenor_months': 12}),
-                                                   _call(2, 'test_hedge', {'module': 'bunker', 'instrument': 'swap',
-                                                                           'target': 'freight', 'coverage_pct': 25, 'tenor_months': 12})]},
-        # an invented figure is refused and sent back
-        lambda m: {'content': None, 'tool_calls': [_call(3, 'submit_recommendations',
-                                                         submit('The swap saves USD 987.6m.', json.loads(
-                                                             [x for x in m if x['role'] == 'tool'][0]['content'])['candidate_id']))]},
-        lambda m: {'content': None, 'tool_calls': [_call(4, 'submit_recommendations',
-                                                         submit('One fuel swap is worth a review.', json.loads(
-                                                             [x for x in m if x['role'] == 'tool'][0]['content'])['candidate_id']))]},
-    ]
-    transport, seen = _scripted(steps)
-    lab = HedgeLab(adapter, AS_OF, FUEL_UP)
-    out = RecommendationAgent(CONFIG, transport=transport).run(lab, {'events': [{'event_id': 'E1'}]}, 'model')
-    assert out['origin'] == 'hybrid' and out['source'] == 'model' and out['model'] == 'test-model'
-    assert out['guard'] == {'checked': True, 'passed': True, 'repaired': True}
-    assert 'error' in _last_tool(seen[2]) and '987.6' in _last_tool(seen[2])['error']
-    assert any(not c['ok'] and 'target' in c['error'] for c in out['tool_calls'])      # the bad target was refused
-    [rec] = out['recommendations']
-    cand = lab.candidates[rec['candidate_id']]
-    assert rec['effect'] == cand['effect'] and rec['run_ids'] == cand['run_ids']
-    assert rec['record']['expected_effect']['min_headroom_change_usd_m'] == cand['effect']['min_headroom_change_usd_m']
-    assert rec['record']['trigger'] == {'kind': 'event', 'id': 'E1'} and rec['record']['status'] == 'proposed'
-    assert rec['record']['lever'] == 'hypothetical_hedge' and out['runs_used'] == 4
-    # the model saw the diagnosis and options in its first message, and news is labelled untrusted in the prompt
-    first = seen[0]
-    assert 'untrusted' in first[0]['content'] and '"diagnosis"' in first[1]['content']
-
-
-@spec
-def test_provider_failure_falls_back_to_rule_planner(adapter):
-    from treasury_gateway.recommendation_agent import HedgeLab, RecommendationAgent
-    transport = httpx.MockTransport(lambda r: httpx.Response(500, json={}))
-    lab = HedgeLab(adapter, AS_OF, FUEL_UP)
-    out = RecommendationAgent(CONFIG, transport=transport).run(lab, {'events': []}, 'auto')
-    assert out['origin'] == 'rule_based' and 'RuntimeError' in out['guard']['note']
-    assert out['recommendations'] and all(r['module'] == 'bunker' for r in out['recommendations'])
-    assert out['recommendations'][0]['record']['trigger']['kind'] == 'run'
-    assert [r['rank'] for r in out['recommendations']] == list(range(1, len(out['recommendations']) + 1))
-    assert out['runs_used'] <= out['run_budget']
-
-
-# ---------------------------------------------------------------- API
-@pytest.fixture
-def client(tmp_path, adapter):
-    from fastapi.testclient import TestClient
-    from treasury_gateway.app import create_app
-    from treasury_gateway.assistant import Assistant
-    from treasury_gateway.news_v8 import NewsV8Reader
-    from treasury_sensitivity.audit import AuditStore
-    from treasury_sensitivity.service import SensitivityService
-    NewsV8Reader(tmp_path / 'news').import_result(json.loads(EXAMPLE.read_text(encoding='utf-8')))
-    svc = SensitivityService(audit=AuditStore(':memory:'),
-                             clock=lambda: datetime(2026, 11, 3, 9, tzinfo=ZoneInfo('Europe/Berlin')))
-    app = create_app(service=svc, news_dir=tmp_path / 'news', state_db=tmp_path / 'state.sqlite', assistant=Assistant(None))
-    return TestClient(app), tmp_path / 'state.sqlite'
-
-
-@spec
-def test_api_session_is_saved_and_has_no_look_ahead(client):
-    c, state = client
-    assert c.post('/api/v1/recommendations/agent', json={'news_from': '2026-11-01', 'news_to': '2026-11-02'}).status_code == 422
-    assert c.post('/api/v1/recommendations/agent', json={'news_to': '2026-11-05', 'as_of': '2026-11-03'}).status_code == 422
-    assert c.post('/api/v1/recommendations/agent', json={'news_from': '2026-11-02', 'news_to': '2026-11-01'}).status_code == 422
-    r = c.post('/api/v1/recommendations/agent', json={'news_from': '2026-10-25', 'news_to': '2026-10-31',
-                                                      'as_of': '2026-11-03', 'shocks': {'bunker': 200}})
-    assert r.status_code == 200, r.text
-    s = r.json()
-    assert s['origin'] == 'rule_based' and s['news_window'] == {'from': '2026-10-25', 'to': '2026-10-31'}
-    assert s['event_ids'] and s['forecast_id'].startswith('forecast_') and s['read_only'] is True
-    assert s['diagnosis']['adverse_modules'] == ['bunker'] and s['candidates']
-    assert c.get(f"/api/v1/recommendations/agent/{s['session_id']}").json()['recommendations'] == s['recommendations']
-    assert c.get('/api/v1/recommendations/agent').json()['sessions'][0]['session_id'] == s['session_id']
-    with sqlite3.connect(state) as db:
-        assert db.execute("SELECT COUNT(*) FROM intelligence_audit WHERE action='recommendation_session'").fetchone()[0] == 1
 
 
 def test_api_refused_with_mock_engine(tmp_path):
@@ -282,93 +189,6 @@ def test_api_refused_with_mock_engine(tmp_path):
     assert TestClient(app).post('/api/v1/recommendations/agent', json={}).status_code == 409
 
 
-@spec
-def test_saved_forecast_uses_original_news_and_rejects_backdating(client, monkeypatch):
-    from treasury_gateway.forecast import ForecastAgent
-    from treasury_gateway.news_v8 import NewsV8Reader
-    from treasury_gateway.recommendation_agent import RecommendationAgent, RecommendationSessions
-    c, _ = client
-    payload = _payload()
-    forecast = {'forecast_id': 'forecast_saved', 'source_run_id': 'original_snapshot',
-                'as_of': AS_OF.isoformat(), 'selected_event_ids': ['E1'], 'scenario': {}}
-    monkeypatch.setattr(ForecastAgent, 'get', lambda self, fid: forecast)
-    def snapshot(self, run_id):
-        assert run_id == 'original_snapshot'
-        return payload
-    monkeypatch.setattr(NewsV8Reader, 'saved_run', snapshot)
-    def no_current_pool(self):
-        raise AssertionError('A saved forecast must not read the current news pool')
-    monkeypatch.setattr(NewsV8Reader, 'cumulative', no_current_pool)
-    monkeypatch.setattr(RecommendationAgent, 'run', lambda self, lab, context, mode: {})
-    monkeypatch.setattr(RecommendationSessions, 'save', lambda self, session: session)
-    response = c.post('/api/v1/recommendations/agent', json={'forecast_id': 'forecast_saved'})
-    assert response.status_code == 200, response.text
-    assert response.json()['events'][0]['title'] == 'E1'
-    assert response.json()['forecast']['source_run_id'] == 'original_snapshot'
-    assert c.post('/api/v1/recommendations/agent', json={
-        'forecast_id': 'forecast_saved', 'as_of': '2026-11-02'}).status_code == 422
-    assert c.post('/api/v1/recommendations/agent', json={
-        'forecast_id': 'forecast_saved', 'news_to': '2026-11-04'}).status_code == 422
-    monkeypatch.setattr(NewsV8Reader, 'saved_run', lambda self, rid: None)
-    assert c.post('/api/v1/recommendations/agent', json={'forecast_id': 'forecast_saved'}).status_code == 409
-
-
-# Broader actions share the same model loop and persistence format as tested hedges.
-def review_action(**changes):
-    return {"kind": "working_capital", "candidate_id": None, "event_ids": ["E1"],
-            "title": "Review collection terms", "rationale": "Freight receipts may be delayed.",
-            "why_now": "Review before affected invoices become due.",
-            "conditions": ["Verify actual invoices and customer terms."],
-            "alternatives": ["Monitor receipts if no exposure is confirmed."], **changes}
-
-
-@pytest.mark.parametrize("changes", [
-    {"event_ids": ["unknown"]}, {"event_ids": []}, {"event_ids": [["E1"]]},
-    {"candidate_id": "unproven"}, {"effect": {"saving": 100}},
-    {"kind": "execute_payment"}, {"conditions": []}, {"title": ""},
-])
-def test_review_action_rejects_unverified_evidence_and_effects(changes):
-    from types import SimpleNamespace
-    from treasury_gateway.recommendation_agent import RecommendationAgent
-    _, errors = RecommendationAgent(None)._accept(SimpleNamespace(candidates={}),
-        {"summary": "Review collections.", "recommendations": [review_action(**changes)]},
-        [{"events": [{"event_id": "E1"}]}])
-    assert errors
-
-
-@spec
-def test_model_can_recommend_collection_review_without_testing_a_hedge(adapter):
-    from treasury_gateway.recommendation_agent import HedgeLab, RecommendationAgent
-    transport, _ = _scripted([lambda m: {"content": None, "tool_calls": [
-        _call(1, "submit_recommendations", {"summary": "Review collection terms before choosing a hedge.",
-                                          "recommendations": [review_action()]})]}])
-    lab = HedgeLab(adapter, AS_OF, FUEL_UP)
-    result = RecommendationAgent(CONFIG, transport=transport).run(lab, {"events": [{"event_id": "E1"}]}, "model")
-    assert result["source"] == "model" and result["guard"]["passed"]
-    assert result["candidates"] == []
-    [rec] = result["recommendations"]
-    assert rec["kind"] == "working_capital" and rec["rank"] == 1
-    assert rec["effect"] is None and rec["grade"] == "unquantified"
-    assert "record" not in rec and rec["event_ids"] == ["E1"]
-
-
-@spec
-def test_preset_and_edited_forecast_reach_recommendation_engine(client, monkeypatch):
-    from treasury_gateway.forecast import ForecastAgent
-    from treasury_gateway.recommendation_agent import RecommendationAgent, RecommendationSessions
-    c, _ = client
-    def no_forecast(*args, **kwargs):
-        raise AssertionError('An explicit scenario must not be replaced by a news forecast')
-    monkeypatch.setattr(ForecastAgent, 'predict', no_forecast)
-    monkeypatch.setattr(RecommendationAgent, 'run', lambda self, lab, context, mode: {'received':context['scenario_inputs']})
-    monkeypatch.setattr(RecommendationSessions, 'save', lambda self, session: session)
-    response = c.post('/api/v1/recommendations/agent', json={
-        'news_from':'2026-10-25','news_to':'2026-10-31','as_of':'2026-11-03',
-        'scenario':{'name':'Oil spike QA', 'start_date':'2026-11-03', 'bunker':{'vlsfo_shock_pct':0.3}}})
-    assert response.status_code == 200, response.text
-    assert response.json()['received']['bunker']['vlsfo_shock_pct'] == 0.3
-    assert response.json()['forecast']['mode'] == 'manual'
-
 
 @spec
 def test_fully_hedged_operating_costs_are_not_ranked_as_residual_losses(adapter):
@@ -379,3 +199,412 @@ def test_fully_hedged_operating_costs_are_not_ranked_as_residual_losses(adapter)
     assert not any(r['line_code'] == 'FX_OPERATING_COST' for r in result['largest_adverse_lines'])
     assert any(r['line_code'] == 'DIVIDEND' for r in result['largest_adverse_lines'])
     assert 'Residual cash' in result['cash_basis']
+
+# ================================================================ recommendation-agent/3
+from test_fact_pack import event as _event, pool_of as _pool_of, saved as _saved  # noqa: E402
+
+HORIZON = 180
+
+
+@pytest.fixture(scope='module')
+def situation(adapter):
+    """A real fact pack: fuel news with a saved model forecast (+20%), Red Sea news on fixed rules."""
+    from hlag_engine.company_profile.registers import load_registers
+    from treasury_gateway.engine_adapter import page_market
+    from treasury_gateway.fact_pack import (build_fact_pack, combine_event_forecasts, market_alerts, market_moves_7d,
+                                            playbook_entries, select_active_events, situation_runs)
+    fuel = _event('E1', 'Bunker prices surge after refinery outage', 60, '2026-10-30T00:00:00Z')
+    sea = _event('E2', 'Red Sea attacks force carriers to reroute via the Cape', 50, '2026-10-29T00:00:00Z')
+    pool = _pool_of(fuel, sea)
+    events = select_active_events(pool)
+    ticked = [e['event_id'] for e in events['included']]
+    combined = combine_event_forecasts(pool['events'], pool, [_saved('E1', 'bunker.vlsfo_shock_pct', 20)], AS_OF, HORIZON)
+    market = page_market(adapter.shared, AS_OF)
+    runs = situation_runs(adapter, AS_OF, combined['scenario'], [], market=market)
+    pack = build_fact_pack(as_of=AS_OF, months=6, runs=runs, market=market, events=events, ticked=ticked,
+                           combined=combined, pool=pool, profile=adapter.shared.profile, registers=load_registers(),
+                           alerts=market_alerts(adapter, AS_OF), market_moves=market_moves_7d(adapter, AS_OF, []),
+                           playbook=playbook_entries(adapter))
+    pack['engine_runs'] = len(runs)
+    _PACK['pack'] = pack
+    return {'pack': pack, 'combined': combined, 'situation_result': runs['situation_result']}
+
+
+def _lab(adapter, situation, max_runs=10):
+    from treasury_gateway.recommendation_agent import HedgeLab
+    return HedgeLab(adapter, AS_OF, situation['combined']['scenario'], [], max_runs=max_runs)
+
+
+def _context(messages):
+    return json.loads(messages[1]['content'].split('\n', 1)[1])
+
+
+_PACK = {}
+
+
+def _valid_set(messages):
+    """What a well-behaved model would submit: a set built only from the session's facts (the summary it was sent
+    lists the same fact ids; get_fact_detail gives the rest)."""
+    from treasury_gateway.recommendation_agent import rule_set
+    ctx = _context(messages)
+    assert set(ctx['FACTS']) == set(_PACK['pack']['facts'])
+    return rule_set({'facts': _PACK['pack']['facts'], 'ticked': ctx['ticked_event_ids']}, [])
+
+
+def _with_invented_number(messages):
+    s = _valid_set(messages)
+    s['decisions'][0]['why'].append({'text': 'This frees EUR 640m.', 'label': 'Engine', 'cites': ['F.sit.status']})
+    return s
+
+
+def _submit(i, builder):
+    return lambda m: {'content': None, 'tool_calls': [_call(i, 'submit_recommendation_set', builder(m))]}
+
+
+def _check(out, situation):
+    from treasury_gateway.recommendation_validator import passed, validate_set
+    tools = {c['candidate_id']: c for c in out['candidates']}
+    return validate_set(out, situation['pack'], tools, min_decisions=0)
+
+
+@spec
+def test_rule_fallback_is_a_full_grounded_set(adapter, situation):
+    from treasury_gateway.fact_pack import OWNER_ROLES
+    from treasury_gateway.recommendation_agent import RecommendationAgent, rule_position
+    from treasury_gateway.recommendation_validator import passed
+    out = RecommendationAgent(None).run(_lab(adapter, situation), situation['pack'])
+    assert out['prompt_version'] == 'recommendation-agent/3' and out['origin'] == 'rule_based'
+    assert out['position'] == rule_position(situation['pack']) and len(out['position']['headline']) == 2
+    assert 3 <= len(out['decisions']) <= 5 and [d['rank'] for d in out['decisions']] == list(range(1, len(out['decisions']) + 1))
+    assert all(d['owner']['role'] in OWNER_ROLES and d['owner']['kind'] == 'business function' for d in out['decisions'])
+    from treasury_gateway.recommendation_agent import PLAIN_PLAYBOOK
+    plain = {(v, sc) for v, sc, _ in PLAIN_PLAYBOOK.values()}
+    assert any((d['verb'], d['scope']) in plain for d in out['decisions'])                 # from the engine playbook
+    assert passed(_check(out, situation)), _check(out, situation)
+    assert out['how_reached']['rounding_note'].startswith('Figures may be rounded')
+    assert out['runs_used'] <= out['run_budget']
+
+
+@spec
+def test_bunker_hedges_are_alternatives_when_the_engine_does_not_mark_fuel_exceptional(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    assert situation['pack']['facts']['F.eng.bunker_exceptional']['value'] is False
+    out = RecommendationAgent(None).run(_lab(adapter, situation), situation['pack'])
+    fuel = [a for a in out['rejected_alternatives'] if 'fuel_all' in a['title']]
+    assert fuel and all('exceptional' in a['reason']['text'] for a in fuel)
+    assert not any(d['kind'] == 'hedge' and d['expected_effect']['engine']['module'] == 'bunker' for d in out['decisions'])
+
+
+@spec
+def test_lab_tests_the_news_situation_and_the_mirror_reverses_the_news(adapter, situation):
+    lab = _lab(adapter, situation)
+    assert lab.params.bunker.vlsfo_shock_pct == pytest.approx(20)
+    assert lab.mirrored.bunker.vlsfo_shock_pct == pytest.approx(-20)
+    assert not lab.params.fx.move_pct                                            # no observed moves added
+
+
+@spec
+def test_closed_policy_keys_are_refused_without_spending_runs(adapter, situation):
+    from treasury_gateway.recommendation_agent import ToolError
+    lab = _lab(adapter, situation)
+    for key in ('fx.hedge_ratio.eur_dividend', 'fx.hedge_ratio.eur_operating_costs'):
+        with pytest.raises(ToolError, match='closed by policy'):
+            lab.test_hedge_ratio(key, 0.5)
+    assert lab.runs_used == 0
+
+
+@spec
+def test_model_set_is_accepted_and_titles_are_built_by_the_server(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    transport, seen = _scripted([_submit(1, _valid_set)])
+    out = RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'model')
+    assert out['origin'] == 'model' and out['model'] == 'test-model'
+    assert out['how_reached']['model_calls'] == 1 and out['how_reached']['checks']['repaired'] == 0 and not out['removed_by_checks']
+    cost = out['how_reached']['ai_cost']
+    assert (cost['calls'], cost['cost_usd'], cost['prompt_tokens'], cost['completion_tokens']) == (1, 0.001, 100, 10)
+    d = out['decisions'][0]
+    assert d['title'].startswith(d['verb'] + ' ' + d['scope']) and d['title'].endswith(f"({d['owner']['role']})")
+    first = seen[0]
+    assert 'untrusted' in first[0]['content'] and '"FACTS"' in first[1]['content'] and '"diag"' in first[1]['content']
+
+
+@spec
+def test_a_bad_item_is_returned_with_its_reason_in_one_message_and_repaired(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    transport, seen = _scripted([_submit(1, _with_invented_number), _submit(2, _valid_set)])
+    out = RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'model')
+    tool_msgs = [m for m in seen[1] if m['role'] == 'tool']
+    assert len(tool_msgs) == 1 and 'Rejected items' in tool_msgs[0]['content'] and 'number 640' in tool_msgs[0]['content']
+    assert out['origin'] == 'model' and out['how_reached']['checks']['repaired'] == 1 and not out['removed_by_checks']
+
+
+@spec
+def test_an_item_failing_after_two_repairs_is_removed_and_the_rest_kept(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    from treasury_gateway.recommendation_validator import passed
+    transport, seen = _scripted([_submit(i, _with_invented_number) for i in (1, 2, 3)])
+    out = RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'model')
+    assert out['how_reached']['model_calls'] == 3 and out['how_reached']['checks']['repaired'] == 2
+    [gone] = out['removed_by_checks']
+    assert out['how_reached']['removed_by_checks'] == out['removed_by_checks']
+    assert gone['kind'] == 'decision' and any('number 640' in r for r in gone['reasons'])
+    assert len(out['decisions']) == len(_valid_set(seen[0])['decisions']) - 1
+    assert passed(_check(out, situation))
+
+
+@spec
+def test_provider_failure_falls_back_to_the_rule_set(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    from treasury_gateway.recommendation_validator import passed
+    transport = httpx.MockTransport(lambda r: httpx.Response(500, json={}))
+    out = RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'auto')
+    assert out['origin'] == 'rule_based' and 'RuntimeError' in out['how_reached']['note']
+    assert passed(_check(out, situation))
+
+
+FORBIDDEN = re.compile(r"\\b(preset|presets|run|runs|engine)\\b", re.I)
+
+
+def _user_texts(out):
+    texts = list(out['position']['headline'])
+    for d in out['decisions']:
+        texts += [d['verb'], d['scope'], d['title'], d['cash_at_stake']['text'], d['timing']['text'], d['usual_practice'],
+                  d['if_wrong']['text']] + [w['text'] for w in d['why'] + d['escalate_if']]
+    texts += [a['reason']['text'] for a in out['rejected_alternatives']]
+    return texts
+
+
+@spec
+def test_rule_fallback_uses_plain_business_wording_and_sizes_every_decision(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    out = RecommendationAgent(None).run(_lab(adapter, situation), situation['pack'])
+    bad = [t for t in _user_texts(out) if FORBIDDEN.search(t)]
+    assert not bad, bad
+    assert all(d['cash_at_stake']['cites'] for d in out['decisions'])
+    assert all(d['timing']['text'].startswith('before the low point on ') for d in out['decisions'])
+
+
+@spec
+def test_rule_position_monitors_when_the_net_effect_takes_ten_percent_of_baseline_headroom(situation):
+    import copy
+    from treasury_gateway.recommendation_agent import rule_position
+    from treasury_gateway.recommendation_validator import Context, check_position
+    pack = copy.deepcopy(situation['pack'])
+    for k in ('F.liq.base.status', 'F.sit.status'):
+        pack['facts'][k]['value'] = 'LOW'
+    share = pack['facts']['F.der.sit.net_effect_pct_of_base_headroom']
+    share['value'] = -12.0
+    pos = rule_position(pack)
+    assert pos['value'] == 'heightened_monitoring' and '12.0%' in pos['headline'][1]
+    assert check_position(pos, Context(pack)) == []
+    share['value'] = -5.0
+    assert rule_position(pack)['value'] == 'business_as_usual'
+
+
+@spec
+def test_the_lab_reuses_the_fact_packs_situation_run(adapter, situation):
+    lab = _lab(adapter, situation)
+    lab.seed(situation['situation_result'])
+    d = lab.diagnose()
+    assert lab.runs_used == 1                                   # only the mirror; the situation is not run again
+    assert d['scenario_min_headroom_usd_m'] == pytest.approx(situation['pack']['facts']['F.sit.min_headroom']['value'], abs=0.06)
+    seeded = _lab(adapter, situation)
+    seeded.seed(situation['situation_result'], lab._base_m)
+    seeded.diagnose()
+    assert seeded.runs_used == 0
+
+
+@spec
+def test_model_sees_a_compact_fact_summary_and_can_ask_for_details(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    steps = [lambda m: {'content': None, 'tool_calls': [_call(1, 'get_fact_detail', {'fact_ids': ['F.policy.bunker', 'F.sit.status']})]},
+             _submit(2, _valid_set)]
+    transport, seen = _scripted(steps)
+    RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'model')
+    facts = _context(seen[0])['FACTS']
+    assert set(facts) == set(situation['pack']['facts'])
+    row = facts['F.policy.bunker']
+    assert {'l', 'v', 'p'} <= set(row) and 'source' not in row and 'rationale' not in row
+    assert not any('articles' in r or 'summary' in r for r in facts.values())
+    full = len(json.dumps(situation['pack']['facts'], default=str))
+    assert len(json.dumps(facts, default=str)) < full / 2          # the summary is less than half of the full facts
+    detail = _last_tool(seen[1])
+    want = {k: situation['pack']['facts'][k] for k in ('F.policy.bunker', 'F.sit.status')}
+    assert detail == json.loads(json.dumps(want, default=str))
+
+
+@spec
+def test_consumption_driven_fuel_scenario_tests_no_price_hedge(adapter):
+    from treasury_gateway.recommendation_agent import HedgeLab, ToolError
+    scenario = {'bunker': {'consumption_uplift_pct': .2}, 'name': 'More fuel burn', 'start_date': AS_OF.isoformat()}
+    lab = HedgeLab(adapter, AS_OF, scenario)
+    assert lab.diagnose()['bunker_driver'] == 'consumption'
+    used = lab.runs_used
+    with pytest.raises(ToolError, match='consumption'):
+        lab.test_hedge('bunker', 'swap', 'fuel_all', 25, 12)
+    assert lab.runs_used == used
+    assert HedgeLab(adapter, AS_OF, FUEL_UP).bunker_driver() == 'price'
+
+
+@spec
+def test_rule_fallback_proposes_an_operations_review_when_consumption_drives_fuel(situation):
+    import copy
+    from treasury_gateway.recommendation_agent import rule_set
+    from treasury_gateway.recommendation_validator import passed, validate_set
+    pack = copy.deepcopy(situation['pack'])
+    pack['facts']['F.sit.bunker_driver']['value'] = 'consumption'
+    out = rule_set(pack, [])
+    ops = [d for d in out['decisions'] if 'routing' in d['scope']]
+    assert ops and ops[0]['owner']['role'] == 'Procurement' and 'surcharge recovery' in ops[0]['scope']
+    assert passed(validate_set(out, pack, {}, min_decisions=0))
+
+
+@spec
+def test_fact_detail_lookups_are_capped_at_eight_per_session(adapter, situation):
+    from treasury_gateway.recommendation_agent import DETAIL_LIMIT, RecommendationAgent
+    ids = list(situation['pack']['facts'])[:10]
+    steps = [lambda m: {'content': None, 'tool_calls': [_call(1, 'get_fact_detail', {'fact_ids': ids})]},
+             lambda m: {'content': None, 'tool_calls': [_call(2, 'get_fact_detail', {'fact_ids': ids[:1]})]},
+             _submit(3, _valid_set)]
+    transport, seen = _scripted(steps)
+    RecommendationAgent(CONFIG, transport=transport).run(_lab(adapter, situation), situation['pack'], 'model')
+    first = _last_tool(seen[1])
+    assert DETAIL_LIMIT == 8 and len([k for k in first if not k.startswith('_')]) == 8 and 'limit reached' in first['_note']
+    assert 'limit reached' in _last_tool(seen[2])['error']
+
+
+def test_prompt_rules_for_assumptions_and_neutral_example():
+    from treasury_gateway.recommendation_agent import SYSTEM
+    assert "supporting assumptions (assumption_ids) must all be likely" in SYSTEM
+    assert "never list it in assumption_ids" in SYSTEM
+    assert "Asia-Europe" not in SYSTEM and "collection terms for overdue accounts" in SYSTEM
+
+
+# ---------------------------------------------------------------- API (recommendation-agent/3)
+def _v8_result():
+    """A valid contract-8 result: 10 scored Events (two drive the forecast), each with its own source Article."""
+    def ev(eid, title, impact, relevance, urgency):
+        aid = 'A' + eid[1:]
+        return ({'event_id': eid, 'title': title, 'category': 'industry', 'summary': title, 'article_ids': [aid],
+                 'score': {'impact': impact, 'relevance': relevance, 'urgency': urgency,
+                           'total': 8 * impact + 7 * relevance + 5 * urgency,
+                           'reasoning': {'impact': 'x', 'relevance': 'x', 'urgency': 'x'}},
+                 'why_it_matters': [], 'what_to_do': []},
+                {'url': f'https://example.com/{aid}', 'title': title, 'text': title, 'publisher': 'Example Wire',
+                 'published_at': '2026-10-30T00:00:00Z', 'article_id': aid, 'discovered_at': '2026-11-01T00:00:00Z',
+                 'normalized_url': f'https://example.com/{aid}', 'content_hash': aid})
+    items = [ev('E01', 'Bunker prices surge after refinery outage', 4, 4, 3),
+             ev('E02', 'Red Sea attacks force carriers to reroute via the Cape', 4, 3, 3)]
+    items += [ev(f'E{i:02d}', f'Port congestion update {i}', 1, 1, 1) for i in range(3, 11)]
+    return {'schema_version': 8, 'run_id': 'run_v3_test', 'status': 'completed', 'events': [e for e, _ in items],
+            'sources': [s for _, s in items], 'errors': [], 'metrics': {}, 'overall_summary': 'Test'}
+
+
+@pytest.fixture(scope='module')
+def v3_client(tmp_path_factory, adapter):
+    import os
+    from fastapi.testclient import TestClient
+    from treasury_gateway.app import create_app
+    from treasury_gateway.assistant import Assistant
+    from treasury_gateway.dashboard_adapter import horizon_cutoff
+    from treasury_gateway.news_v8 import NewsV8Reader
+    from treasury_sensitivity.audit import AuditStore
+    from treasury_sensitivity.service import SensitivityService
+    saved_env = os.environ.pop('NEWS_V8_DATABASE', None)   # use the imported result, not a live news database
+    tmp = tmp_path_factory.mktemp('v3')
+    NewsV8Reader(tmp / 'news').import_result(_v8_result())
+    svc = SensitivityService(audit=AuditStore(':memory:'),
+                             clock=lambda: datetime(2026, 11, 3, 9, tzinfo=ZoneInfo('Europe/Berlin')))
+    app = create_app(service=svc, news_dir=tmp / 'news', state_db=tmp / 'state.sqlite', assistant=Assistant(None),
+                     cash_engine='spec')
+    app.state.store_version = lambda adapter: 'fixed-for-tests'   # the cache key no longer depends on the store's file time
+    horizon = (date.fromisoformat(horizon_cutoff(AS_OF, 6)) - AS_OF).days
+    f = _saved('E01', 'bunker.vlsfo_shock_pct', 20, horizon=horizon, pool='run_v3_test')
+    st = app.state.intelligence
+    with st.lock, st.db:
+        st.db.execute('INSERT INTO intelligence_forecasts VALUES(?,?,?)', (f['forecast_id'], '2026-11-03T08:00:00Z', json.dumps(f)))
+    yield TestClient(app), app
+    if saved_env is not None:
+        os.environ['NEWS_V8_DATABASE'] = saved_env
+
+
+@spec
+def test_active_events_lists_the_top_eight_and_the_rest(v3_client):
+    c, _ = v3_client
+    r = c.get('/api/v1/recommendations/active-events').json()
+    assert len(r['included']) == 8 and r['more_count'] == 2 and len(r['not_included']) == 2
+    by = {e['event_id']: e for e in r['included']}
+    assert by['E01']['forecast'] == 'model_saved' and by['E02']['forecast'] == 'rule_based'
+
+
+@spec
+def test_session_uses_the_ticked_events_without_dates_and_is_saved(v3_client):
+    c, _ = v3_client
+    r = c.post('/api/v1/recommendations/agent', json={})
+    assert r.status_code == 200, r.text
+    s = r.json()
+    assert s['prompt_version'] == 'recommendation-agent/3' and s['session_id'].startswith('recsession_')
+    assert len(s['events']['ticked']) == 8 and 'E01' in s['events']['ticked']
+    origin = {x['event_id']: x['origin'] for x in s['events']['news_inputs']}
+    assert origin['E01'] == 'model_saved' and origin['E02'] == 'rule_based'
+    assert 3 <= len(s['decisions']) <= 5
+    listed = c.get('/api/v1/recommendations/agent').json()['sessions'][0]
+    assert listed['session_id'] == s['session_id'] and listed['position'] == s['position']['value'] and not listed['legacy']
+    more = c.get('/api/v1/recommendations/active-events').json()['not_included'][0]['event_id']
+    r = c.post('/api/v1/recommendations/agent', json={'event_ids': ['E01', more]})
+    assert r.status_code == 200 and r.json()['events']['ticked'] == ['E01', more]
+    assert c.post('/api/v1/recommendations/agent', json={'event_ids': ['E99']}).status_code == 422
+
+
+@spec
+def test_decisions_are_audited_and_change_nothing_else(v3_client):
+    c, app = v3_client
+    s = c.post('/api/v1/recommendations/agent', json={}).json()
+    st = app.state.intelligence
+    before = (json.dumps(st.adjustments(), default=str),
+              st.db.execute('SELECT count(*) FROM intelligence_forecasts').fetchone()[0])
+    dec = s['decisions'][0]['decision_id']
+    r = c.post(f"/api/v1/recommendations/agent/{s['session_id']}/decisions",
+               json={'decision_id': dec, 'decision': 'defer', 'reviewer': 'Reviewer', 'comment': 'Next week'})
+    assert r.status_code == 200 and r.json()['decision'] == 'defer'
+    got = c.get(f"/api/v1/recommendations/agent/{s['session_id']}/decisions").json()['decisions']
+    assert got[0]['decision_id'] == dec and got[0]['reviewer'] == 'Reviewer' and got[0]['comment'] == 'Next week'
+    after = (json.dumps(st.adjustments(), default=str),
+             st.db.execute('SELECT count(*) FROM intelligence_forecasts').fetchone()[0])
+    assert before == after
+    assert c.post(f"/api/v1/recommendations/agent/{s['session_id']}/decisions",
+                  json={'decision_id': 'dec_x', 'decision': 'approve', 'reviewer': 'R'}).status_code == 404
+
+
+
+@spec
+def test_fact_pack_and_a_session_are_prepared_ahead_and_shown_as_latest(v3_client):
+    c, app = v3_client
+    app.state.prepare_recommendations()
+    status = c.get('/api/v1/recommendations/active-events').json()['fact_pack']
+    assert status['status'] == 'ready' and status['as_of'] == AS_OF.isoformat()
+    assert status['built_at'] and status['build_seconds'] >= 0
+    latest = c.get('/api/v1/recommendations/agent/latest').json()['session']
+    assert latest['prepared'] is True and latest['prepared_at'] and latest['origin'] == 'rule_based'   # no model configured
+    assert latest['session_id'] == app.state.recommendation_fact_state['session_id']
+    s = c.post('/api/v1/recommendations/agent', json={}).json()
+    assert s['fact_pack']['cached'] is True and s['fact_pack']['built_at'] == status['built_at'] and s['prepared'] is False
+    assert s['session_seconds'] >= 0 and s['how_reached']['engine_runs'] == s['runs_used'] + 4
+    assert c.get('/api/v1/recommendations/agent/latest').json()['session']['session_id'] == s['session_id']
+
+
+@spec
+def test_a_news_import_rebuilds_the_fact_pack_in_the_background(v3_client):
+    import time
+    c, app = v3_client
+    result = _v8_result()
+    result['run_id'] = 'run_v3_refreshed'
+    result['events'][0]['title'] = result['events'][0]['summary'] = 'Bunker prices surge again after refinery outage'
+    assert c.post('/api/v1/intelligence/import-result', json=result).status_code == 200
+    thread = app.state.recommendation_fact_state['thread']
+    thread.join(timeout=600)                                 # wait for the background preparation itself, not a poll
+    assert not thread.is_alive() and app.state.recommendation_fact_state['last_error'] is None
+    status = c.get('/api/v1/recommendations/active-events').json()['fact_pack']
+    assert status['status'] == 'ready', status
+    latest = c.get('/api/v1/recommendations/agent/latest').json()['session']
+    assert latest['prepared'] is True and latest['fact_pack']['ticked'] == status['ticked']

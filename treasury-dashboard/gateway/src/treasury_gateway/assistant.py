@@ -17,9 +17,13 @@ Configuration (environment variables, or a .env file; the news engine's variable
 """
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 import re
+import threading
+from contextlib import contextmanager
+from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
@@ -248,6 +252,53 @@ def provider_message(response: httpx.Response, *, allow_tools: bool = False) -> 
 
 
 # --------------------------------------------------------------------------------------------- assistant
+# ------------------------------------------------------------------------------------------ provider cost log
+# Every gateway model call appends one line (stage, model, tokens, provider-reported USD cost) to a JSONL file, so a
+# run's model spend can be totalled exactly (ported from the 2026-11-08 team snapshot). No keys are written.
+_COST_STAGE: contextvars.ContextVar[str] = contextvars.ContextVar("llm_cost_stage", default="assistant")
+_COST_LOCK = threading.Lock()
+
+
+@contextmanager
+def cost_stage(stage: str):
+    """Label the model calls made inside this block (e.g. "forecast") in the cost log. An outer label wins, so a news
+    forecast made for a recommendation run is booked to the recommendation."""
+    token = _COST_STAGE.set(stage if _COST_STAGE.get() == "assistant" else _COST_STAGE.get())
+    try:
+        yield
+    finally:
+        _COST_STAGE.reset(token)
+
+
+def usage_request(config: dict) -> dict:
+    """OpenRouter reports each call's cost only when asked; other providers get no extra field."""
+    return {"usage": {"include": True}} if "openrouter.ai" in str(config.get("base_url", "")) else {}
+
+
+def cost_log_path() -> Path:
+    if os.environ.get("LLM_COST_LOG"):
+        return Path(os.environ["LLM_COST_LOG"])
+    workspace = Path(os.environ.get("TREASURY_WORKSPACE", str(Path(__file__).resolve().parents[4])))
+    return workspace / "data" / "llm-costs.jsonl"
+
+
+def record_cost(response: httpx.Response, model: str | None, stage: str | None = None) -> dict | None:
+    """Append one call's usage to the cost log and return the line. Never fails the call it describes."""
+    try:
+        usage = (response.json() or {}).get("usage") or {}
+        line = {"time": datetime.now(timezone.utc).isoformat(timespec="seconds"), "stage": stage or _COST_STAGE.get(),
+                "model": model, "http_status": response.status_code,
+                "prompt_tokens": usage.get("prompt_tokens"), "completion_tokens": usage.get("completion_tokens"),
+                "cost_usd": usage.get("cost")}
+        path = cost_log_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with _COST_LOCK, path.open("a", encoding="utf-8") as f:
+            print(json.dumps(line), file=f)
+        return line
+    except Exception:  # noqa: BLE001 - logging must not change the result of a model call
+        return None
+
+
 class Assistant:
     def __init__(self, config: dict | None, transport: httpx.BaseTransport | None = None, timeout: float = 40.0):
         self.config = config
@@ -261,7 +312,9 @@ class Assistant:
         c = self.config
         with httpx.Client(transport=self.transport, timeout=self.timeout) as client:
             r = client.post(f"{c['base_url']}/chat/completions", headers={"Authorization": f"Bearer {c['api_key']}"},
-                            json={"model": c["model"], "messages": messages, "temperature": 0, "response_format": {"type": "json_object"}})
+                            json={"model": c["model"], "messages": messages, "temperature": 0, "response_format": {"type": "json_object"},
+                                  **usage_request(c)})
+        record_cost(r, c["model"])
         if r.status_code >= 400:
             raise RuntimeError(f"provider returned HTTP {r.status_code}")
         return provider_message(r)["content"]

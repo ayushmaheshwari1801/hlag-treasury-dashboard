@@ -24,7 +24,7 @@ import { NewsImpactCard, NewsImpactDetail, type NewsRow } from "./dashboard/Even
 import { LINE_COLORS, LiquidityForecastCard, useRunPaths, type LiquidityLine } from "./dashboard/LiquidityForecast";
 import { METRIC_EXPLAIN, modelAssumptions, newsDriversByMetric } from "./dashboard/metricAssumptions";
 import { WorkingCapitalCard } from "./dashboard/WorkingCapital";
-import { HedgeAgentCard } from "./dashboard/HedgeAgent";
+import { RecommendationsCard } from "./dashboard/Recommendations";
 import { ArticleDrawer, AssistantDrawer, NewsList, SourcesDrawer } from "./dashboard/RiskDrawers";
 import "./TreasuryDashboard.css";
 
@@ -113,7 +113,7 @@ export default function TreasuryDashboard() {
             onOpenNews={row => setArticle(row.article_ids[0] ?? row.id)} onOpenImpact={setImpactDetail} />}
           {v && <LiquidityPositionCard r={r} v={v} />}
         </div>
-        {String(f?.calculation?.run_id ?? "").startsWith("spec_") && <div className="board-full"><HedgeAgentCard asOf={asOf} shocks={r.shocks} overrides={r.overrides} forecastInput={r.forecastInput} horizonDays={f?.horizon_days} rate={v?.rate} scenarioName={scenarioLabel(r)} scenarioKey={r.scenarioKey} /></div>}
+        {String(f?.calculation?.run_id ?? "").startsWith("spec_") && <div className="board-full"><RecommendationsCard /></div>}
       </div>
     </Step>
 
