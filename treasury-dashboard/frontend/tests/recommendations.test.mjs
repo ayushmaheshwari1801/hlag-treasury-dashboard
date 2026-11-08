@@ -73,14 +73,75 @@ test("AI cost and steps in plain words", () => {
   assert.equal(v.costText(session), "USD 0.032 for 6 AI calls (144,522 input and 45,531 output tokens).");
   assert.equal(v.costText({ origin: "rule_based" }), "No AI call (rule-based).");
   assert.deepEqual(v.toolSummary([{ tool: "get_fact_detail", ok: true }, { tool: "submit_recommendation_set", ok: false },
-    { tool: "submit_recommendation_set", ok: true }]), ["1 fact detail lookups", "2 submissions to the checks (1 refused or sent back)"]);
+    { tool: "submit_recommendation_set", ok: true }]), ["1 fact detail lookup", "2 submissions to the checks (1 refused or sent back)"]);
 });
 
-test("decision card is its own block layout, not the .action icon grid", () => {
-  const card = DecisionCard({ d: decision, session });
-  assert.equal(card.type, "article");
-  assert.equal(card.props.className, "rec-card");
+test("decision card: own block layout, two per row, details and the decision form collapsed", async () => {
+  const React = await import(import.meta.resolve("react"));
+  const { renderToStaticMarkup } = await import(import.meta.resolve("react-dom/server"));
+  const html = renderToStaticMarkup(React.createElement(DecisionCard, { d: decision, session }));
+  assert.match(html, /^<article class="rec-card"/);
+  const visible = html.split("<details")[0];
+  for (const text of ["Cash at stake", "Owner", "By when", "Effort / reversibility"]) assert.ok(visible.includes(text), text);
+  const hidden = html.split("<details")[1];
+  for (const text of ["Why it matters", "Expected effect", "If wrong", "Escalate if"]) assert.ok(hidden.includes(text), text);
+  assert.match(html, /Record decision/);
+  assert.doesNotMatch(html, /Reviewer name/);                 // the decision form opens only after "Record decision"
   const css = readFileSync(new URL("../src/TreasuryDashboard.css", import.meta.url), "utf8");
   assert.match(css, /\.rec-card\{display:block;min-width:0/);
-  assert.match(css, /\.rec-cards\{display:grid;grid-template-columns:repeat\(auto-fill,minmax\(320px,1fr\)\)/);
+  assert.match(css, /\.rec-cards\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+});
+
+test("model assumption label, prepared line, context line and event statuses", () => {
+  assert.equal(v.labelClass("Model assumption"), "lbl-model");
+  assert.equal(v.preparedLine({ ...session, fact_pack: { as_of: "2026-11-08" } }, when), "Prepared 2026-11-08T05:00:00Z · facts as of 2026-11-08");
+  assert.match(v.CONTEXT_LINE, /^Based on today's prices plus the ticked News forecasts; the header above shows the selected What-if scenario\.$/);
+  assert.equal(v.eventStatusText({ status: "used_in_decision", decision: 2 }), "Used in decision 2");
+  assert.equal(v.eventStatusText({ status: "not_quantifiable" }), "Not quantifiable");
+  assert.equal(v.eventStatusText({ status: "no_cash_effect" }), "No cash effect in the horizon");
+});
+
+test("prepared time is shown in Singapore time like the rest of the page", async () => {
+  const fmt = await import(load("format.ts"));
+  const line = v.preparedLine({ ...session, prepared_at: "2026-11-08T06:53:32Z", fact_pack: { as_of: "2026-11-08" } }, fmt.when);
+  assert.equal(line, "Prepared 8 Nov 2026, 14:53 SGT · facts as of 8 Nov 2026");
+});
+
+test("facts used: plain value, date and source, the provenance label, grouped", async () => {
+  const fmt = await import(load("format.ts"));
+  const credit = { id: "F.bank.undrawn_rcf", label: "Unused credit lines", value: 700.1, eur_value: 649.4, unit: "USD m",
+    date: "2025-12-31", source: "Annual Report 2025", provenance: "DISCLOSED" };
+  assert.equal(v.factLine(credit, fmt.when), "Unused credit lines: EUR 649.4m · 31 Dec 2025 · Annual Report 2025");
+  assert.equal(v.factValueText({ label: "Hedge ratio: CAD operating costs", value: 70, unit: "%" }, fmt.when), "70%");
+  assert.equal(v.factValueText({ label: "VLSFO move over 4 weeks", value: 12.2, unit: "%" }, fmt.when), "+12.2%");
+  assert.equal(v.factValueText({ label: "ZIM in the forecast", value: false }, fmt.when), "No");
+  assert.equal(v.factLabelOf("DISCLOSED"), "Fact");
+  assert.equal(v.factLabelOf("MARKET"), "Fact");
+  assert.equal(v.factLabelOf("DERIVED"), "Fact");
+  assert.equal(v.factLabelOf("ASSUMPTION"), "Model assumption");
+  assert.equal(v.factLabelOf("PROXY"), "Model assumption");
+  assert.equal(v.factLabelOf("ENGINE"), "Engine");
+  assert.equal(v.factLabelOf("NEWS"), "News forecast");
+  const groups = v.groupFacts([credit, { id: "F.alert.x" }, { id: "F.news.e1.freight" }, { id: "F.sit.low" }, { id: "F.policy.cad" }]);
+  assert.deepEqual(groups.map(g => [g.group, g.facts.length]),
+    [["Market & alerts", 1], ["News forecasts", 1], ["Liquidity forecast", 1], ["Company & policy", 2]]);
+});
+
+test("how this was reached: steps in order with each item sent back, singular counts", async () => {
+  const React = await import(import.meta.resolve("react"));
+  const { renderToStaticMarkup } = await import(import.meta.resolve("react-dom/server"));
+  const m = await import(load("dashboard/Recommendations.tsx"));
+  const s = { ...session, how_reached: { checks: { passed: 1, repaired: 1, removed: 1 }, engine_runs: 1, facts_used: [
+      { id: "F.sit.low", label: "Today's prices: lowest headroom", value: 10, eur_value: 9.3, unit: "USD m", source: "Liquidity forecast (calculation engine)", provenance: "ENGINE" }],
+    steps: [{ text: "Submitted 3 items to the checks." }, { text: "Round 1: 1 item sent back.", sent_back: [
+      { item: "Decision 1", reason: "cash at stake missing", resolution: "corrected" }] }] } };
+  const html = renderToStaticMarkup(React.createElement(m.HowReachedForTest ?? (() => null), { session: s }));
+  if (!m.HowReachedForTest) return;
+  assert.match(html, /1 item passed the checks after 1 repair round; 1 item removed\. 1 liquidity forecast run\./);
+  assert.ok(html.indexOf("Submitted 3 items") < html.indexOf("Round 1"));
+  assert.match(html, /<b>Decision 1<\/b>: cash at stake missing/);
+  assert.match(html, />corrected</);
+  assert.match(html, /<h5>Liquidity forecast<\/h5>/);
+  assert.match(html, /Engine<\/span> Today&#x27;s prices: lowest headroom: EUR 9\.3m · Liquidity forecast/);
+  assert.doesNotMatch(html, /F\.sit/);
 });

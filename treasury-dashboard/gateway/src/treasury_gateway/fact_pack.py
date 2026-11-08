@@ -17,6 +17,8 @@ from datetime import date, datetime, timedelta
 from typing import Any
 
 from .dashboard_adapter import ROWS, NAMES, horizon_cutoff, row_amounts, slider_scenario
+
+ROW_WORDS = {"freight": "freight", "bunker": "fuel", "rates": "interest", "fx": "currencies", "other": "other"}
 from .forecast import ForecastOutput, Prediction, compile_scenario, rule_forecast
 
 MAX_EVENTS = 8  # active Events ticked by default, ranked by score
@@ -31,12 +33,102 @@ HEADER_SERIES = ("WCI_SHA_RTM", "WCI_SHA_LAX", "WCI_RTM_NYC", "WCI_COMPOSITE", "
 BUNKER_POLICY = {"text": "Fuel hedges: none in 2025, none at present; derivatives only in exceptional cases",
                  "source": "Hapag-Lloyd Annual Report 2025, pp. 24, 46 (engine specification table)"}
 TREND_LABEL = "last week's moves repeat"
+MATERIAL_PCT = 1.0  # a decision's cash at stake below 1% of the baseline lowest headroom is immaterial
 NET_EFFECT_MONITOR_PCT = 10.0  # ILLUSTRATIVE: net situation cash effect >= 10% of baseline lowest headroom -> monitor
 # News inputs that correspond to an engine playbook preset type: (input prefix, required sign or None, preset type).
 PRESET_OF_INPUT = (("freight.transit_delay_days.", None, "transit_delay"),
                    ("freight.transit_delay_days.", None, "red_sea_reescalation"),
                    ("rates.rate_path.USD", -1, "fed_cutting_cycle"), ("fx.move_pct.EUR", 1, "eur_rally"))
 SUMMARY_CHARS = 400
+ARTICLE_CHARS = 1500  # per cited article: its numbers count as cited when the Event is cited
+
+
+# ------------------------------------------------------------------------------------------- plain labels
+NEWS = "With the ticked News"
+ENGINE_SOURCE = "Liquidity forecast (calculation engine)"
+TRADE_WORDS = {"ASIA_EUROPE": "Asia–Europe", "ASIA_AMERICA": "Asia–America", "EUROPE_AMERICA": "Europe–America",
+               "AFRICA_INTRA": "Africa & Intraregional"}
+INPUT_FIELDS = {"rate_shock_pct": "Freight rates", "volume_shock_pct": "Transport volumes",
+                "transit_delay_days": "Collection delay", "vlsfo_shock_pct": "VLSFO fuel price",
+                "hsfo_shock_pct": "HSFO fuel price", "consumption_uplift_pct": "Fuel consumption",
+                "rate_path": "Interest-rate step", "credit_spread_change_bp": "Refinancing spread",
+                "move_pct": "Exchange rate", "cash_flow": "Direct cash flow"}
+POLICY_NAMES = {"cad": "CAD operating costs", "eur_debt": "EUR debt repayment", "eur_dividend": "EUR dividend",
+                "eur_operating_costs": "EUR operating costs", "inr_brl": "INR and BRL obligations"}
+WINDOW_WORDS = {"1d": "1 day", "1w": "1 week", "4w": "4 weeks", "20d": "20 days"}
+# Engine playbook entries in plain business English: (verb, scope, owner). Hedge and swap steps are tested separately.
+PLAYBOOK_PLAIN = {
+    "freight.sustained_fall": ("Raise", "the liquidity buffer", "Treasury"),
+    "freight.spike": ("Prepare", "a plan to deploy surplus cash", "Treasury"),
+    "freight.disruption": ("Confirm", "the low-point dates against the payment calendar", "Treasury"),
+    "bunker.sustained_rise": ("Review", "fuel surcharge (MFR) recovery with the commercial team", "Commercial/Pricing"),
+    "bunker.sharp_fall": ("Prepare", "for faster cash release from lower fuel costs", "Treasury"),
+    "bunker.red_sea": ("Assess", "the combined effect of higher freight rates, slower collections and higher fuel burn", "Treasury"),
+    "rates.rates_rising": ("Prepare", "to bring refinancing forward", "Treasury"),
+    "rates.rates_falling": ("Assess", "repaying floating-rate debt with surplus cash", "Treasury"),
+    "rates.spreads_widening": ("Prepare", "early funding for upcoming debt maturities", "Treasury"),
+    "fx.eur_rally": ("Review", "the timing of EUR purchases for planned EUR payments", "Treasury"),
+    "fx.em_stress": ("Reduce", "cash held in INR and BRL", "Treasury"),
+    "fx.volatility_spike": ("Increase", "the frequency of FX exposure reviews", "Treasury"),
+}
+
+
+def _lower(text: str) -> str:
+    """Lower-case for use mid-sentence, keeping codes such as CAD, EUR or FX upper-case."""
+    return " ".join(w if (w.isupper() and len(w) <= 4) else w.lower() for w in text.split(" "))
+
+
+def series_name(sid: str) -> str:
+    """A market series in words (the engine's display names), never its id."""
+    from hlag_engine.engine.methodology import SERIES_NAME
+    names = {**SERIES_NAME, "VLSFO_BLENDED": "VLSFO (hub-weighted)"}
+    if sid.startswith("FREIGHT_REALISED_"):
+        return "Realised freight rate, " + TRADE_WORDS.get(sid.removeprefix("FREIGHT_REALISED_"), "trade")
+    return names.get(sid, sid.replace("_", " ").title())
+
+
+def input_name(param_key: str) -> str:
+    """A News forecast input in words: "Freight rates, Asia–Europe", "USD interest-rate step"."""
+    parts = param_key.split(".")
+    field = INPUT_FIELDS.get(parts[1] if len(parts) > 1 else "", parts[-1].replace("_", " "))
+    subject = parts[2] if len(parts) > 2 else ""
+    if parts[0] == "fx" and subject:
+        return f"{subject} exchange rate"
+    if parts[0] == "rates" and subject:
+        return f"{subject} interest-rate step"
+    return f"{field}, {TRADE_WORDS.get(subject, subject)}" if subject else field
+
+
+def alert_label(a: dict) -> str:
+    """Readable market alert: severity, series and move (not the rule's reference text)."""
+    sev = "Severe" if a["severity"] == "severe" else "Warning"
+    window = WINDOW_WORDS.get(a["window"], a["window"])
+    names = [series_name(sid) for sid in a["series"]]
+    moves = a.get("moves") or {}
+    def pct(sid):
+        v = moves.get(sid)
+        return None if v is None else f"{'+' if v >= 0 else '−'}{abs(v):.1f}%"
+    obs = a.get("observed")
+    if a["type"] == "vol_regime":
+        what = names[0].split(" / ")[0] if " / " in names[0] else names[0]
+        return f"{sev}: {what} volatility is {'stressed' if a['severity'] == 'severe' else 'elevated'} (short-term vs long-term ratio {obs})"
+    if a["type"] == "divergence" and len(names) == 2:
+        faster = names[0] if (obs or 0) >= 0 else names[1]
+        slower = names[1] if faster == names[0] else names[0]
+        detail = ", ".join(x for x in (f"{names[0]} {pct(a['series'][0])}" if pct(a["series"][0]) else "",
+                                       f"{names[1]} {pct(a['series'][1])}" if pct(a["series"][1]) else "") if x)
+        m0, m1 = moves.get(a["series"][0]), moves.get(a["series"][1])
+        if m0 is not None and m1 is not None and (m0 >= 0) != (m1 >= 0):
+            up, down = (names[0], names[1]) if m0 >= 0 else (names[1], names[0])
+            return f"{sev}: {up} rose while {down} fell over {window} ({detail})"
+        if m0 is not None and m1 is not None and m0 < 0 and m1 < 0:
+            return f"{sev}: {faster} fell less than {slower} over {window} ({detail})"
+        return f"{sev}: {faster} rose faster than {slower} over {window}" + (f" ({detail})" if detail else "")
+    if a["type"] == "spread_change" and len(names) == 2:
+        return f"{sev}: the {names[0]} to {names[1]} spread {'widened' if (obs or 0) >= 0 else 'narrowed'} by {abs(obs or 0):g} over {window}"
+    if a["type"] == "bp_move":
+        return f"{sev}: {names[0]} {'rose' if (obs or 0) >= 0 else 'fell'} {abs(obs or 0):g} bp over {window}"
+    return f"{sev}: {names[0]} {'rose' if (obs or 0) >= 0 else 'fell'} {abs(obs or 0):.1f}% over {window}"
 
 
 # ------------------------------------------------------------------------------------------------ helpers
@@ -56,6 +148,10 @@ def fact(fid: str, label: str, value: Any, unit: str | None, provenance: str, so
     if unit == "USD m" and isinstance(value, (int, float)) and rate:
         out["eur_value"] = _r(value / rate)
     return out
+
+
+DRIVER_WORDS = {"price": "fuel price", "consumption": "fuel consumption", "price_and_consumption": "fuel price and consumption",
+                "none": "none"}
 
 
 def bunker_driver(scenario: dict) -> str:
@@ -223,7 +319,7 @@ def market_moves_7d(adapter, as_of: date, adjustments: list[dict] | None = None)
             comparisons[sid] = {"latest": rows[-1].date.isoformat(), "latest_value": rows[-1].value,
                                 "previous": p.date.isoformat(), "previous_value": p.value,
                                 "rule": "previous print" if weekly else "7 days earlier (nearest earlier date)",
-                                "text": f"{sid}: {_short(rows[-1].date.isoformat())} vs {_short(p.date.isoformat())}"}
+                                "text": f"{series_name(sid)}: {_short(rows[-1].date.isoformat())} vs {_short(p.date.isoformat())}"}
         shared.engine.gateway_adjustments = to_engine_adjustments(adjustments or [], as_of)
         try:
             start, _ = shared.engine.anchored_baseline(as_of, prev)
@@ -260,11 +356,18 @@ def market_alerts(adapter, as_of: date) -> list[dict]:
     rules = [r for m in shared.engine.modules for r in m.alert_rules()]
     with shared.lock:
         outcomes = evaluate_rules(rules, SeriesSource(shared.store, as_of, shared.profile))
-    return [{"rule_id": o.rule.rule_id, "module": o.rule.module.value, "severity": o.severity.value,
-             "observed": _r(o.observed, 2), "unit": o.rule.unit, "window": o.rule.window,
-             "description": o.rule.description, "series": list(o.rule.series),
-             "date": max(d for _, _, d, _ in o.inputs).isoformat() if o.inputs else None}
-            for o in outcomes if o.evaluable and o.severity is not None]
+    out = []
+    for o in outcomes:
+        if not (o.evaluable and o.severity is not None):
+            continue
+        latest = {sid: v for sid, v, _, _ in o.inputs if "(previous)" not in sid}
+        prev = {sid.removesuffix(" (previous)"): v for sid, v, _, _ in o.inputs if "(previous)" in sid}
+        moves = {sid: _r((latest[sid] / prev[sid] - 1) * 100, 1) for sid in latest if prev.get(sid)}
+        out.append({"rule_id": o.rule.rule_id, "module": o.rule.module.value, "severity": o.severity.value,
+                    "type": o.rule.type.value, "observed": _r(o.observed, 2), "unit": o.rule.unit, "window": o.rule.window,
+                    "description": o.rule.description, "series": list(o.rule.series), "moves": moves,
+                    "date": max(d for _, _, d, _ in o.inputs).isoformat() if o.inputs else None})
+    return out
 
 
 # ----------------------------------------------------------------------------------------------- the pack
@@ -295,34 +398,35 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
 
     base, sit = runs["baseline"], runs["situation"]
     rate = (sit.get("market_snapshot", {}).get("FX_USD_PER_EUR") or {}).get("value")
-    eng = "hlag_engine run (read-only)"
-    add(fact("F.fx.t0_usd_per_eur", "USD per EUR at T0 (the rate for all EUR figures)", rate, "USD per EUR", "MARKET",
-             "Engine market snapshot", as_of.isoformat()))
-    add(fact("F.horizon.end", "End of the engine horizon", base["baseline_path"][-1]["date"], None, "ENGINE", eng))
+    eng = ENGINE_SOURCE
+    add(fact("F.fx.t0_usd_per_eur", "USD per EUR on the forecast date (the rate for all EUR figures)", rate, "USD per EUR", "MARKET",
+             "Market data on the forecast date", as_of.isoformat()))
+    add(fact("F.horizon.end", "End of the liquidity forecast", base["baseline_path"][-1]["date"], None, "ENGINE", eng))
     add(fact("F.horizon.selected_end", f"End of the selected {months}-month horizon", horizon_cutoff(as_of, months),
              None, "DERIVED", "Dashboard horizon"))
 
     # ---- liquidity: baseline (today's prices held flat)
     bs = base["summary"]
-    add(fact("F.liq.base.min_headroom", "Baseline lowest headroom above the minimum reserve", _r(bs["baseline_min_usd_m"]),
+    add(fact("F.liq.base.min_headroom", "Today's prices: lowest headroom above the minimum reserve", _r(bs["baseline_min_usd_m"]),
              "USD m", "ENGINE", eng, bs["baseline_min_date"], rate))
-    add(fact("F.liq.base.min_date", "Date of the baseline lowest headroom", bs["baseline_min_date"], None, "ENGINE", eng))
-    add(fact("F.liq.base.status", "Baseline engine status", base["status"], None, "ENGINE", eng,
+    add(fact("F.liq.base.min_date", "Today's prices: date of the lowest headroom", bs["baseline_min_date"], None, "ENGINE", eng))
+    add(fact("F.liq.base.status", "Today's prices: liquidity risk status", base["status"], None, "ENGINE", eng,
              reasons=base.get("status_reasons") or None))
-    add(fact("F.liq.base.first_breach", "Baseline first reserve breach", bs.get("first_breach_date") or "none",
+    add(fact("F.liq.base.first_breach", "Today's prices: first reserve breach", bs.get("first_breach_date") or "none",
              None, "ENGINE", eng))
     params = profile.parameters
 
     def param(key):
         e = params.get(key)
         return (e.value, e.label.value) if e is not None else (None, None)
-    for fid, key, label in (("F.liq.reserve.minimum", "liquidity.minimum_operational_reserve_usd", "Minimum operating reserve"),
-                            ("F.liq.reserve.total", "liquidity.liquidity_reserve_usd", "Reported liquidity reserve"),
+    for fid, key, label in (("F.liq.reserve.minimum", "liquidity.minimum_operational_reserve_usd", "Minimum reserve (operating floor)"),
+                            ("F.liq.reserve.total", "liquidity.liquidity_reserve_usd",
+                             "Reported liquidity reserve (cash, financial assets and unused credit lines)"),
                             ("F.liq.credit_lines_unused", "liquidity.unused_credit_lines_usd", "Unused credit lines"),
                             ("F.liq.cash", "liquidity.cash_and_equivalents_usd", "Cash and cash equivalents (last disclosure)")):
         value, label_ = param(key)
         if value is not None:
-            add(fact(fid, label, _r(float(value) / 1e6), "USD m", label_, "Company profile " + str(profile.profile_version), rate=rate))
+            add(fact(fid, label, _r(float(value) / 1e6), "USD m", label_, f"Company profile {profile.profile_version}", rate=rate))
 
     # ---- key payment dates (largest scheduled baseline outflows within 12 months)
     end = (as_of + timedelta(days=365)).isoformat()
@@ -333,35 +437,35 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
             pays[k] = pays.get(k, 0.0) + line["amount_usd_base_m"]
     for i, ((code, day), amount) in enumerate(sorted(pays.items(), key=lambda kv: kv[1])[:PAYMENT_COUNT], 1):
         add(fact(f"F.pay.{i}", f"Scheduled payment: {code.replace('_', ' ').lower()}", _r(amount), "USD m", "ENGINE",
-                 eng + ", baseline cash lines", day, rate))
+                 ENGINE_SOURCE + ", scheduled cash lines", day, rate))
 
     # ---- market (occurred): level, 1-week and 4-week moves, publication date, staleness
     series = {s["series_id"]: s for s in market.get("series", [])}
     for sid in HEADER_SERIES:
         s = series.get(sid)
         if not s or s.get("value") is None:
-            add(fact(f"F.mkt.{sid}.level", f"{sid} level", None, None, "MARKET", "Engine market store", note="missing"))
+            add(fact(f"F.mkt.{sid}.level", f"{series_name(sid)}: latest price", None, None, "MARKET", "Market data", note="missing"))
             continue
         pts = market.get("history", {}).get(sid, [])
-        src = s.get("source") or "Engine market store"
-        add(fact(f"F.mkt.{sid}.level", f"{sid} latest real print", s["value"], s.get("unit"), s.get("label") or "MARKET",
+        src = s.get("source") or "Market data"
+        add(fact(f"F.mkt.{sid}.level", f"{series_name(sid)}: latest price", s["value"], s.get("unit"), s.get("label") or "MARKET",
                  src, s.get("date"), stale=bool(s.get("stale"))))
         week = market.get("weekly", {}).get(sid)
         chg1, unit1 = _move(s, {"value": week["value"]} if week else None)
-        add(fact(f"F.mkt.{sid}.chg_1w", f"{sid} 1-week change", chg1, unit1, "DERIVED", src, s.get("date"),
+        add(fact(f"F.mkt.{sid}.chg_1w", f"{series_name(sid)}: 1-week change", chg1, unit1, "DERIVED", src, s.get("date"),
                  compared_with=week["date"] if week else None))
         prev4 = _prior(pts, 28)
         chg4, unit4 = _move(s, prev4)
-        add(fact(f"F.mkt.{sid}.chg_4w", f"{sid} 4-week change", chg4, unit4, "DERIVED", src, s.get("date"),
+        add(fact(f"F.mkt.{sid}.chg_4w", f"{series_name(sid)}: 4-week change", chg4, unit4, "DERIVED", src, s.get("date"),
                  compared_with=prev4["date"] if prev4 else None))
     for a in alerts:
-        add(fact(f"F.alert.{a['rule_id']}", f"Market alert ({a['severity']}): {a['description'] or a['rule_id']}",
-                 a["observed"], a["unit"], "ENGINE", "Engine Tier A alert rules", a["date"], window=a["window"],
+        add(fact(f"F.alert.{a['rule_id']}", alert_label(a),
+                 a["observed"], a["unit"], "ENGINE", "Market alert rules (calculation engine)", a["date"], window=a["window"],
                  severity=a["severity"], module=a["module"]))
     bc = baseline_change or {"available": False,
                              "reason": "no scheduled baseline for today and one at least 7 days older in the engine store"}
-    add(fact("F.occ.baseline_change_1w", "Weekly baseline change (P86)", bc.get("total_usd_m"),
-             "USD m" if bc.get("available") else None, "ENGINE", "Engine scheduled baselines", rate=rate,
+    add(fact("F.occ.baseline_change_1w", "Weekly change in the forecast at today's prices", bc.get("total_usd_m"),
+             "USD m" if bc.get("available") else None, "ENGINE", "Scheduled forecasts (calculation engine)", rate=rate,
              available=bool(bc.get("available")), reason=bc.get("reason"), by_driver_usd_m=bc.get("by_driver_usd_m")))
 
     if market_moves:
@@ -370,12 +474,12 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
         note = ("Each series compared as the market tiles: weekly series latest vs previous print, daily series "
                 "latest vs 7 days earlier (nearest earlier date). " + "; ".join(c["text"] for c in comps.values()) + ".")
         add(fact("F.eng.market_moves_7d", label, _r(mm["total_usd_m"]), "USD m", "DERIVED",
-                 "Engine baseline step (P86 method) on today's prints vs each series' comparison print, read-only",
+                 "Liquidity forecast at today's prices compared with last week's prices",
                  as_of.isoformat(), rate, note=note, comparisons={k: c["text"] for k, c in comps.items()},
                  missing=mm.get("missing") or None))
         for group, v in mm["by_driver_usd_m"].items():
-            add(fact(f"F.eng.market_moves_7d.{group}", f"{label}: {group}", _r(v), "USD m", "DERIVED",
-                     "Engine baseline step (P86 method), read-only", as_of.isoformat(), rate))
+            add(fact(f"F.eng.market_moves_7d.{group}", f"{label}: {ROW_WORDS.get(group, group)}", _r(v), "USD m", "DERIVED",
+                     "Liquidity forecast at today's prices compared with last week's prices", as_of.isoformat(), rate))
 
     # ---- situation: baseline + combined news forecast
     ss = sit["summary"]
@@ -383,49 +487,57 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
     sit_lines = [l for l in sit.get("lines", []) if as_of.isoformat() < l["date"] <= cutoff]
     sit_rows = row_amounts(sit_lines)
     net = sum(l["delta_usd_m"] for l in sit_lines)
-    add(fact("F.sit.min_headroom", "Situation lowest headroom (baseline + news)", _r(ss["scenario_min_usd_m"]),
+    add(fact("F.sit.min_headroom", f"{NEWS}: lowest headroom above the minimum reserve", _r(ss["scenario_min_usd_m"]),
              "USD m", "ENGINE", eng, ss["scenario_min_date"], rate))
-    add(fact("F.sit.min_date", "Date of the situation lowest headroom", ss["scenario_min_date"], None, "ENGINE", eng))
-    add(fact("F.sit.status", "Situation engine status", sit["status"], None, "ENGINE", eng,
+    add(fact("F.sit.min_date", f"{NEWS}: date of the lowest headroom (the low point)", ss["scenario_min_date"], None, "ENGINE", eng))
+    add(fact("F.sit.status", f"{NEWS}: liquidity risk status", sit["status"], None, "ENGINE", eng,
              reasons=sit.get("status_reasons") or None))
-    add(fact("F.sit.first_breach", "Situation first reserve breach", ss.get("first_breach_date") or "none", None, "ENGINE", eng))
-    add(fact("F.sit.headroom_change_vs_base", "Change in lowest headroom: situation minus baseline",
+    add(fact("F.sit.first_breach", f"{NEWS}: first reserve breach", ss.get("first_breach_date") or "none", None, "ENGINE", eng))
+    add(fact("F.sit.headroom_change_vs_base", f"{NEWS}: change in lowest headroom against today's prices",
              _r(ss["scenario_min_usd_m"] - ss["baseline_min_usd_m"]), "USD m", "ENGINE", eng, rate=rate))
-    add(fact("F.sit.bunker_driver", "What moves fuel cash in the news situation (price, consumption, both or none)",
-             bunker_driver(combined["scenario"]), None, "DERIVED", "News forecast inputs",
+    add(fact("F.sit.bunker_driver", f"{NEWS}: what moves fuel cash (price, consumption, both or none)",
+             bunker_driver(combined["scenario"]), None, "DERIVED", "News forecasts",
+             value_text=DRIVER_WORDS.get(bunker_driver(combined["scenario"]), bunker_driver(combined["scenario"])),
              note="A fuel price hedge offsets price moves only; extra consumption at the same price needs an operations "
                   "review (routing, speed, consumption, surcharge recovery)."))
-    add(fact("F.sit.net_cash_effect", "Situation net cash effect within the selected horizon (all drivers and direct cash)",
+    add(fact("F.sit.net_cash_effect", f"{NEWS}: net cash effect within the horizon (all drivers)",
              _r(net), "USD m", "ENGINE", eng, cutoff, rate))
     for rid in ROWS:
-        add(fact(f"F.sit.row.{rid}", f"Situation cash effect within the selected horizon: {NAMES[rid]}",
+        add(fact(f"F.sit.row.{rid}", f"{NEWS}: {_lower(NAMES[rid])} within the horizon",
                  _r(sit_rows[rid]), "USD m", "ENGINE", eng, cutoff, rate))
+    low = ss["scenario_min_date"]
+    after_rows = row_amounts([l for l in sit_lines if l["date"] > low])
+    for rid in ROWS:
+        if abs(sit_rows[rid]) > 0.05:
+            add(fact(f"F.sit.row.{rid}.after_low_pct", f"{NEWS}: share of the {_lower(NAMES[rid])} cash effect dated after the low point",
+                     _r(after_rows[rid] / sit_rows[rid] * 100, 1), "%", "DERIVED",
+                     "Calculated from the forecast cash lines by date", low))
     desk = [d for d in sit.get("desk_exceptions", [])]
     for i, d in enumerate(desk, 1):
-        add(fact(f"F.sit.desk.{d.get('side') or 'other'}.{i}", f"Desk exception: {d.get('side')}",
+        add(fact(f"F.sit.desk.{d.get('side') or 'other'}.{i}", f"{NEWS}: large single-driver loss flagged ({ROW_WORDS.get(d.get('side'), d.get('side'))})",
                  _r(d.get("gross_adverse_usd_m")), "USD m", "ENGINE", eng, d.get("date"), rate,
                  kind=d.get("kind"), pct_of_headroom=_r(d.get("pct_of_headroom"))))
     bunker_desk = [f"F.sit.desk.bunker.{i}" for i, d in enumerate(desk, 1)
                    if d.get("side") == "bunker" and d.get("kind", "driver") == "driver"]
     high = STATUS_ORDER.get(sit["status"], 0) >= STATUS_ORDER["HIGH"]
-    reason = ("engine status " + sit["status"]) if high else ""
+    reason = ("liquidity risk status " + sit["status"].lower()) if high else ""
     if bunker_desk:
-        reason = (reason + "; " if reason else "") + "bunker desk exception"
-    add(fact("F.eng.bunker_exceptional", "Engine marks fuel as exceptional (status HIGH/CRITICAL or a bunker desk exception)",
+        reason = (reason + "; " if reason else "") + "large fuel loss flagged"
+    add(fact("F.eng.bunker_exceptional", "Fuel marked as exceptional by the liquidity forecast (high or critical risk, or a large fuel loss)",
              bool(high or bunker_desk), None, "ENGINE", eng,
-             reason=reason or f"engine status {sit['status']}; no bunker desk exception", cites=bunker_desk or None))
+             reason=reason or f"liquidity risk status {sit['status'].lower()}; no large fuel loss flagged", cites=bunker_desk or None))
 
     # ---- trend continues (ASSUMPTION): the Observed moves run
     if "trend" in runs:
         tr = runs["trend"]
         tr_rows = row_amounts([l for l in tr.get("lines", []) if as_of.isoformat() < l["date"] <= cutoff])
-        src = "Observed moves run: " + TREND_LABEL
+        src = "Liquidity forecast if " + TREND_LABEL
         add(fact("F.eng.trend_continues.min_headroom", f"Lowest headroom if {TREND_LABEL}", _r(tr["summary"]["scenario_min_usd_m"]),
                  "USD m", "ASSUMPTION", src, tr["summary"]["scenario_min_date"], rate))
         add(fact("F.eng.trend_continues.headroom_change_vs_base", f"Change in lowest headroom if {TREND_LABEL}",
                  _r(tr["summary"]["scenario_min_usd_m"] - tr["summary"]["baseline_min_usd_m"]), "USD m", "ASSUMPTION", src, rate=rate))
         for rid in ROWS:
-            add(fact(f"F.eng.trend_continues.row.{rid}", f"Cash effect if {TREND_LABEL}: {NAMES[rid]}", _r(tr_rows[rid]),
+            add(fact(f"F.eng.trend_continues.row.{rid}", f"If {TREND_LABEL}: {_lower(NAMES[rid])}", _r(tr_rows[rid]),
                      "USD m", "ASSUMPTION", src, cutoff, rate))
 
     # ---- news: ticked Events, their inputs (origin), overlaps and conflicts
@@ -438,17 +550,37 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
                  art[0].get("publisher") if art else "News engine", event_published(e, sources),
                  category=e.get("category"), relevance=(e.get("score") or {}).get("relevance"),
                  summary=(e.get("summary") or "")[:SUMMARY_CHARS], origin=combined["origins"][eid]["origin"],
-                 articles=[{"title": a.get("title"), "publisher": a.get("publisher"), "url": a.get("url")} for a in art]))
+                 articles=[{"title": a.get("title"), "publisher": a.get("publisher"), "url": a.get("url")} for a in art],
+                 article_text=" ".join((a.get("text") or "")[:ARTICLE_CHARS] for a in art) or None))
     for p in combined["inputs"]:
         fid = f"F.news.{p['event_id']}.input.{slot_name(_slot(p))}"
-        add(fact(fid, f"News forecast input {p['param_key']}", p["change"], p["unit"], "NEWS",
-                 "Saved model forecast" if p["origin"] == "model_saved" else "Fixed rule (no saved forecast)",
+        title = by_id.get(p["event_id"], {}).get("title", "News Event")
+        add(fact(fid, f"News forecast: {input_name(p['param_key'])} (from \"{title}\")", p["change"], p["unit"], "NEWS",
+                 "News forecast (AI, saved)" if p["origin"] == "model_saved" else "News forecast (fixed rule)",
                  p["effective_date"], origin=p["origin"], used=p["used"], confidence=p["confidence"],
                  rationale=p["rationale"][:SUMMARY_CHARS], event_id=p["event_id"], param_key=p["param_key"]))
     for c in combined["conflicts"]:
-        add(fact(f"F.news.conflict.{c['input']}", f"News Events disagree on {c['input']}",
-                 [f"{x['event_id']} {x['direction']}" for x in c["events"]], None, "DERIVED", "News forecast inputs",
+        add(fact(f"F.news.conflict.{c['input']}", f"News Events disagree on {input_name(c['input'].split(':')[0])}",
+                 [f"{x['event_id']} {x['direction']}" for x in c["events"]], None, "DERIVED", "News forecasts",
                  events=c["events"], used_event_id=c["used_event_id"]))
+
+    # ---- ZIM acquisition: whether its financing is in the forecast, and the disclosed / assumed amounts (never switched on here)
+    zim_on = bool(((sit.get("engine_params") or {}).get("rates") or {}).get("zim_tranche_on"))
+    add(fact("F.zim.in_forecast", "ZIM acquisition financing included in the liquidity forecast", zim_on, None, "ENGINE", eng,
+             note="Switched off in the company profile until the deal status is verified; not changed by the recommendations."))
+    for fid, key, label, unit in (("F.zim.debt_tranche", "rates.zim_amount_usd", "ZIM acquisition debt tranche", "USD m"),
+                                  ("F.zim.purchase_price", "rates.zim_consideration_usd", "ZIM acquisition purchase price", "USD m"),
+                                  ("F.zim.draw_date", "rates.zim_draw_date", "ZIM tranche draw date", None),
+                                  ("F.zim.spread_bp", "rates.zim_spread_bp", "ZIM tranche spread over SOFR", "bp"),
+                                  ("F.zim.profile_switch", "rates.zim_tranche_on", "ZIM financing switch in the company profile", None)):
+        e = params.get(key)
+        if e is None:
+            continue
+        value = _r(float(e.value) / 1e6) if unit == "USD m" else (str(e.value) if unit is None else e.value)
+        src = getattr(e, "source", None)
+        source = (f"{src.report}, {src.page}" if src is not None and getattr(src, "report", None)
+                  else "Company profile " + str(profile.profile_version))
+        add(fact(fid, label, value, unit, e.label.value, source, rate=rate, rationale=e.rationale or None))
 
     # ---- engine playbook entries whose trigger is met (alert firing, situation status, preset type of a news input)
     for e in playbook or []:
@@ -463,8 +595,10 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
                     if preset == e["trigger"] and p["param_key"].startswith(prefix)
                     and (sign is None or (p["change"] > 0) == (sign > 0))]
         if trig:
-            add(fact(f"F.playbook.{e['entry_id']}", f"Engine playbook entry {e['entry_id']}", e["actions"], None, "ENGINE",
-                     "Engine module playbook", trigger_type=e["trigger_type"], trigger=e["trigger"],
+            plain = PLAYBOOK_PLAIN.get(e["entry_id"])
+            add(fact(f"F.playbook.{e['entry_id']}", "Standard treasury response" + (f": {plain[0].lower()} {plain[1]}" if plain else ""),
+                     (f"{plain[0]} {plain[1]}" if plain else "; ".join(e["actions"])), None, "ENGINE",
+                     "Standard treasury responses (calculation engine)", engine_actions=e["actions"], trigger_type=e["trigger_type"], trigger=e["trigger"],
                      trigger_facts=sorted(set(trig)), hedge_tool=e["hedge_tool"], review_owner=e["review_owner"]))
 
     # ---- policy and facilities
@@ -475,13 +609,20 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
         cap = entry.allowed_range[1] if entry.allowed_range else None
         closed = key in CLOSED_KEYS
         room = None if closed or cap is None else _r((cap - float(entry.value)) * 100, 0)
-        add(fact(f"F.policy.{name}", f"FX hedge ratio {name.replace('_', ' ')}", _r(float(entry.value) * 100, 0), "%",
-                 entry.label.value, "Company profile " + str(profile.profile_version), cap_pct=None if cap is None else _r(cap * 100, 0),
+        add(fact(f"F.policy.{name}", f"Hedge ratio: {POLICY_NAMES.get(name, name.replace('_', ' '))}", _r(float(entry.value) * 100, 0), "%",
+                 entry.label.value, f"Company profile {profile.profile_version}", cap_pct=None if cap is None else _r(cap * 100, 0),
                  room_pct_points=room, closed=closed or None, rationale=entry.rationale))
+        if cap is not None and not closed:
+            disclosed = "disclosed" in (entry.rationale or "").lower()
+            add(fact(f"F.policy.{name}.cap", f"Hedge ratio cap: {POLICY_NAMES.get(name, name.replace('_', ' '))}", _r(cap * 100, 0), "%",
+                     "DISCLOSED" if disclosed else "ASSUMPTION",
+                     "Annual report (as cited in the company profile)" if disclosed else "Company profile allowed range",
+                     rationale=entry.rationale))
     add(fact("F.policy.bunker", "Bunker hedging policy", BUNKER_POLICY["text"], None, "DISCLOSED", BUNKER_POLICY["source"]))
     unused = facts.get("F.liq.credit_lines_unused", {}).get("value")
     for c in registers.counterparties.counterparties:
-        add(fact(f"F.bank.{c.id}", f"Relationship bank {c.name} (generic register name)", c.name, None, "ASSUMPTION",
+        bank = "Bank " + c.id.rsplit("_", 1)[-1]
+        add(fact(f"F.bank.{c.id}", f"Relationship bank ({bank}; names are not disclosed)", bank, None, "ASSUMPTION",
                  "Counterparty register (names not disclosed)", credit_line_share_pct=_r(c.credit_line_share * 100, 0),
                  implied_credit_line_usd_m=_r(c.credit_line_share * unused) if unused else None,
                  hedge_counterparty=c.hedge_counterparty))
@@ -500,20 +641,22 @@ def build_fact_pack(*, as_of: date, months: int, runs: dict, market: dict, event
         # Source in words (input labels), never internal ids; the ids stay in "inputs" for the checks.
         source = "Calculated from " + "; ".join(facts[i]["label"] if i in facts else i for i in of)
         add(fact(fid, label, value, unit, "DERIVED", source, when, rate, inputs=of))
-    der("F.der.sit.consumed_pct", "Share of baseline headroom the situation consumes", _r(ss.get("consumed_pct"), 1), "%",
+    der("F.der.materiality_threshold", f"Materiality threshold: {MATERIAL_PCT:g}% of the lowest headroom at today's prices",
+        _r(bs["baseline_min_usd_m"] * MATERIAL_PCT / 100), "USD m", ["F.liq.base.min_headroom"])
+    der("F.der.sit.consumed_pct", f"{NEWS}: share of the lowest headroom at today's prices that is used up", _r(ss.get("consumed_pct"), 1), "%",
         ["F.liq.base.min_headroom", "F.sit.min_headroom"])
     if bs["baseline_min_usd_m"]:
         der("F.der.sit.net_effect_pct_of_base_headroom",
-            "Situation net cash effect as % of the baseline lowest headroom (negative = adverse)",
+            f"{NEWS}: net cash effect as % of the lowest headroom at today's prices (negative = adverse)",
             _r(net / bs["baseline_min_usd_m"] * 100, 1), "%", ["F.sit.net_cash_effect", "F.liq.base.min_headroom"])
-    der("F.der.sit.days_to_min", "Days from T0 to the situation lowest headroom",
+    der("F.der.sit.days_to_min", f"{NEWS}: days from today to the low point",
         (date.fromisoformat(ss["scenario_min_date"]) - as_of).days, "days", ["F.sit.min_date"])
-    der("F.der.base.days_to_min", "Days from T0 to the baseline lowest headroom",
+    der("F.der.base.days_to_min", "Today's prices: days from today to the low point",
         (date.fromisoformat(bs["baseline_min_date"]) - as_of).days, "days", ["F.liq.base.min_date"])
     total = sum(sit_rows.values())
     if abs(total) > 1e-9:
         for rid in ROWS:
-            der(f"F.der.sit.share.{rid}", f"Share of the situation cash effect: {NAMES[rid]}", _r(sit_rows[rid] / total * 100, 1),
+            der(f"F.der.sit.share.{rid}", f"{NEWS}: {_lower(NAMES[rid])} as a share of the net cash effect", _r(sit_rows[rid] / total * 100, 1),
                 "%", [f"F.sit.row.{rid}"])
 
     names = sorted({c.name for c in registers.counterparties.counterparties} | {c.id for c in registers.counterparties.counterparties}

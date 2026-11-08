@@ -4,8 +4,9 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { when } from "../format";
-import { costText, DECISIONS, defaultTicks, factPackText, forecastText, isLegacy, labelClass, moreText, originText,
-         positionOf, requestBody, sourceTip, stampText, toolSummary, triggerHelp, triggerText } from "./recommendationView";
+import { CONTEXT_LINE, costText, DECISIONS, defaultTicks, eventStatusText, factLabelOf, factLine, factPackText, forecastText,
+         groupFacts, isLegacy, labelClass, moreText, originText, plural, positionOf, preparedLine, requestBody, sourceTip,
+         triggerHelp, triggerText } from "./recommendationView";
 
 function Stmt({ s, session }: { s: any; session: any }) {
   if (!s?.text) return null;
@@ -33,24 +34,24 @@ function EventList({ active, ticked, setTicked }: { active: any; ticked: string[
 
 export function DecisionCard({ d, session }: { d: any; session: any }) {
   const eff = d.expected_effect ?? {};
+  const [review, setReview] = useState(false);
   return <article className="rec-card" aria-label={d.title}>
     <header className="rec-card-head">
       <span className="rec-rank">{d.rank}</span>
       <h3 className="rec-title">{d.title}</h3>
     </header>
-    <p className="small rec-trigger" title={triggerHelp(d.trigger?.type)}><b>Trigger:</b> {triggerText(d.trigger, when)}</p>
     <div className="rec-section"><b>Cash at stake</b><Stmt s={d.cash_at_stake} session={session} /></div>
-    <div className="rec-section"><b>Why it matters</b><ul>{(d.why ?? []).map((w: any, i: number) => <li key={i}><Stmt s={w} session={session} /></li>)}</ul></div>
-    <div className="rec-section"><b>Expected effect</b>
-      {eff.engine ? <span> Lowest headroom {eff.engine.min_headroom_change_eur_m >= 0 ? "+" : "−"}EUR {Math.abs(eff.engine.min_headroom_change_eur_m).toFixed(1)}m (tested, graded {String(eff.engine.grade).replace(/_/g, " ")}); gives up EUR {Math.abs(eff.engine.cost_if_reverses_over_horizon_eur_m ?? 0).toFixed(1)}m if the move reverses.</span>
-        : <span className="muted"> Not quantified.</span>}</div>
     <dl className="rec-facts">
       <div><dt>Owner</dt><dd>{d.owner?.role} <span className="small muted">(business function)</span></dd></div>
       <div><dt>By when</dt><dd>{d.timing?.text}</dd></div>
-      <div><dt>Effort</dt><dd>{d.effort}</dd></div>
-      <div><dt>Reversibility</dt><dd>{d.reversibility}</dd></div>
+      <div><dt>Effort / reversibility</dt><dd>{d.effort} / {d.reversibility}</dd></div>
     </dl>
-    <details className="rec-more-details"><summary>If wrong, escalation and evidence</summary>
+    <details className="rec-more-details"><summary>Why, effect and escalation</summary>
+      <p className="small rec-trigger" title={triggerHelp(d.trigger?.type)}><b>Trigger:</b> {triggerText(d.trigger, when)}</p>
+      <div className="rec-section"><b>Why it matters</b><ul>{(d.why ?? []).map((w: any, i: number) => <li key={i}><Stmt s={w} session={session} /></li>)}</ul></div>
+      <div className="rec-section"><b>Expected effect</b>
+        {eff.engine ? <span> Lowest headroom {eff.engine.min_headroom_change_eur_m >= 0 ? "+" : "−"}EUR {Math.abs(eff.engine.min_headroom_change_eur_m).toFixed(1)}m (tested, graded {String(eff.engine.grade).replace(/_/g, " ")}); gives up EUR {Math.abs(eff.engine.cost_if_reverses_over_horizon_eur_m ?? 0).toFixed(1)}m if the move reverses.</span>
+          : <span className="muted"> Not quantified.</span>}</div>
       <div className="rec-section"><b>If wrong</b><Stmt s={d.if_wrong} session={session} /></div>
       <div className="rec-section"><b>Escalate if</b><ul>{(d.escalate_if ?? []).map((w: any, i: number) => <li key={i}><Stmt s={w} session={session} /></li>)}</ul></div>
       {d.usual_practice && <div className="rec-section"><b>How treasurers usually handle this</b><span> {d.usual_practice}</span></div>}
@@ -60,8 +61,20 @@ export function DecisionCard({ d, session }: { d: any; session: any }) {
           <span key={a.url}> · <a href={a.url} target="_blank" rel="noreferrer noopener">{a.publisher ?? "Source"}</a></span>)}</li>;
       })}</ul></div>}
     </details>
-    <DecisionReview sessionId={session.session_id} decisionId={d.decision_id} />
+    <button className="link small rec-record" aria-expanded={review} onClick={() => setReview(!review)}>{review ? "Hide decision form" : "Record decision"}</button>
+    {review && <DecisionReview sessionId={session.session_id} decisionId={d.decision_id} />}
   </article>;
+}
+
+function EventsUsed({ session }: { session: any }) {
+  const checks = Object.fromEntries((session.to_verify ?? []).map((v: any) => [v.id, v.check]));
+  if (!(session.events_used ?? []).length) return null;
+  return <div className="rec-events-used"><h3>Events and how they were used</h3>
+    <ul>{session.events_used.map((e: any) => <li key={e.event_id}>
+      <b>{e.title ?? session.facts?.[`F.news.${e.event_id}`]?.label ?? "News Event"}</b>
+      {" — "}<span className={`chip ${e.status === "used_in_decision" ? "ok" : e.status === "not_quantifiable" ? "warn" : ""}`}>{eventStatusText(e)}</span>
+      {" "}{e.reason}{e.to_verify_id && checks[e.to_verify_id] ? <span className="small muted"> · To verify: {checks[e.to_verify_id]}</span> : null}
+    </li>)}</ul></div>;
 }
 
 function DecisionReview({ sessionId, decisionId }: { sessionId: string; decisionId: string }) {
@@ -87,18 +100,27 @@ function DecisionReview({ sessionId, decisionId }: { sessionId: string; decision
 
 function HowReached({ session }: { session: any }) {
   const h = session.how_reached ?? {};
+  const c = h.checks ?? {};
   return <details className="rec-how"><summary>How this was reached</summary>
-    <p className="small">{originText(session)}. {h.checks?.passed ?? 0} items passed the checks{h.checks?.repaired ? ` after ${h.checks.repaired} repair round${h.checks.repaired === 1 ? "" : "s"}` : ""}; {h.checks?.removed ?? 0} removed. {h.engine_runs} liquidity forecast runs.</p>
+    <p className="small">{originText(session)}. {plural(c.passed ?? 0, "item")} passed the checks{c.repaired ? ` after ${plural(c.repaired, "repair round")}` : ""}; {plural(c.removed ?? 0, "item")} removed. {plural(h.engine_runs ?? 0, "liquidity forecast run")}.</p>
     <p className="small"><b>AI cost:</b> {costText(session)}</p>
     <p className="small muted">{h.rounding_note}</p>
+    <h4>Steps</h4>
+    <ol className="small rec-steps">{(h.steps ?? []).map((st: any, i: number) => <li key={i}>{st.text}
+      {(st.sent_back ?? []).length > 0 && <ul>{st.sent_back.map((x: any, j: number) =>
+        <li key={j}><b>{x.item}</b>: {x.reason} <span className={`chip ${x.resolution === "removed" ? "bad" : "ok"}`}>{x.resolution}</span></li>)}</ul>}
+    </li>)}</ol>
     {(h.removed_by_checks ?? []).length > 0 && <><h4>Removed by checks</h4><ul className="small">{h.removed_by_checks.map((x: any, i: number) =>
-      <li key={i}><b>{x.title}</b> ({x.kind}): {x.reasons.join("; ")}</li>)}</ul></>}
-    <h4>Steps</h4><ul className="small">{toolSummary(h.tool_calls).map(t => <li key={t}>{t}</li>)}</ul>
+      <li key={i}><b>{x.title}</b> ({x.kind})</li>)}</ul></>}
     <h4>Facts used ({(h.facts_used ?? []).length})</h4>
-    <ul className="small rec-facts-used">{(h.facts_used ?? []).map((f: any) => <li key={f.id}>{f.label} <span className="muted">({f.provenance})</span></li>)}</ul>
+    {groupFacts(h.facts_used).map(g => <div key={g.group} className="rec-fact-group"><h5>{g.group}</h5>
+      <ul className="small">{g.facts.map((f: any) => <li key={f.id}><span className={`rec-lbl ${labelClass(factLabelOf(f.provenance))}`}>{factLabelOf(f.provenance)}</span> {factLine(f, when)}</li>)}</ul>
+    </div>)}
     {h.note && <p className="small muted">{h.note}</p>}
   </details>;
 }
+
+export const HowReachedForTest = HowReached;
 
 export function RecommendationsCard() {
   const [active, setActive] = useState<any>(null), [ticked, setTicked] = useState<string[]>([]);
@@ -136,22 +158,24 @@ export function RecommendationsCard() {
     <EventList active={active} ticked={ticked} setTicked={setTicked} />
     <div className="rec-controls">
       <button className="primary" disabled={busy || !ticked.length} onClick={() => void reassess()}>{busy ? "Reassessing…" : "Reassess"}</button>
-      <span className="small muted">{factPackText(active?.fact_pack, when)}</span>
+      {!session && <span className="small muted">{factPackText(active?.fact_pack, when)}</span>}
     </div>
     {busy && <p className="rec-progress" role="status"><span className="spinner" aria-hidden />Reassessing ({elapsed}s): building the facts, testing options and checking every item. Rule-based takes about 10 s; with the AI model about two minutes.</p>}
     {preparing && !session && <p className="small muted" role="status">Preparing the latest recommendations in the background…</p>}
     {error && <p className="small err" role="alert">{error}</p>}
     {session && isLegacy(session) && <p className="small muted">The latest saved session uses an older format and is not shown. Select Reassess.</p>}
     {session && !isLegacy(session) && <>
-      <p className="small muted rec-stamp">{stampText(session, when)} · {originText(session)}{rate ? ` · EUR figures at USD ${rate} per EUR (T0)` : ""}</p>
+      <p className="small muted rec-stamp">{preparedLine(session, when)} · {originText(session)}{rate ? ` · EUR figures at USD ${rate} per EUR` : ""}</p>
       <div className={`rec-position ${pos.cls}`}>
         <span className={`chip ${pos.cls}`}>{pos.text}</span>
         <p>{(session.position?.headline ?? []).join(" ")}</p>
       </div>
+      <p className="small muted rec-context">{CONTEXT_LINE}</p>
       {session.decisions.length === 0 ? <p className="small muted">No decision passed the checks; see How this was reached.</p>
         : <div className="rec-cards">{session.decisions.map((d: any) => <DecisionCard key={d.decision_id} d={d} session={session} />)}</div>}
       {session.rejected_alternatives?.length > 0 && <div className="rec-rejected"><h3>Considered, not recommended</h3>
         <ul>{session.rejected_alternatives.map((a: any, i: number) => <li key={i}><b>{a.title}</b> — <Stmt s={{ ...a.reason, label: a.reason?.label ?? "Engine" }} session={session} /></li>)}</ul></div>}
+      <EventsUsed session={session} />
       {session.to_verify?.length > 0 && <div className="rec-verify"><h3>To verify before acting</h3>
         <ul>{session.to_verify.map((v: any) => <li key={v.id}><span className="rec-lbl lbl-verify">To verify</span> {v.check}</li>)}</ul></div>}
       <HowReached session={session} />

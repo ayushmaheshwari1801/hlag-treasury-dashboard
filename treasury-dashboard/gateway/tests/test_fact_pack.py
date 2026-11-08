@@ -282,7 +282,7 @@ def test_market_moves_7d_measures_each_series_as_the_tiles(built):
     x = f["F.eng.market_moves_7d"]
     assert x["provenance"] == "DERIVED" and x["label"] == "Effect of market moves over the last 7 days on the baseline forecast"
     assert x["comparisons"]["WCI_COMPOSITE"] == m["comparisons"]["WCI_COMPOSITE"]["text"]
-    assert x["comparisons"]["WCI_COMPOSITE"].startswith("WCI_COMPOSITE: ") and " vs " in x["comparisons"]["WCI_COMPOSITE"]
+    assert x["comparisons"]["WCI_COMPOSITE"].startswith("WCI composite (Drewry): ") and " vs " in x["comparisons"]["WCI_COMPOSITE"]
     assert f["F.eng.market_moves_7d.bunker"]["value"] == pytest.approx(m["by_driver_usd_m"]["bunker"], abs=0.06)
 
 
@@ -305,4 +305,37 @@ def test_trade_lanes_are_facts(built):
 def test_fact_sources_and_labels_never_show_internal_ids(built):
     import re
     for fid, f in built["pack"]["facts"].items():
-        assert not re.search(r"\bF\.[a-z]+\.|\bcand_", f["source"] + " " + f["label"]), (fid, f["source"])
+        shown = f.get("value_text", f["value"])                              # the page shows value_text when present
+        text = f"{f['label']} {f['source']} " + (shown if isinstance(shown, str) else "")
+        assert not re.search(r"\bF\.[a-z]+|\bcand_|hlag_engine|\bSituation\b", text), (fid, text)
+        assert not re.search(r"\b[a-z]+_[a-z_]+\b|\b[a-z]+\.[a-z_]+\.[a-z_]+\b|\b[a-z_]+\.[a-z_]*_[a-z_]+\b", text), (fid, text)
+        assert not re.search(r"\b[A-Z][A-Z0-9]+_[A-Z0-9_]+\b", text), (fid, text)          # series or bank ids
+
+
+@pytest.mark.spec_engine
+def test_zim_acquisition_facts_and_it_stays_switched_off(built):
+    f = built["pack"]["facts"]
+    assert f["F.zim.in_forecast"]["value"] is False and f["F.zim.in_forecast"]["provenance"] == "ENGINE"
+    assert (f["F.zim.debt_tranche"]["value"], f["F.zim.debt_tranche"]["provenance"]) == (2500.0, "DISCLOSED")
+    assert (f["F.zim.purchase_price"]["value"], f["F.zim.purchase_price"]["provenance"]) == (4200.0, "DISCLOSED")
+    assert "ad hoc release" in f["F.zim.purchase_price"]["source"]
+    assert f["F.zim.draw_date"]["provenance"] == "ASSUMPTION" and f["F.zim.profile_switch"]["value"] == "False"
+    assert not built["runs"]["situation"]["engine_params"]["rates"].get("zim_tranche_on")
+
+
+def test_alert_labels_name_the_series_and_the_move():
+    from treasury_gateway.fact_pack import alert_label
+    div = {"severity": "severe", "window": "4w", "series": ["VLSFO_RTM", "BRENT"], "type": "divergence", "observed": 9.1}
+    assert alert_label({**div, "moves": {"VLSFO_RTM": 12.2, "BRENT": 3.1}}) == \
+        "Severe: VLSFO Rotterdam rose faster than Brent crude over 4 weeks (VLSFO Rotterdam +12.2%, Brent crude +3.1%)"
+    assert alert_label({**div, "observed": 28.1, "moves": {"VLSFO_RTM": 13.4, "BRENT": -14.7}}) == \
+        "Severe: VLSFO Rotterdam rose while Brent crude fell over 4 weeks (VLSFO Rotterdam +13.4%, Brent crude −14.7%)"
+    vol = {"severity": "severe", "window": "20d", "series": ["FX_USD_PER_BRL"], "type": "vol_regime", "observed": 2.71}
+    assert alert_label(vol) == "Severe: BRL volatility is stressed (short-term vs long-term ratio 2.71)"
+    bp = {"severity": "warning", "window": "1w", "series": ["UST_2Y"], "type": "bp_move", "observed": -15}
+    assert alert_label(bp) == "Warning: US Treasury 2Y fell 15 bp over 1 week"
+
+
+def test_labels_keep_currency_codes_upper_case():
+    from treasury_gateway.fact_pack import _lower
+    assert _lower("CAD FX") == "CAD FX" and _lower("Bunker fuel and MFR") == "bunker fuel and MFR"

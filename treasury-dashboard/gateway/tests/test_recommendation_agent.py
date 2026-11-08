@@ -336,6 +336,12 @@ def test_a_bad_item_is_returned_with_its_reason_in_one_message_and_repaired(adap
     tool_msgs = [m for m in seen[1] if m['role'] == 'tool']
     assert len(tool_msgs) == 1 and 'Rejected items' in tool_msgs[0]['content'] and 'number 640' in tool_msgs[0]['content']
     assert out['origin'] == 'model' and out['how_reached']['checks']['repaired'] == 1 and not out['removed_by_checks']
+    steps = out['how_reached']['steps']
+    back = [st for st in steps if st.get('sent_back')]
+    assert len(back) == 1 and back[0]['text'].endswith('sent back 1 item.')
+    [item] = back[0]['sent_back']
+    assert item['resolution'] == 'corrected' and 'number 640' in item['reason'] and 'F.' not in item['reason']
+    assert steps.index(back[0]) < steps.index(next(st for st in steps if 'passed every check' in st['text']))
 
 
 @spec
@@ -349,6 +355,10 @@ def test_an_item_failing_after_two_repairs_is_removed_and_the_rest_kept(adapter,
     assert out['how_reached']['removed_by_checks'] == out['removed_by_checks']
     assert gone['kind'] == 'decision' and any('number 640' in r for r in gone['reasons'])
     assert len(out['decisions']) == len(_valid_set(seen[0])['decisions']) - 1
+    back = [st for st in out['how_reached']['steps'] if st.get('sent_back')]
+    assert len(back) == 3                                               # every round, including the final one
+    assert all(x['resolution'] == 'removed' for st in back for x in st['sent_back'])   # it never passed
+    assert any(st['text'] == 'Removed 1 item that still failed the checks.' for st in out['how_reached']['steps'])
     assert passed(_check(out, situation))
 
 
@@ -362,7 +372,7 @@ def test_provider_failure_falls_back_to_the_rule_set(adapter, situation):
     assert passed(_check(out, situation))
 
 
-FORBIDDEN = re.compile(r"\\b(preset|presets|run|runs|engine)\\b", re.I)
+FORBIDDEN = re.compile(r"\\b(preset|presets|run|runs|engine|situation|module)\\b|\\b(LOW|WATCH|HIGH|CRITICAL)\\b|\\d{4}-\\d{2}-\\d{2}", re.I)
 
 
 def _user_texts(out):
@@ -478,6 +488,48 @@ def test_prompt_rules_for_assumptions_and_neutral_example():
     assert "supporting assumptions (assumption_ids) must all be likely" in SYSTEM
     assert "never list it in assumption_ids" in SYSTEM
     assert "Asia-Europe" not in SYSTEM and "collection terms for overdue accounts" in SYSTEM
+
+
+@spec
+def test_rule_fallback_lists_every_ticked_event_and_keeps_only_material_decisions(adapter, situation):
+    from treasury_gateway.recommendation_agent import RecommendationAgent
+    from treasury_gateway.recommendation_validator import Context, _material
+    pack = situation['pack']
+    out = RecommendationAgent(None).run(_lab(adapter, situation), pack)
+    assert [e['event_id'] for e in out['events_used']] == pack['ticked']
+    assert all(e['status'] in ('used_in_decision', 'considered_not_acted', 'no_cash_effect', 'not_quantifiable') and e['reason']
+               for e in out['events_used'])
+    assert all(1 <= e['decision'] <= len(out['decisions']) for e in out['events_used'] if e['status'] == 'used_in_decision')
+    ctx = Context(pack)
+    for d in out['decisions']:
+        if not _material(d['cash_at_stake']['cites'], ctx):
+            assert d['verb'] in ('Monitor', 'Confirm') and any(c.startswith(('F.alert.', 'F.policy.')) for c in d['trigger']['cites'])
+
+
+def test_events_used_follow_removed_decisions_and_missing_events_are_listed():
+    from treasury_gateway.recommendation_agent import _complete_events_used
+    pack = {'ticked': ['E1', 'E2', 'E3'], 'facts': {'F.news.E1': {'label': 'Fuel news'}}}
+    entries = [{'event_id': 'E1', 'status': 'used_in_decision', 'decision': 3, 'reason': 'Drives decision 3.'},
+               {'event_id': 'E2', 'status': 'used_in_decision', 'decision': 1, 'reason': 'Drives decision 1.'},
+               {'event_id': 'E9', 'status': 'no_cash_effect', 'reason': 'Not ticked.'}]
+    out, completed = _complete_events_used(entries, {3: 1}, pack)      # decision 1 removed, decision 3 is now 1
+    by = {e['event_id']: e for e in out}
+    assert by['E1']['decision'] == 1 and by['E1']['title'] == 'Fuel news'
+    assert by['E2']['status'] == 'considered_not_acted' and 'removed by the checks' in by['E2']['reason']
+    assert by['E3']['status'] == 'considered_not_acted' and 'E9' not in by
+    assert completed == ['E2', 'E3']
+
+
+def test_prompt_rules_for_amounts_opportunities_labels_events_and_wording():
+    from treasury_gateway.recommendation_agent import SYSTEM
+    for phrase in ("Never copy cash_at_stake into amount_or_limit", "collecting overdue receivables does not recover revenue",
+                   "frame the decision as an opportunity", "1 to 5 ranked decisions", "Model assumption (facts whose provenance",
+                   "AI assumption (only entries of your own", "events_used: every ticked Event exactly once",
+                   "Write dates like 31 Dec 2026", 'Never write\n"situation" or "module"',
+                   "reported liquidity reserve (cash, financial assets and unused credit lines)",
+                   "after_low_pct above 50", "F.der.materiality_threshold", '"EUR 2,585.0m"',
+                   '"no forecast input" alone is not enough', "F.zim.in_forecast", "never Fact"):
+        assert phrase in SYSTEM, phrase
 
 
 # ---------------------------------------------------------------- API (recommendation-agent/3)
@@ -608,3 +660,41 @@ def test_a_news_import_rebuilds_the_fact_pack_in_the_background(v3_client):
     assert status['status'] == 'ready', status
     latest = c.get('/api/v1/recommendations/agent/latest').json()['session']
     assert latest['prepared'] is True and latest['fact_pack']['ticked'] == status['ticked']
+
+
+def test_check_reasons_are_shown_in_plain_words():
+    from treasury_gateway.recommendation_agent import plain_reason
+    facts = {'F.sit.net_cash_effect': {'label': 'With the ticked News: net cash effect within the horizon (all drivers)'}}
+    out = plain_reason('number 25 in why[1] is not in the facts this item cites (F.sit.net_cash_effect = -114.6 USD m); '
+                       'cash_at_stake missing', facts)
+    assert out == ('number 25 in why (point 2) is not in the facts this item cites ("With the ticked News: net cash effect '
+                   'within the horizon (all drivers)" = -114.6 USD m); cash at stake missing')
+
+
+def test_unaddressed_severe_alerts_are_listed_by_the_checks():
+    from treasury_gateway.recommendation_agent import _complete_severe_alerts
+    label = 'Severe: BRL volatility is stressed (short-term vs long-term ratio 2.71)'
+    pack = {'ticked': [], 'facts': {'F.alert.fx.vol_regime.brl': {'id': 'F.alert.fx.vol_regime.brl', 'label': label,
+                                                                  'severity': 'severe', 'provenance': 'ENGINE'},
+                                    'F.alert.ust': {'id': 'F.alert.ust', 'label': 'Warning', 'severity': 'warning'}}}
+    final = {'decisions': [], 'rejected_alternatives': []}
+    assert _complete_severe_alerts(final, pack) == [label]
+    [alt] = final['rejected_alternatives']
+    assert alt['reason']['cites'] == ['F.alert.fx.vol_regime.brl'] and label in alt['title']
+    assert _complete_severe_alerts(final, pack) == []                     # now addressed
+
+
+def test_steps_use_singular_counts():
+    from treasury_gateway.recommendation_agent import _plural
+    assert (_plural(1, 'check'), _plural(2, 'check')) == ('1 check', '2 checks')
+
+
+def test_fact_id_patterns_in_check_reasons_become_words():
+    from treasury_gateway.recommendation_agent import plain_reason
+    out = plain_reason('cash_at_stake must cite a cash or headroom fact (USD m or %) from F.sit.*, F.der.*, F.liq.*, F.pay.* '
+                       'or F.eng.market_moves_7d*; x', {})
+    assert out == ("cash at stake must cite a cash or headroom fact (USD m or %) from the liquidity forecast, a scheduled "
+                   "payment or last week's market moves; x")
+    out = plain_reason("(e.g. the driver's F.sit.row.* effect, F.sit.headroom_change_vs_base or F.der.* headroom consumed)",
+                       {'F.sit.headroom_change_vs_base': {'label': 'With the ticked News: change in lowest headroom'}})
+    assert out == "(e.g. the driver's cash effect, \"With the ticked News: change in lowest headroom\" or the share of headroom consumed)"

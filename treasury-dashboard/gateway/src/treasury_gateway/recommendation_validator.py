@@ -14,13 +14,23 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date
 from typing import Any
 
 from .assistant import ISO_DATE, check_numbers
 from .common_words import ordinary
 from .fact_pack import CLOSED_KEYS, OWNER_ROLES, STATUS_ORDER
 
-LABELS = ("Fact", "Engine", "News forecast", "AI assumption", "To verify")
+LABELS = ("Fact", "Engine", "News forecast", "Model assumption", "AI assumption", "To verify")
+EVENT_STATUSES = ("used_in_decision", "considered_not_acted", "no_cash_effect", "not_quantifiable")
+MONTHS = {m: i for i, m in enumerate(("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"), 1)}
+# Dates as the page writes them ("31 Dec 2026"); converted to ISO for checking against the facts.
+DATE_TEXT = re.compile(r"\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+(\d{4})\b")
+# Words that must not reach the treasurer: internal terms and upper-case status codes.
+BANNED_WORDS = re.compile(r"\b(situations?|modules?)\b", re.I)
+STATUS_CODES = re.compile(r"\b(LOW|WATCH|HIGH|CRITICAL)\b")
+# Headroom shares of the baseline lowest headroom, usable to judge materiality of a % cash-at-stake fact.
+HEADROOM_SHARES = ("F.der.sit.consumed_pct", "F.der.sit.net_effect_pct_of_base_headroom")
 POSITIONS = ("business_as_usual", "heightened_monitoring", "defensive", "opportunistic")
 TRIGGERS = ("Occurred", "Forecast", "Structural")
 VERBS = ("Prepare", "Review", "Propose", "Monitor", "Confirm", "Defer", "Pre-arrange", "Escalate", "Assess",
@@ -36,13 +46,19 @@ EXECUTION = re.compile(r"\b(execute|place (?:the|a) trade|buy|sell|enter into|dr
                        r"book (?:the|a) hedge)\b", re.I)
 # Amounts in USD millions in user-facing text ("2743.6 USD m", "USD 725m"); rates and prices (USD per EUR, USD/t) are fine.
 USD_AMOUNT = re.compile(r"\bUSD\s*[\d,.]+\s*(?:m|mn|million|bn|billion)\b|[\d,.]+\s*USD\s*(?:m|mn|million|bn|billion)\b", re.I)
+# EUR amounts are written like the page: "EUR 2,585.0m" (EUR first, thousands separator, "m" attached).
+EUR_BAD = (re.compile(r"\d(?:[\d,]*\d)?(?:\.\d+)?\s*EUR\b"),             # "2585.0 EUR m" (not "31 Dec 2026, EUR")
+           re.compile(r"\bEUR\s*[-−+]?\d{4,}(?:\.\d+)?"),                   # "EUR 2585.0m" (no thousands separator)
+           re.compile(r"\bEUR\s*[-−+]?[\d,]+(?:\.\d+)?\s+(?:m|mn|million)\b"),   # "EUR 2,585.0 m"
+           re.compile(r"\bEUR\s+m\b"))
 UNCERTAINTY = re.compile(r"\b(conflict\w*|disagree\w*|opposite|uncertain\w*|diverg\w*)\b", re.I)
 HEDGE_WORD = re.compile(r"\bhedg", re.I)
 TREND = "F.eng.trend_continues"
 # Generic words that make the preceding word an institution name ("Deutsche Bank", "Acme Group").
 INSTITUTION = {"bank", "banks", "group", "company", "holding", "holdings", "fund", "capital", "partners", "trust",
                "insurance", "securities", "facility", "facilities", "board", "committee", "management"}
-FACT_LABEL_PROV = {"DISCLOSED", "MARKET", "DERIVED", "ENGINE", "PROXY"}
+FACT_LABEL_PROV = {"DISCLOSED", "MARKET", "DERIVED", "ENGINE"}
+MODEL_LABEL_PROV = {"ASSUMPTION", "PROXY"}  # engine profile values that are assumptions or proxies
 TRIGGER_PREFIX = {"Occurred": ("F.mkt.", "F.alert.", "F.occ.", "F.eng.market_moves_7d"), "Forecast": ("F.news.", "F.sit."),
                   "Structural": ("F.liq.", "F.pay.", "F.policy.", "F.bank.", "F.horizon.", "F.sit.")}
 # Capitalised words that are not company-specific names (sentence starters, months, terms, units).
@@ -158,12 +174,23 @@ def check_citations(item: Any, ctx: Context) -> list[str]:
     return [f"unknown citation {c}: cite only fact ids, tool result ids, assumption ids or to-verify ids" for c in bad]
 
 
+def _iso_dates(text: str) -> str:
+    """'31 Dec 2026' -> '2026-12-31', so written dates are checked against the facts and not read as numbers."""
+    def iso(m):
+        try:
+            return date(int(m.group(3)), MONTHS[m.group(2)[:3].lower()], int(m.group(1))).isoformat()
+        except ValueError:
+            return m.group(0)
+    return DATE_TEXT.sub(iso, text)
+
+
 def check_numbers_cited(item: Any, ctx: Context, where: str = "this item") -> list[str]:
-    """Every number in the item's texts must be in the facts or tool results that the item cites (not the session)."""
+    """Every number in the item's texts must be in the facts or tool results that the item cites (not the session).
+    Dates written as "31 Dec 2026" must be dates in the cited facts."""
     texts = _texts(item)
     cited = ctx.cited_objects(sorted(set(_cites(item))))
     problems = []
-    text = " ".join(texts)
+    text = _iso_dates(" ".join(texts))
     for tok in check_numbers(text, {"cited": cited}):
         shown = ", ".join(f"{f.get('id')} = {f.get('value')} {f.get('unit') or ''}".strip() +
                           (f" / {f['eur_value']} EUR m" if f.get("eur_value") is not None else "")
@@ -171,8 +198,35 @@ def check_numbers_cited(item: Any, ctx: Context, where: str = "this item") -> li
         problems.append(f"number {tok} in {where} is not in the facts this item cites" + (f" ({shown})" if shown else ""))
     allowed_dates = {d for o in cited for v in _walk(o) if isinstance(v, str) for d in ISO_DATE.findall(v)}
     for d in sorted(set(ISO_DATE.findall(text)) - allowed_dates):
-        problems.append(f"date {d} in {where} is not in the facts this item cites")
+        shown = date.fromisoformat(d)
+        problems.append(f"date {shown.day} {shown.strftime('%b %Y')} in {where} is not in the facts this item cites")
     return problems
+
+
+def check_style(item: Any, where: str = "this item") -> list[str]:
+    """Plain wording for the treasurer: dates like "31 Dec 2026", no internal terms, no upper-case status codes.
+    Structured date fields (e.g. trigger.date, ISO by design and formatted by the page) are not prose."""
+    def prose(x):
+        if isinstance(x, dict):
+            return {k: prose(v) for k, v in x.items() if k != "date"}
+        if isinstance(x, list):
+            return [prose(v) for v in x]
+        return x
+    text = " ".join(_texts(prose(item)))
+    p = []
+    if ISO_DATE.search(text):
+        p.append(f"{where}: write dates like 31 Dec 2026, not {ISO_DATE.search(text).group(0)}")
+    if BANNED_WORDS.search(text):
+        p.append(f"{where}: do not use the word '{BANNED_WORDS.search(text).group(0)}'; say 'with the ticked news' or "
+                 "name the driver")
+    if any(r.search(text) for r in EUR_BAD):
+        bad = next(r.search(text).group(0) for r in EUR_BAD if r.search(text))
+        p.append(f"{where}: write amounts like the page, e.g. \"EUR 2,585.0m\" (EUR first, comma for thousands, m "
+                 f"attached), not \"{bad.strip()}\"")
+    if STATUS_CODES.search(text):
+        p.append(f"{where}: write the liquidity risk status in lower case ('{STATUS_CODES.search(text).group(0).lower()}'), "
+                 "not as a code")
+    return p
 
 
 def _plain_word(word: str) -> bool:
@@ -230,13 +284,23 @@ def check_labels(stmts: list[tuple[str, dict]], ctx: Context) -> list[str]:
             continue
         if label not in LABELS:
             problems.append(f"{where}: label must be one of {', '.join(LABELS)}")
+        elif label == "Fact" and cites and all(
+                (c in ctx.tools) or (c in ctx.facts and ctx.facts[c]["provenance"] == "ENGINE") for c in cites):
+            problems.append(f"{where}: this statement cites only engine results, so label it Engine, not Fact")
         elif label in ("Fact", "Engine") and not any(
                 (c in ctx.facts and ctx.facts[c]["provenance"] in FACT_LABEL_PROV) or c in ctx.tools for c in cites):
-            problems.append(f"{where}: a {label} statement must cite a disclosed, market, derived or engine fact")
+            model = any(c in ctx.facts and ctx.facts[c]["provenance"] in MODEL_LABEL_PROV for c in cites)
+            problems.append(f"{where}: a {label} statement must cite a disclosed, market, derived or engine fact"
+                            + ("; facts that are model assumptions or proxies are labelled Model assumption" if model else ""))
+        elif label == "Model assumption" and not any(
+                c in ctx.facts and ctx.facts[c]["provenance"] in MODEL_LABEL_PROV for c in cites):
+            problems.append(f"{where}: a Model assumption statement must cite a fact whose provenance is ASSUMPTION or "
+                            "PROXY in the company profile")
         elif label == "News forecast" and not any(c.startswith("F.news.") and c in ctx.facts for c in cites):
             problems.append(f"{where}: a News forecast statement must cite a News fact")
         elif label == "AI assumption" and not any(c in ctx.assumptions for c in cites):
-            problems.append(f"{where}: an AI assumption statement must cite an assumption id")
+            problems.append(f"{where}: an AI assumption statement must cite an assumption id from this session's "
+                            "assumptions (profile assumptions are labelled Model assumption)")
         elif label == "To verify" and not any(c in ctx.to_verify for c in cites):
             problems.append(f"{where}: a To verify statement must cite a to-verify id")
     return problems
@@ -280,6 +344,8 @@ def check_assumption(a: dict, ctx: Context) -> list[str]:
         problems.append("assumption needs effect_if_wrong")
     probe = {"text": a.get("statement", ""), "cites": basis or []}
     problems += check_names(probe, ctx) + check_numbers_cited(probe, ctx, "the assumption")
+    problems += check_style({"statement": a.get("statement", ""), "effect_if_wrong": a.get("effect_if_wrong", "")},
+                            "the assumption")
     problems += check_events({"event_ids": [], "cites": basis or []}, ctx)
     return problems
 
@@ -294,6 +360,8 @@ def check_decision(d: dict, ctx: Context) -> list[str]:
     for f in ("amount_or_limit", "timing"):
         if not isinstance(d.get(f), dict) or not str(d[f].get("text", "")).strip():
             p.append(f"{f} is required; write \"no limit set\" or a dated condition if there is none")
+    if _repeats_scope(d):
+        p.append("amount_or_limit repeats the scope; state only the amount the action can change, or \"no limit set\"")
     stake = d.get("cash_at_stake")
     if not isinstance(stake, dict) or not str(stake.get("text", "")).strip() or not stake.get("cites"):
         p.append("cash_at_stake is required: a statement citing the facts that size what is at stake (e.g. the "
@@ -302,6 +370,14 @@ def check_decision(d: dict, ctx: Context) -> list[str]:
                  and ctx.facts.get(c, {}).get("unit") in ("USD m", "%") for c in stake["cites"]):
         p.append("cash_at_stake must cite a cash or headroom fact (USD m or %) from F.sit.*, F.der.*, F.liq.*, F.pay.* "
                  "or F.eng.market_moves_7d*")
+    if isinstance(stake, dict) and stake.get("cites") and not _material(stake["cites"], ctx):
+        trig_cites = (d.get("trigger") or {}).get("cites", [])
+        alert_or_limit = any(str(c).startswith(("F.alert.", "F.policy.")) for c in trig_cites)
+        if not (alert_or_limit and d.get("verb") in ("Monitor", "Confirm")):
+            threshold = ctx.facts["F.der.materiality_threshold"]
+            p.append(f"cash at stake is immaterial (below 1% of the baseline lowest headroom, EUR "
+                     f"{threshold.get('eur_value')}m): list it under rejected alternatives, or, if an alert or a policy "
+                     "limit triggers it, use the verb Monitor or Confirm with that trigger")
     role = (d.get("owner") or {}).get("role") if isinstance(d.get("owner"), dict) else d.get("owner")
     if role not in OWNER_ROLES:
         p.append(f"owner '{role}' is not one of the six business functions: {', '.join(OWNER_ROLES)}")
@@ -321,6 +397,7 @@ def check_decision(d: dict, ctx: Context) -> list[str]:
     if isinstance(d.get("timing"), dict):  # relative timing: its number is a duration, not a figure
         numbered = {**d, "timing": {**d["timing"], "text": RELATIVE_TIMING.sub(" ", str(d["timing"].get("text", "")))}}
     p += check_citations(d, ctx) + check_numbers_cited(numbered, ctx) + check_names(d, ctx) + check_events(d, ctx)
+    p += check_style({k: v for k, v in d.items() if k not in ("title",)}, "decision")
     stmts = _statements(d, "why", "if_wrong", "escalate_if", "expected_effect", "amount_or_limit", "timing", "trigger",
                         "cash_at_stake")
     p += check_labels(stmts, ctx)
@@ -372,6 +449,48 @@ def check_decision(d: dict, ctx: Context) -> list[str]:
     return sorted(set(p), key=p.index)
 
 
+def _repeats_scope(d: dict) -> bool:
+    """True when the amount text shares a run of four or more words with the scope (e.g. "room under the 80% cap")."""
+    words = lambda t: re.findall(r"[a-z0-9%]+", str(t).casefold())
+    amount = words((d.get("amount_or_limit") or {}).get("text", "") if isinstance(d.get("amount_or_limit"), dict) else "")
+    scope = " " + " ".join(words(d.get("scope", ""))) + " "
+    if not amount or " ".join(amount) == "no limit set":
+        return False
+    return any(" " + " ".join(amount[i:i + 4]) + " " in scope for i in range(len(amount) - 3))
+
+
+def severe_alerts_unaddressed(result: dict, ctx: Context) -> list[str]:
+    """Severe market alerts that no decision trigger and no rejected alternative cites."""
+    severe = [fid for fid, f in ctx.facts.items() if fid.startswith("F.alert.") and f.get("severity") == "severe"]
+    cited = set()
+    for d in result.get("decisions", []) or []:
+        if isinstance(d, dict):
+            cited |= set((d.get("trigger") or {}).get("cites", []))
+    for a in result.get("rejected_alternatives", []) or []:
+        if isinstance(a, dict):
+            cited |= set(((a.get("reason") or {}) if isinstance(a.get("reason"), dict) else {}).get("cites", []))
+    return [fid for fid in severe if fid not in cited]
+
+
+def _material(cites: list[str], ctx: Context) -> bool:
+    """Is the cash at stake at least 1% of the baseline lowest headroom? Unknown or unsized facts count as material."""
+    threshold = ctx.facts.get("F.der.materiality_threshold", {}).get("value")
+    base = ctx.facts.get("F.liq.base.min_headroom", {}).get("value")
+    if not isinstance(threshold, (int, float)):
+        return True
+    sizes = []
+    for c in cites:
+        f = ctx.facts.get(c, {})
+        v = f.get("value")
+        if not isinstance(v, (int, float)) or isinstance(v, bool):
+            continue
+        if f.get("unit") == "USD m":
+            sizes.append(abs(v))
+        elif c in HEADROOM_SHARES and isinstance(base, (int, float)):
+            sizes.append(abs(v) / 100 * base)
+    return not sizes or max(sizes) >= threshold
+
+
 def check_hedge(d: dict, cand_id: str | None, ctx: Context, cited: set[str]) -> list[str]:
     cand = ctx.tools.get(cand_id) if cand_id else None
     if cand is None:
@@ -413,14 +532,15 @@ def check_alternative(a: dict, ctx: Context) -> list[str]:
     if a.get("candidate_id") and a["candidate_id"] not in ctx.tools:
         p.append(f"unknown candidate_id {a['candidate_id']}")
     probe = {**a, "cites": list({*_cites(a), *([a["candidate_id"]] if a.get("candidate_id") else [])})}
-    return p + check_citations(a, ctx) + check_numbers_cited(probe, ctx, "the alternative") + check_names(a, ctx)
+    return (p + check_citations(a, ctx) + check_numbers_cited(probe, ctx, "the alternative") + check_names(a, ctx)
+            + check_style(a, "the alternative"))
 
 
 def check_to_verify(v: dict, ctx: Context) -> list[str]:
     p = []
     if not isinstance(v.get("check"), str) or not v["check"].strip():
         p.append("to-verify item needs a check")
-    return p + check_names(v, ctx)
+    return p + check_names(v, ctx) + check_style(v, "the to-verify item")
 
 
 def check_position(pos: dict, ctx: Context) -> list[str]:
@@ -446,12 +566,56 @@ def check_position(pos: dict, ctx: Context) -> list[str]:
     probe = {"text": " ".join(headline) if isinstance(headline, list) else "", "cites": cites}
     if USD_AMOUNT.search(probe["text"]):
         p.append("write amounts in EUR m (each fact's eur_value), not USD m")
-    return p + check_citations(probe, ctx) + check_numbers_cited(probe, ctx, "the headline") + check_names(probe, ctx)
+    return (p + check_citations(probe, ctx) + check_numbers_cited(probe, ctx, "the headline") + check_names(probe, ctx)
+            + check_style(probe, "the headline"))
+
+
+def check_events_used(entries: Any, ctx: Context, n_decisions: int) -> tuple[list[str], dict[int, list[str]]]:
+    """Every ticked Event is listed once with a status and a one-line reason. Returns (set problems, per entry)."""
+    if not isinstance(entries, list):
+        return ["events_used must list every ticked Event"], {}
+    seen, per = [], {}
+    for i, e in enumerate(entries):
+        p = []
+        if not isinstance(e, dict):
+            per[i] = ["each events_used entry must be an object"]
+            continue
+        eid, status = e.get("event_id"), e.get("status")
+        if eid not in ctx.ticked:
+            p.append(f"event {eid} is not a ticked Event")
+        if eid in seen:
+            p.append(f"event {eid} is listed twice")
+        seen.append(eid)
+        if status not in EVENT_STATUSES:
+            p.append(f"status must be one of {', '.join(EVENT_STATUSES)}")
+        if status == "used_in_decision" and not (isinstance(e.get("decision"), int) and 1 <= e["decision"] <= n_decisions):
+            p.append(f"used_in_decision needs the decision number (1 to {n_decisions})")
+        if status == "no_cash_effect":
+            support = [c for c in e.get("cites", []) if isinstance(c, str) and c in ctx.facts
+                       and (c.startswith(f"F.news.{eid}.input.")
+                            or (not c.startswith("F.news.") and ctx.facts[c]["provenance"] in FACT_LABEL_PROV))]
+            if not support:
+                p.append("no_cash_effect needs a cited fact showing it (a forecast input of this Event with no effect in "
+                         "the forecast, or a fact showing the payment is settled); \"no forecast input\" alone is not "
+                         "enough: use not_quantifiable with a to-verify check")
+        if status == "not_quantifiable" and e.get("to_verify_id") not in ctx.to_verify:
+            p.append("not_quantifiable needs a to_verify_id with the check to make")
+        if not isinstance(e.get("reason"), str) or not e["reason"].strip():
+            p.append("a one-line reason is required")
+        # The entry is about its Event: numbers in that Event's title or cited article text count as cited.
+        probe = {"text": e.get("reason", ""),
+                 "cites": [c for c in e.get("cites", []) if isinstance(c, str)] + ([f"F.news.{eid}"] if eid in ctx.ticked else [])}
+        p += check_citations(probe, ctx) + check_names(probe, ctx) + check_numbers_cited(probe, ctx, "the reason")
+        p += check_style(probe, "the reason")
+        if p:
+            per[i] = p
+    missing = sorted(ctx.ticked - set(seen))
+    return ([f"ticked Events missing from events_used: {', '.join(missing)}"] if missing else []), per
 
 
 # ------------------------------------------------------------------------------------------- the whole set
 def validate_set(result: dict, pack: dict, tool_results: dict[str, dict] | None = None,
-                 min_decisions: int = 3) -> dict:
+                 min_decisions: int = 1) -> dict:
     """Problems per item: {"set": [...], "position": [...], "assumptions": {id: [...]}, "to_verify": {id: [...]},
     "decisions": {index: [...]}, "alternatives": {index: [...]}}. Assumptions that fail are not available to the
     decisions that cite them (the decision then fails with "unknown assumption")."""
@@ -464,7 +628,7 @@ def validate_set(result: dict, pack: dict, tool_results: dict[str, dict] | None 
     out = {"set": [], "position": check_position(result.get("position") or {}, ctx), "assumptions": bad_assumptions,
            "to_verify": {v.get("id", f"#{i}"): pr for i, v in enumerate(result.get("to_verify", []))
                          if (pr := check_to_verify(v, ctx))},
-           "decisions": {}, "alternatives": {}}
+           "decisions": {}, "alternatives": {}, "events_used": {}}
     decisions = result.get("decisions", [])
     if not isinstance(decisions, list):
         out["set"].append("decisions must be a list")
@@ -478,6 +642,13 @@ def validate_set(result: dict, pack: dict, tool_results: dict[str, dict] | None 
         out["set"].append("two decisions have the same scope; merge them")
     if not min_decisions <= len(decisions) <= 5:
         out["set"].append(f"return {min_decisions} to 5 ranked decisions")
+    for fid in severe_alerts_unaddressed(result, ctx):
+        out["set"].append(f"severe alert \"{ctx.facts[fid]['label']}\" is not addressed: cite {fid} in a decision's "
+                          "trigger, or list it under rejected alternatives with a reason that cites it")
+    if "events_used" in result or ctx.ticked:
+        missing, per = check_events_used(result.get("events_used"), ctx, len(decisions))
+        out["set"] += missing
+        out["events_used"] = per
     for i, a in enumerate(result.get("rejected_alternatives", [])):
         pr = check_alternative(a, ctx) if isinstance(a, dict) else ["each alternative must be an object"]
         if pr:
@@ -487,5 +658,5 @@ def validate_set(result: dict, pack: dict, tool_results: dict[str, dict] | None 
 
 def passed(report: dict) -> bool:
     return not (report["set"] or report["position"] or report["assumptions"] or report["to_verify"]
-                or report["decisions"] or report["alternatives"])
+                or report["decisions"] or report["alternatives"] or report.get("events_used"))
 

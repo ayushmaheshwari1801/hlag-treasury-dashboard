@@ -44,6 +44,11 @@ def pack(status="WATCH", base_status="LOW", bunker_exceptional=False, first_brea
         fact("F.eng.trend_continues.min_headroom", "Lowest headroom if last week's moves repeat", 2890.0, "USD m",
              "ASSUMPTION", "Observed moves run", rate=RATE),
         fact("F.bank.BANK_A", "Relationship bank BANK_A (generic register name)", "BANK_A", None, "ASSUMPTION", "Register"),
+        fact("F.der.materiality_threshold", "Materiality threshold: 1% of the baseline lowest headroom", 29.0, "USD m",
+             "DERIVED", "Calculated from Baseline lowest headroom", rate=RATE),
+        fact("F.sit.row.interest", "News-case cash effect: interest", 0.0, "USD m", "ENGINE", "Engine", rate=RATE),
+        fact("F.alert.fx.vol_regime.brl", "Market alert (warning): BRL volatility", 1.6, "ratio", "ENGINE", "Engine alerts", "2026-11-06"),
+        fact("F.policy.cad.cap", "Hedge ratio cap cad", 80, "%", "DISCLOSED", "Annual report"),
         fact("F.trade.ASIA_EUROPE", "Trade lane Asia-Europe", "Asia–Europe", None, "DISCLOSED", "Investor Report H1 2026, p. 10"),
         fact("F.mkt.BRENT.level", "BRENT latest real print", 64.2, "USD/bbl", "MARKET", "ICE", "2026-10-30"),
     ]
@@ -58,7 +63,7 @@ def pack(status="WATCH", base_status="LOW", bunker_exceptional=False, first_brea
 def decision(verb, scope, owner, trigger, **kw):
     d = {"verb": verb, "scope": scope, "owner": {"role": owner, "kind": "business function"},
          "amount_or_limit": {"text": "no limit set", "cites": []},
-         "timing": {"text": "before 2026-12-31", "cites": ["F.liq.base.min_date"]},
+         "timing": {"text": "before 31 Dec 2026", "cites": ["F.liq.base.min_date"]},
          "trigger": trigger, "why": [], "expected_effect": {"text": "not quantified", "candidate_id": None, "cites": []},
          "cash_at_stake": {"text": "The news lowers the lowest headroom by EUR 357.9m.", "label": "Engine",
                            "cites": ["F.sit.headroom_change_vs_base"]},
@@ -73,8 +78,8 @@ def decision(verb, scope, owner, trigger, **kw):
 def good_set():
     return {
         "position": {"value": "heightened_monitoring",
-                     "headline": ["The news situation lowers the lowest headroom by EUR 357.9m.",
-                                  "The engine status is WATCH."],
+                     "headline": ["The ticked news lowers the lowest headroom by EUR 357.9m.",
+                                  "The liquidity risk status is watch."],
                      "cites": ["F.sit.headroom_change_vs_base", "F.sit.status"]},
         "decisions": [
             decision("Prepare", "drawdown readiness on the unused credit lines", "Treasury",
@@ -92,7 +97,7 @@ def good_set():
                      escalate_if=[{"text": "If last week's moves repeat.", "cites": ["A2"]}]),
             decision("Confirm", "the payment calendar for the dividend", "CFO",
                      {"type": "Structural", "date": "2027-05-31", "source": "Engine", "cites": ["F.pay.1"]},
-                     why=[{"text": "The dividend of EUR 527.3m falls on 2027-05-31.", "label": "Engine", "cites": ["F.pay.1"]}],
+                     why=[{"text": "The dividend of EUR 527.3m falls on 31 May 2027.", "label": "Engine", "cites": ["F.pay.1"]}],
                      to_verify_ids=["V1"]),
         ],
         "rejected_alternatives": [{"title": "Hedge fuel with a swap",
@@ -104,6 +109,8 @@ def good_set():
                         {"id": "A2", "statement": "Last week's moves repeat.", "basis": ["F.eng.trend_continues.min_headroom"],
                          "likelihood": "possible", "effect_if_wrong": "No added pressure."}],
         "to_verify": [{"id": "V1", "check": "Actual dividend payment date and amount.", "why": "Internal fact."}],
+        "events_used": [{"event_id": "E1", "status": "used_in_decision", "decision": 1, "reason": "It drives the fuel forecast."},
+                        {"event_id": "E2", "status": "considered_not_acted", "reason": "Its forecast overlaps a stronger Event."}],
     }
 
 
@@ -277,13 +284,17 @@ def test_business_as_usual_not_allowed_with_high_status_or_a_breach():
     assert any("business_as_usual is not allowed" in x for x in problems(s, pack(first_breach="2027-02-28"))["position"])
 
 
-def test_headline_is_two_sentences_and_set_has_three_to_five_unique_decisions():
+def test_headline_is_two_sentences_and_set_has_one_to_five_unique_decisions():
     s = good_set()
     s["position"]["headline"] = ["Only one sentence."]
     assert any("exactly two sentences" in x for x in problems(s)["position"])
     s = good_set()
-    s["decisions"] = s["decisions"][:2]
-    assert any("3 to 5" in x for x in problems(s)["set"])
+    s["decisions"] = []
+    s["events_used"][0] = {"event_id": "E1", "status": "considered_not_acted", "reason": "No action needed."}
+    assert any("1 to 5" in x for x in problems(s)["set"])
+    s = good_set()
+    s["decisions"] = s["decisions"] * 2
+    assert any("1 to 5" in x for x in problems(s)["set"])
     s = good_set()
     s["decisions"][1]["scope"] = s["decisions"][0]["scope"]
     assert any("same scope" in x for x in problems(s)["set"])
@@ -330,7 +341,7 @@ def test_new_verbs_are_accepted(verb):
     assert passed(problems(s)), flat(problems(s))
 
 
-@pytest.mark.parametrize("text", ["within 2 weeks", "within 30 days", "in the next 6 weeks", "before the low point on 2026-12-31"])
+@pytest.mark.parametrize("text", ["within 2 weeks", "within 30 days", "in the next 6 weeks", "before the low point on 31 Dec 2026"])
 def test_relative_timing_or_a_fact_date_is_accepted(text):
     s = good_set()
     s["decisions"][1]["timing"] = {"text": text, "cites": ["F.liq.base.min_date"]}
@@ -339,8 +350,8 @@ def test_relative_timing_or_a_fact_date_is_accepted(text):
 
 def test_other_dates_and_figures_in_timing_are_rejected():
     s = good_set()
-    s["decisions"][1]["timing"] = {"text": "before 2027-02-15", "cites": ["F.liq.base.min_date"]}
-    assert any("date 2027-02-15" in x for x in problems(s)["decisions"][1])
+    s["decisions"][1]["timing"] = {"text": "before 15 Feb 2027", "cites": ["F.liq.base.min_date"]}
+    assert any("date 15 Feb 2027" in x for x in problems(s)["decisions"][1])
     s = good_set()
     s["decisions"][1]["timing"] = {"text": "once fuel passes 900 USD/t", "cites": ["F.liq.base.min_date"]}
     assert any("number 900" in x for x in problems(s)["decisions"][1])
@@ -408,3 +419,131 @@ def test_hyphenated_words_are_accepted_when_every_part_is_ordinary_or_in_the_fac
 
 def test_hyphenated_word_with_an_unknown_part_is_rejected():
     assert any("Acme-Maersk" in x for x in name_probe("The Acme-Maersk alliance cut capacity."))
+
+
+
+# ---------------------------------------------------------------------------------- round 8
+def test_iso_dates_internal_terms_and_status_codes_are_rejected_in_text():
+    for text, reason in (("Collections slow before 2026-12-31.", "write dates like 31 Dec 2026"),
+                         ("The situation worsens.", "do not use the word 'situation'"),
+                         ("The fuel module drives it.", "do not use the word 'module'"),
+                         ("Status stays LOW.", "lower case ('low')")):
+        s = good_set()
+        s["decisions"][1]["why"].append({"text": text, "label": "Fact", "cites": ["F.liq.base.min_date", "F.mkt.VLSFO_RTM.chg_4w"]})
+        assert any(reason in x for x in problems(s)["decisions"][1]), (text, problems(s)["decisions"].get(1))
+
+
+def test_one_decision_is_enough():
+    s = good_set()
+    s["decisions"] = s["decisions"][:1]
+    s["events_used"][0]["decision"] = 1
+    assert passed(problems(s)), flat(problems(s))
+
+
+def test_immaterial_cash_at_stake_needs_an_alert_or_policy_trigger_and_monitor_or_confirm():
+    s = good_set()
+    s["decisions"][1]["cash_at_stake"] = {"text": "EUR 0.0m for interest.", "label": "Engine", "cites": ["F.sit.row.interest"]}
+    assert any("immaterial" in x for x in problems(s)["decisions"][1])           # market-move trigger, verb Monitor
+    s["decisions"][1]["trigger"] = {"type": "Occurred", "cites": ["F.alert.fx.vol_regime.brl"], "source": "alert"}
+    assert 1 not in problems(s)["decisions"]                                       # alert trigger + Monitor: allowed
+    s["decisions"][1]["verb"] = "Prepare"
+    assert any("immaterial" in x for x in problems(s)["decisions"][1])           # alert trigger but wrong verb
+
+
+def test_model_assumption_label_for_profile_assumptions_and_fact_for_disclosed_caps():
+    s = good_set()
+    s["decisions"][1]["why"].append({"text": "The register lists BANK_A.", "label": "Fact", "cites": ["F.bank.BANK_A"]})
+    assert any("labelled Model assumption" in x for x in problems(s)["decisions"][1])
+    s["decisions"][1]["why"][-1]["label"] = "Model assumption"
+    assert 1 not in problems(s)["decisions"]
+    s["decisions"][1]["why"].append({"text": "The CAD cap is 80%.", "label": "Fact", "cites": ["F.policy.cad.cap"]})
+    assert 1 not in problems(s)["decisions"]
+    s["decisions"][1]["why"].append({"text": "Fuel keeps rising.", "label": "AI assumption", "cites": ["F.mkt.VLSFO_RTM.chg_4w"]})
+    assert any("assumption id from this session" in x for x in problems(s)["decisions"][1])
+
+
+def test_every_ticked_event_must_be_listed_with_a_status():
+    s = good_set()
+    s["events_used"] = s["events_used"][:1]
+    assert any("missing from events_used: E2" in x for x in problems(s)["set"])
+    s = good_set()
+    s["events_used"][1] = {"event_id": "E2", "status": "not_quantifiable", "reason": "No input."}
+    assert any("to_verify_id" in x for x in problems(s)["events_used"][1])
+    s["events_used"][1]["to_verify_id"] = "V1"
+    assert passed(problems(s)), flat(problems(s))
+    s["events_used"][0]["decision"] = 9
+    assert any("decision number" in x for x in problems(s)["events_used"][0])
+
+
+
+# ---------------------------------------------------------------------------------- round 9
+@pytest.mark.parametrize("text, ok", [("Headroom is EUR 2,597.0m.", True), ("Headroom is EUR -357.9m.", True),
+                                      ("Headroom is 2597.0 EUR m.", False), ("Headroom is EUR 2597.0m.", False),
+                                      ("Headroom is EUR 2,597.0 m.", False),
+                                      ("The low point is 31 Dec 2026, EUR 2,597.0m.", True)])
+def test_amounts_are_written_like_the_page(text, ok):
+    s = good_set()
+    s["decisions"][1]["why"].append({"text": text, "label": "Engine", "cites": ["F.liq.base.min_headroom", "F.sit.headroom_change_vs_base"]})
+    out = problems(s)["decisions"].get(1, [])
+    assert (not any("write amounts like the page" in x for x in out)) is ok, out
+
+
+def test_no_cash_effect_needs_a_supporting_fact():
+    s = good_set()
+    s["events_used"][1] = {"event_id": "E2", "status": "no_cash_effect", "reason": "No forecast input."}
+    assert any("no_cash_effect needs a cited fact" in x for x in problems(s)["events_used"][1])
+    s["events_used"][1]["cites"] = ["F.news.E2"]                                    # the Event itself is not evidence
+    assert 1 in problems(s)["events_used"]
+    s["events_used"][1].update(cites=["F.news.E2.input.bunker.vlsfo_shock_pct"],
+                               reason="Its fuel input was not added, so it has no effect in the forecast.")
+    assert passed(problems(s)), flat(problems(s))
+
+
+def test_statement_citing_only_engine_facts_is_labelled_engine():
+    s = good_set()
+    s["decisions"][2]["why"][0]["label"] = "Fact"                                   # cites only F.pay.1 (engine)
+    assert any("label it Engine, not Fact" in x for x in problems(s)["decisions"][2])
+    s["decisions"][2]["why"][0]["label"] = "Engine"
+    assert 2 not in problems(s)["decisions"]
+
+
+# ---------------------------------------------------------------------------------- round 10
+def severe_pack():
+    p = pack()
+    p["facts"]["F.alert.divergence.vlsfo_brent"] = fact(
+        "F.alert.divergence.vlsfo_brent", "Severe: VLSFO rose faster than Brent over 4 weeks (VLSFO +12.2%, Brent +3.1%)",
+        9.1, "pct", "ENGINE", "Engine alerts", "2026-10-30", severity="severe")
+    return p
+
+
+def test_a_severe_alert_must_be_in_a_trigger_or_a_rejected_alternative():
+    p = severe_pack()
+    r = problems(good_set(), p)
+    assert any("severe alert" in x and "is not addressed" in x for x in r["set"]), r["set"]
+    s = good_set()
+    s["decisions"][1]["trigger"]["cites"].append("F.alert.divergence.vlsfo_brent")
+    assert not any("severe alert" in x for x in problems(s, p)["set"])
+    s = good_set()
+    s["rejected_alternatives"][0]["reason"]["cites"].append("F.alert.divergence.vlsfo_brent")
+    assert not any("severe alert" in x for x in problems(s, p)["set"])
+
+
+def test_a_warning_alert_need_not_be_addressed():
+    assert not any("severe alert" in x for x in problems(good_set())["set"])
+
+
+def test_amount_that_repeats_the_scope_is_rejected():
+    s = good_set()
+    s["decisions"][0]["amount_or_limit"]["text"] = "drawdown readiness on the unused credit lines"
+    assert any("amount_or_limit repeats the scope" in x for x in problems(s)["decisions"][0])
+    assert not any("repeats the scope" in x for x in problems(good_set())["decisions"].get(0, []))
+
+
+def test_numbers_in_a_cited_event_title_or_article_text_count_as_cited():
+    p = pack()
+    p["facts"]["F.news.E2"]["article_text"] = "A state fund takes a 25% stake in a fuel supplier; supply stays ample."
+    s = good_set()
+    s["events_used"][1]["reason"] = "A 25% stake changes ownership, not fuel cash, in the horizon."
+    assert passed(problems(s, p)), flat(problems(s, p))
+    s["events_used"][1]["reason"] = "A 35% stake changes ownership, not fuel cash, in the horizon."
+    assert any("number 35" in x for x in problems(s, p)["events_used"][1])
