@@ -18,6 +18,7 @@ NAMES = {'fx_eur':'EUR and other FX','fx_gbp':'GBP FX','fx_cny':'CNY FX','fx_cad
 METRICS = {'fx_eur':('FX_USD_PER_EUR','EUR / USD','USD/EUR'),
            'fx_gbp':('FX_USD_PER_GBP','GBP / USD','USD/GBP'),
            'fx_cny':('FX_USD_PER_CNY','CNY / USD','USD/CNY'),
+           'fx_cad':('FX_USD_PER_CAD','CAD / USD','USD/CAD'),
            'interest':('ESTR','Euro short-term rate','%'),
            'bunker':('VLSFO_RTM','VLSFO Rotterdam','USD/t'),
            'freight':('WCI_COMPOSITE','WCI composite','USD/FEU')}
@@ -60,8 +61,19 @@ def _weekly_move(market,sid,as_of):
 WC_SHOCKS={'collection_delay':(0,60)}
 
 
+def observed_moves(market:dict,as_of:date)->dict:
+    """Each slider's market move over the last week (FX %, ESTR bp, VLSFO USD/t, WCI %); a missing comparison is 0."""
+    out={}
+    for key in ROWS:
+        sid='FX_USD_PER_'+key[3:].upper() if key.startswith('fx_') else 'ESTR' if key=='interest' else 'VLSFO_RTM' if key=='bunker' else 'WCI_COMPOSITE'
+        out[key]=_weekly_move(market,sid,as_of) or 0.
+    return out
+
+
 def slider_scenario(shocks:dict,as_of:date,market:dict,base_scenario:dict|None=None)->dict:
-    """Merge explicitly moved original-page sliders into an optional detailed news forecast."""
+    """Merge explicitly moved original-page sliders into an optional detailed news forecast. A moved slider replaces
+    the forecast's value for that market. Without a forecast, every unmoved slider takes last week's market move once
+    more (today's prices are already in the baseline)."""
     if not isinstance(shocks,dict) or set(shocks)-set(ROWS)-set(WC_SHOCKS): raise ValueError('Unknown what-if slider')
     wc={k:shocks[k] for k in WC_SHOCKS if k in shocks}
     shocks={k:v for k,v in shocks.items() if k not in WC_SHOCKS}
@@ -74,11 +86,7 @@ def slider_scenario(shocks:dict,as_of:date,market:dict,base_scenario:dict|None=N
             p['source']='custom'; p.setdefault('name','Collections slower')
     quotes={r['series_id']:r for r in market.get('series',[]) if isinstance(r,dict) and 'series_id' in r}
     quotes.update(market.get('market_snapshot',{}))
-    effective={}
-    if base_scenario is None:
-        for key in ROWS:
-            sid='FX_USD_PER_'+key[3:].upper() if key.startswith('fx_') else 'ESTR' if key=='interest' else 'VLSFO_RTM' if key=='bunker' else 'WCI_COMPOSITE'
-            effective[key]=_weekly_move(market,sid,as_of) or 0.
+    effective=observed_moves(market,as_of) if base_scenario is None else {}
     effective.update(shocks)
     for key,v in effective.items():
         lo,hi=(-20,20) if key.startswith('fx_') else (-200,200) if key=='interest' else (-300,300) if key=='bunker' else (-50,50)
@@ -100,7 +108,7 @@ def slider_scenario(shocks:dict,as_of:date,market:dict,base_scenario:dict|None=N
         else:
             p.setdefault('freight',{})['rate_shock_pct']={t:v/100 for t in ('ASIA_EUROPE','ASIA_AMERICA','EUROPE_AMERICA','AFRICA_INTRA')}
     if effective:
-        p['source']='custom';p.setdefault('name','Cash what-if' if shocks else 'Observed weekly moves')
+        p['source']='custom';p.setdefault('name','Cash what-if' if shocks else "Last week's moves repeated")
     return p
 
 
@@ -342,7 +350,7 @@ def compose_cash_dashboard(template:dict,run:dict,market:dict,months:int,shocks:
             'horizons':[{'months':m,'days':(month_end(add_months(as_of,m))-as_of).days} for m in (3,6,12)],
             'eurusd':{'value':eur,'date':snapshots.get('FX_USD_PER_EUR',{}).get('date'),'provenance':snapshots.get('FX_USD_PER_EUR',{}).get('label','UNAVAILABLE')},
             'market_metrics':metrics,'scenario':{'shocks':{s['id']:s['value'] for s in sliders},'custom':bool(shocks),'sliders':sliders,
-                'presets':[{'id':'observed','label':'Observed moves','description':'Recent weekly moves; missing comparisons use zero','shocks':{}},
+                'presets':[{'id':'observed','label':"Last week's moves repeated",'description':"Today's prices are already in the baseline; applies last week's moves once more. Missing comparisons use zero.",'shocks':{}},
                            {'id':'eur_up','label':'EUR +10%','description':'Illustrative single-driver FX scenario','shocks':{'fx_eur':10}},
                            {'id':'eur_rates_up','label':'€STR +100 bp','description':'Illustrative EUR benchmark step','shocks':{'interest':100}}],
                 'note':'Sliders change only this cash-engine run. The full saved scenario preserves route, timing and multi-driver forecasts.'},

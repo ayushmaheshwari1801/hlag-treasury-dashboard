@@ -40,7 +40,7 @@ export const ORIGIN: Record<string, { label: string; help: string }> = {
 };
 export const originOf = (o: string) => ORIGIN[o] ?? { label: o, help: "" };
 
-export const MODULE: Record<string, string> = { bunker: "Bunker fuel", rates: "Interest rates", fx: "FX" };
+export const MODULE: Record<string, string> = { bunker: "Bunker fuel", rates: "Interest rates", fx: "FX", freight: "Freight" };
 
 const TARGET: Record<string, string> = {
   fuel_all: "blended fuel", vlsfo: "VLSFO", hsfo: "HSFO", floating_debt_usd: "USD floating debt",
@@ -68,13 +68,71 @@ export function defaultWindow(asOf: string, days = 7): { from: string; to: strin
 
 /** Request body. as_of = end of the news window, so no later news or market data is used. */
 export function agentRequest(window: { from: string; to: string }, includeWhatIf: boolean,
-  shocks: Record<string, number>, overrides: Record<string, unknown>, forecastInput?: {scenario: any; forecast_id?: string; as_of?: string}, horizonDays?: number) {
-  const body: Record<string, unknown> = { news_from: window.from, news_to: window.to, as_of: window.to, mode: "auto" };
+  shocks: Record<string, number>, overrides: Record<string, unknown>, forecastInput?: {scenario: any; forecast_id?: string; as_of?: string}, horizonDays?: number,
+  eventIds?: string[]) {
+  // forecast_mode "auto": news assumptions from the model, like the News Tracker's own estimates (fixed rules match few Events).
+  const body: Record<string, unknown> = { news_from: window.from, news_to: window.to, as_of: window.to, mode: "auto", forecast_mode: "auto" };
+  // Tracker Events (top six plus pins): exactly those Events, whatever their age, still nothing after the analysis date.
+  if (eventIds?.length) { delete body.news_from; body.event_ids = [...eventIds].sort(); }
   if (includeWhatIf && Object.keys(shocks).length) body.shocks = shocks;
   if (includeWhatIf && Object.keys(overrides).length) body.overrides = overrides;
   if (includeWhatIf && forecastInput) Object.assign(body, forecastInput);
-  if (includeWhatIf && horizonDays) body.horizon_days = Math.min(365, horizonDays);
+  if (horizonDays) body.horizon_days = Math.min(365, horizonDays);  // the page horizon, not a What-if move
   return body;
+}
+
+/** Horizon the backend applies when none is sent (RecommendationAgentRequest.horizon_days). */
+export const DEFAULT_HORIZON_DAYS = 90;
+
+/** Most recent saved news-only session for this window, horizon and news collection, so the card can show advice
+ *  without a click. Advice saved before a news refresh (or without a recorded collection) is not reused. */
+export function matchingSession(history: any[], window: { from: string; to: string }, horizonDays?: number, newsRunId?: string,
+  eventIds?: string[]): any | null {
+  const horizon = horizonDays ? Math.min(365, horizonDays) : DEFAULT_HORIZON_DAYS;
+  const sameEvents = (h: any) => eventIds?.length
+    ? JSON.stringify([...(h.event_ids ?? [])].sort()) === JSON.stringify([...eventIds].sort()) && !h.news_window?.from
+    : h.news_window?.from === window.from;
+  return history.find(h => sameEvents(h) && h.news_window?.to === window.to && h.as_of === window.to
+    && !h.custom_inputs && (h.horizon_days ?? DEFAULT_HORIZON_DAYS) === horizon
+    && (!newsRunId || h.news_run_id === newsRunId)) ?? null;
+}
+
+export type Advice = { tone: "ok" | "warn" | "bad"; title: string; detail: string };
+
+/** One-line Treasury verdict from the engine diagnosis; amounts via `money` (display currency). */
+export function adviceHeadline(session: any, money: (v: number | null | undefined, d?: number, signed?: boolean) => string): Advice | null {
+  const d = session?.diagnosis;
+  if (!d) return null;
+  const recs: any[] = session.recommendations ?? [];
+  const hedges = recs.filter(r => (r.kind ?? "hedge") === "hedge");
+  const reviews = recs.length - hedges.length;
+  const actions = hedges.length
+    ? `${hedges.length} tested hedge${hedges.length > 1 ? "s" : ""} and ${reviews} review action${reviews === 1 ? "" : "s"} below.`
+    : reviews ? `No hedge is needed; ${reviews} review action${reviews === 1 ? "" : "s"} below.` : "No action is recommended.";
+  const low = `${money(d.scenario_min_headroom_usd_m, 0)} on ${dayLabel(d.scenario_min_date)}`;
+  if (d.first_breach_date) return { tone: "bad", title: `Act now: the liquidity reserve is breached on ${dayLabel(d.first_breach_date)}`,
+    detail: `Lowest headroom ${low}. ${actions}` };
+  const consumed = Number(d.headroom_consumed_usd_m ?? 0);
+  if (consumed > 0.5) {
+    const tier = d.shortfall_tier && d.shortfall_tier !== "within_operating_cash";
+    return { tone: tier ? "bad" : "warn",
+      title: tier ? `Prepare funding: headroom falls to ${low}` : `Watch: headroom falls by ${money(consumed, 0)}, liquidity stays within operating cash`,
+      detail: `Lowest headroom ${low}. ${actions}` };
+  }
+  return { tone: "ok", title: "No liquidity pressure from the latest news", detail: `Headroom is not reduced. ${actions}` };
+}
+
+/** "6 Jan 2027" from an ISO date; the input unchanged if it is not a date. */
+export function dayLabel(s: string | null | undefined, year = true): string {
+  if (!s) return "—";
+  const t = new Date(`${s.slice(0, 10)}T00:00:00Z`);
+  return Number.isFinite(t.getTime())
+    ? t.toLocaleDateString("en-GB", { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}), timeZone: "UTC" }) : s;
+}
+
+/** "1 Nov – 7 Nov 2026" for the window line. */
+export function windowLabel(window: { from: string; to: string }): string {
+  return `${dayLabel(window.from, false)} – ${dayLabel(window.to)}`;
 }
 
 export function windowProblem(window: { from: string; to: string }, today: string): string | null {

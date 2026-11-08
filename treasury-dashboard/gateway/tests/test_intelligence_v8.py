@@ -246,7 +246,7 @@ def test_collect_defaults_to_ten_articles_and_rejects_invalid_limits(tmp_path, m
     app.include_router(create_router(IntelligenceStore(":memory:"), reader))
     with TestClient(app) as client:
         assert client.post("/api/v1/intelligence/collect", json={}).status_code == 200
-        assert calls[0]["max_articles"] == 10
+        assert calls[0]["max_articles"] == 30
         for limit in [0, -1, True, "10"]:
             assert client.post("/api/v1/intelligence/collect", json={"max_articles": limit}).status_code == 422
     assert len(calls) == 1

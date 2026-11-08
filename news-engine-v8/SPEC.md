@@ -167,7 +167,7 @@ saved forecasts remain accessible. No automatic paid re-run or reclassification 
 
 ## Default ten-Article rerun budget
 
-The dashboard collect endpoint and HTTP/CLI run requests default to max_articles=10.
+The dashboard collect endpoint and HTTP/CLI run requests default to max_articles=30.
 This is a unique selected-Article processing budget across new and resumed work, not
 ten Events and not a limit on full source text. Pending proposal units are selected atomically;
 work that does not fit remains pending. Unfinished work takes precedence over completed cache hits.

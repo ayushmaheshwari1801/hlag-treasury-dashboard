@@ -83,3 +83,57 @@ test('news dates reject incomplete years and impossible calendar dates',()=>{
  for (const from of ['0001-11-01','2026-02-31','2026-1-01']) assert.ok(m.windowProblem({from,to:'2026-11-07'},'2026-11-07'));
  assert.equal(m.windowProblem({from:'2026-11-01',to:'2026-11-07'},'2026-11-07'),null);
 });
+
+test("the card reuses only a saved news-only session for the same window and horizon", () => {
+  const w = { from: "2026-11-01", to: "2026-11-07" };
+  const h = [
+    { session_id: "custom", news_window: w, as_of: "2026-11-07", custom_inputs: true, horizon_days: 183 },
+    { session_id: "other-horizon", news_window: w, as_of: "2026-11-07", horizon_days: 90 },
+    { session_id: "match", news_window: w, as_of: "2026-11-07", horizon_days: 183 },
+  ];
+  assert.equal(m.matchingSession(h, w, 183).session_id, "match");
+  assert.equal(m.matchingSession(h, w).session_id, "other-horizon");            // older sessions used the 90-day default
+  assert.equal(m.matchingSession(h, { from: "2026-10-31", to: "2026-11-07" }, 183), null);
+  assert.equal(m.agentRequest(w, false, { bunker: 1 }, {}, undefined, 183).horizon_days, 183);  // page horizon always sent
+});
+
+test("the advice headline leads with the liquidity verdict in plain words", () => {
+  const money = (v) => `EUR ${v}m`;
+  const reviews = [{ kind: "monitoring" }, { kind: "funding" }];
+  const breach = m.adviceHeadline({ diagnosis: { first_breach_date: "2027-02-28", scenario_min_headroom_usd_m: -561, scenario_min_date: "2027-02-28", headroom_consumed_usd_m: 3468 }, recommendations: reviews }, money);
+  assert.equal(breach.tone, "bad");
+  assert.match(breach.title, /reserve is breached on 28 Feb 2027/);
+  assert.match(breach.detail, /on 28 Feb 2027/);
+  assert.match(breach.detail, /No hedge is needed; 2 review actions/);
+  const watch = m.adviceHeadline({ diagnosis: { headroom_consumed_usd_m: 167, shortfall_tier: "within_operating_cash", scenario_min_headroom_usd_m: 2739, scenario_min_date: "2027-01-05" }, recommendations: [{ kind: "hedge" }] }, money);
+  assert.equal(watch.tone, "warn");
+  assert.match(watch.detail, /1 tested hedge and 0 review actions/);
+  assert.equal(m.adviceHeadline({ diagnosis: { headroom_consumed_usd_m: -1 }, recommendations: [] }, money).tone, "ok");
+  assert.equal(m.adviceHeadline({}, money), null);
+});
+
+test("saved advice is not reused after the news has been refreshed", () => {
+  const w = { from: "2026-11-02", to: "2026-11-08" };
+  const h = [{ session_id: "old-news", news_window: w, as_of: "2026-11-08", horizon_days: 204, news_run_id: "pool_old" },
+             { session_id: "unrecorded", news_window: w, as_of: "2026-11-08", horizon_days: 204 }];
+  assert.equal(m.matchingSession(h, w, 204, "pool_new"), null);
+  assert.equal(m.matchingSession(h, w, 204, "pool_old").session_id, "old-news");
+  assert.equal(m.matchingSession([...h, { ...h[0], session_id: "current", news_run_id: "pool_new" }], w, 204, "pool_new").session_id, "current");
+});
+
+test("advice on the tracker Events sends exactly those Events and reuses only advice on the same set", () => {
+  const w = { from: "2026-11-02", to: "2026-11-08" };
+  const body = m.agentRequest(w, false, {}, {}, undefined, 204, ["E3", "E1", "E2"]);
+  assert.deepEqual(body.event_ids, ["E1", "E2", "E3"]);
+  assert.equal(body.news_from, undefined);                 // tracker Events may be older than the window
+  assert.equal(body.news_to, "2026-11-08"); assert.equal(body.as_of, "2026-11-08");   // still no look-ahead
+  const saved = { session_id: "s", as_of: "2026-11-08", horizon_days: 204, news_run_id: "p", news_window: { from: null, to: "2026-11-08" }, event_ids: ["E2", "E1", "E3"] };
+  assert.equal(m.matchingSession([saved], w, 204, "p", ["E1", "E2", "E3"]).session_id, "s");
+  assert.equal(m.matchingSession([saved], w, 204, "p", ["E1", "E2", "E4"]), null);       // a pin or new top Event
+  assert.equal(m.matchingSession([{ ...saved, news_window: w }], w, 204, "p", ["E1", "E2", "E3"]), null);  // window-based advice
+});
+
+test("advice asks for model-based news assumptions, like the News Tracker estimates", () => {
+  assert.equal(m.agentRequest({ from: "2026-11-02", to: "2026-11-08" }, false, {}, {}).forecast_mode, "auto");
+  assert.equal(m.MODULE.freight, "Freight");
+});

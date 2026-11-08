@@ -18,6 +18,13 @@ import { useEventImpact } from "./dashboard/useEventImpact";
 import { ContextBar, STEPS, scenarioLabel } from "./dashboard/ContextBar";
 import { LiquidityPositionCard, MarketImpactCard, MonitoringCard, WaterfallCard, riskView } from "./dashboard/MarketCards";
 import { NewsImpactCard, NewsImpactDetail, type NewsRow } from "./dashboard/EventImpactBoard";
+import { mergePinned, usePinnedNews } from "./dashboard/pinnedNews";
+import type { Granularity } from "./engineUi";
+
+const GRANULARITY_KEY = "treasury.granularity.v1";
+function savedGranularity(): Granularity {
+  try { const g = localStorage.getItem(GRANULARITY_KEY); return g === "daily" || g === "weekly" ? g : "monthly"; } catch { return "monthly"; }
+}
 import { LINE_COLORS, LiquidityForecastCard, useRunPaths, type LiquidityLine } from "./dashboard/LiquidityForecast";
 import { METRIC_EXPLAIN, modelAssumptions, newsDriversByMetric } from "./dashboard/metricAssumptions";
 import { WorkingCapitalCard } from "./dashboard/WorkingCapital";
@@ -45,8 +52,12 @@ export default function TreasuryDashboard() {
   useEffect(() => { void api.engineAssumptions().then(d => setParams(d.parameters ?? [])).catch(() => setParams(null)); }, []);
   useEffect(() => { void api.assistantStatus().then(s => setModelConfigured(s?.mode === "model")).catch(() => setModelConfigured(false)); }, []);
 
+  const pins = usePinnedNews();
+  // Daily / Weekly / Monthly: one choice for the liquidity chart and the cash-flow table; remembered in this browser.
+  const [granularity, setGranularityState] = useState<Granularity>(savedGranularity);
+  const setGranularity = (g: Granularity) => { setGranularityState(g); try { localStorage.setItem(GRANULARITY_KEY, g); } catch { /* storage unavailable */ } };
   const v = r.data ? riskView(r) : null, f = v?.f;
-  const rows: NewsRow[] = v ? v.newsShown : [];
+  const rows: NewsRow[] = v ? mergePinned<NewsRow>(v.newsShown, pins.pinned) as NewsRow[] : [];
   const colors: Record<string, string> = Object.fromEntries(rows.map((row, i) => [row.event_id, LINE_COLORS[i % LINE_COLORS.length]]));
   const newsRunId = r.data ? r.data.news.run_id ?? r.data.news.export ?? "" : "";
   const impacts = useEventImpact({ eventIds: rows.map(row => row.event_id), asOf: f ? String(f.as_of).slice(0, 10) : undefined, horizonDays: f?.horizon_days,
@@ -74,7 +85,7 @@ export default function TreasuryDashboard() {
     <Step id="position">
       <div className="position-grid">
         <div className="position-main">
-          {v && f ? <LiquidityForecastCard r={r} v={v} paths={paths} selectedLabel={scenarioLabel(r)} lines={lines}
+          {v && f ? <LiquidityForecastCard r={r} v={v} paths={paths} selectedLabel={scenarioLabel(r)} lines={lines} granularity={granularity} onGranularity={setGranularity}
             onOpenDetail={() => setDrawer("cashflows")} onOpenLine={id => { const row = rows.find(n => n.event_id === id); if (row) setImpactDetail(row); }} /> : pending}
           {v && <details className="card expandable" open><summary><b>What drives the liquidity path</b><small>Liquidity waterfall by driver · how close the scenario comes to the minimum reserve</small></summary>
             <div className="dash-grid two"><WaterfallCard v={v} /><MonitoringCard r={r} v={v} /></div></details>}
@@ -106,11 +117,12 @@ export default function TreasuryDashboard() {
           {v && <WorkingCapitalCard r={r} v={v} params={params} />}
         </div>
         <div className="board-right">
-          {v && <NewsImpactCard rows={rows} r={r} impacts={impacts} colors={colors} onSeeAll={() => setDrawer("news")}
+          {v && <NewsImpactCard rows={rows} r={r} impacts={impacts} colors={colors} onSeeAll={() => setDrawer("news")} onUnpin={pins.unpin}
             onOpenNews={row => setArticle(row.article_ids[0] ?? row.id)} onOpenImpact={setImpactDetail} />}
           {v && <LiquidityPositionCard r={r} v={v} />}
         </div>
-        {String(f?.calculation?.run_id ?? "").startsWith("spec_") && <div className="board-full"><HedgeAgentCard asOf={asOf} shocks={r.shocks} overrides={r.overrides} forecastInput={r.forecastInput} horizonDays={f?.horizon_days} rate={v?.rate} scenarioName={scenarioLabel(r)} scenarioKey={r.scenarioKey} /></div>}
+        {String(f?.calculation?.run_id ?? "").startsWith("spec_") && <div className="board-full"><HedgeAgentCard asOf={asOf} shocks={r.shocks} overrides={r.overrides} forecastInput={r.forecastInput} horizonDays={f?.horizon_days} rate={v?.rate} scenarioName={scenarioLabel(r)} scenarioKey={r.scenarioKey} newsRunId={newsRunId || undefined}
+          eventIds={[...new Set([...(v?.scenarioEvents ?? []).map((e: any) => e.event_id), ...pins.pinned.map(p => p.event_id)])]} /></div>}
       </div>
     </Step>
 
@@ -119,12 +131,14 @@ export default function TreasuryDashboard() {
     {modal && f?.calculation?.run_id && <CashDetails runId={f.calculation.run_id} rowId={modal} rowLabel={v?.ci.rows.find((x: any) => x.id === modal)?.label} horizonEnd={f.calculation.horizon_end} onClose={() => setModal(null)} />}
     {metricDetail && f && <MetricDetail rowId={metricDetail} finance={f} busy={r.busy} onClose={() => setMetricDetail(null)} onCashDetail={() => { setModal(metricDetail); setMetricDetail(null); }} {...metricProps(metricDetail)} />}
     {drawer === "cashflows" && f?.calculation?.run_id && <Drawer title="Cash-flow detail" modal wide onClose={() => setDrawer(null)}>
-      <CashFlows runId={f.calculation.run_id} rate={v!.rate} horizonEnd={f.calculation.horizon_end} scenarioName={f.scenario?.full_scenario?.name} /></Drawer>}
-    {drawer === "news" && <NewsList allowedEventIds={[]} onClose={() => setDrawer(null)} onOpen={setArticle} onForecast={() => {}} />}
+      <CashFlows runId={f.calculation.run_id} rate={v!.rate} horizonEnd={f.calculation.horizon_end} scenarioName={f.scenario?.full_scenario?.name} granularity={granularity} onGranularity={setGranularity} /></Drawer>}
+    {drawer === "news" && <NewsList allowedEventIds={[]} onClose={() => setDrawer(null)} onOpen={setArticle} onForecast={() => {}}
+      isPinned={pins.isPinned} onTogglePin={pins.toggle} onLoaded={(all, complete) => { if (complete) pins.reconcile(all); }} />}
     {drawer === "brief" && <AssistantDrawer months={r.months} shocks={r.shocks} overrides={r.overrides} forecastInput={r.forecastInput} onClose={() => setDrawer(null)} onOpenArticle={setArticle} />}
     {drawer === "sources" && <SourcesDrawer onClose={() => setDrawer(null)} reload={r.load} />}
     {article && <ArticleDrawer id={article} allowedEventIds={[]} onClose={() => setArticle(null)} onTest={t => { setArticle(null); r.testScenario(t); }} onForecast={() => {}} />}
     {impactDetail && v && <NewsImpactDetail row={impactDetail} item={impacts.items[impactDetail.event_id]} color={colors[impactDetail.event_id]} r={r} v={v} baseline={paths?.baseline ?? []} reserve={paths?.reserve ?? null}
+      granularity={granularity} onGranularity={setGranularity}
       onClose={() => setImpactDetail(null)} onOpenArticle={setArticle} onApply={() => {}} />}
   </div>;
 }

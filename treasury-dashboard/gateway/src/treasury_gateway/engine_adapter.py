@@ -385,7 +385,10 @@ class EngineAdapter:
         return dashboard_profile(self.shared.profile)
 
     def default_as_of(self) -> date:
-        return default_as_of(self.store)
+        # The store's single SQLite connection is shared with engine runs on other threads; reading it while a run
+        # is in progress could come back empty ("no data loaded for ..."), so take the same lock the runs take.
+        with self.shared.lock:
+            return default_as_of(self.store)
 
     # ------------------------------------------------------------ RiskEngine interface
     def presets(self, as_of: date | None = None) -> list[dict]:
@@ -703,7 +706,9 @@ HEDGE_NOTE = ('Hypothetical hedge test · nothing is executed. Saving = change i
 def hedge_options(shared: _Shared) -> dict:
     from hlag_engine.modules.bunker.hedge import INSTRUMENTS, TARGETS
     ranges = load_scenario_ranges()
-    return {'module': 'bunker', 'as_of': default_as_of(shared.store).isoformat(),
+    with shared.lock:  # shared SQLite connection: read it under the same lock as engine runs
+        as_of = default_as_of(shared.store)
+    return {'module': 'bunker', 'as_of': as_of.isoformat(),
             'targets': [{'id': k, 'label': v} for k, v in TARGETS.items()],
             'instruments': [{'id': i.value, 'label': 'Swap' if i.value == 'swap' else 'Fixed-price supply contract',
                              'margin_calls': i.value == 'swap'} for i in INSTRUMENTS],

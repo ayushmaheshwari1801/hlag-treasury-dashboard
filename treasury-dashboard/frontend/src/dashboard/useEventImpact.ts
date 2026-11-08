@@ -12,7 +12,7 @@ import { eventScenarioCacheKey, eventScenarioRequest, savedEventForecast } from 
 /** queued: not processed yet; needs_model: no saved forecast and a model call needs an explicit click. */
 export type ImpactStatus = "queued" | "needs_model" | "forecasting" | "calculating" | "ready" | "no_inputs" | "error";
 export interface PathPoint { date: string; value: number }
-export interface EventImpact { eventId: string; status: ImpactStatus; forecast?: any; finance?: any; path?: PathPoint[] | null; error?: string }
+export interface EventImpact { eventId: string; status: ImpactStatus; forecast?: any; finance?: any; path?: PathPoint[] | null; flows?: any[] | null; error?: string }
 
 interface Options {
   eventIds: string[];
@@ -77,9 +77,14 @@ export function useEventImpact({ eventIds, asOf, horizonDays, months, newsRunId,
           publish(id, { status: "calculating", forecast });
           const result = await api.whatIf(months, {}, { forecast_id: forecast.forecast_id, scenario: forecast.scenario, as_of: forecast.as_of }, overrides, controller.signal);
           const finance = result.finance, runId = finance?.calculation?.run_id;
-          let path: PathPoint[] | null = null;
-          if (runId) path = await api.engineCashflows(runId).then(c => c.liquidity ? liquidityPath(c.liquidity.scenario_path, rate, horizonEnd) : null).catch(() => null);
-          publish(id, { status: "ready", finance, path });
+          let path: PathPoint[] | null = null, flows: any[] | null = null;
+          if (runId) {
+            // One read of the run's cash flows: its liquidity path and its cash lines by driver and day (for the timing table).
+            const c = await api.engineCashflows(runId).catch(() => null);
+            path = c?.liquidity ? liquidityPath(c.liquidity.scenario_path, rate, horizonEnd) : null;
+            flows = c?.by_driver_day ?? null;
+          }
+          publish(id, { status: "ready", finance, path, flows });
         } catch (e) {
           publish(id, { status: "error", error: errorText(e) });
         }

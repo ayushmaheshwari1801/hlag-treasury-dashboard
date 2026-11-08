@@ -2,6 +2,8 @@
 import argparse
 import hmac
 import os
+import threading
+from concurrent.futures import Future
 from datetime import date
 from pathlib import Path
 from typing import Annotated, Literal
@@ -18,7 +20,7 @@ from treasury_sensitivity.audit import AuditStore
 from treasury_sensitivity.models import StrictModel, ValidationProblem
 from treasury_sensitivity.service import SensitivityService
 
-from .assistant import Assistant, build_context, provider_config
+from .assistant import Assistant, build_context, cost_stage, provider_config
 from .integrations import registry
 from .news_v8 import NewsV8Reader
 from .market_data import create_router as market_router, read_snapshot
@@ -181,8 +183,8 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
 
     # ------------------------------------------------------------------ composite
     def page_scenario(day, shocks=None, scenario=None, forecast_id=None, overrides=None):
-        """The scenario the page shows: moved sliders on top of the preset or saved news forecast (observed weekly
-        moves when neither is selected), plus per-run overrides. Used by the dashboard and the hedge tool."""
+        """The scenario the page shows: moved sliders on top of the preset or saved news forecast (last week's moves
+        repeated when neither is selected), plus per-run overrides. Used by the dashboard and the hedge tool."""
         import sqlite3
         from .dashboard_adapter import slider_scenario
         from .forecast import ForecastAgent
@@ -325,10 +327,33 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
             app.state.recommendation_sessions = RecommendationSessions(intelligence)
         return app.state.recommendation_sessions
 
+    inflight: dict[str, Future] = {}
+    inflight_lock = threading.Lock()
+
     @app.post("/api/v1/recommendations/agent", dependencies=protected, tags=["recommendations"])
     def recommendation_agent(body: RecommendationAgentRequest):
         """Run the Treasury recommendation agent: pick news by publication window, build the news scenario, let the model
-        test hypothetical hedges with the engine (write=False) and judge their effect. Nothing is executed."""
+        test hypothetical hedges with the engine (write=False) and judge their effect. Nothing is executed.
+        Identical requests that arrive while one is running (several open pages preparing advice) share that run."""
+        key = body.model_dump_json()
+        with inflight_lock:
+            running = inflight.get(key)
+            if running is None:
+                inflight[key] = mine = Future()
+        if running is not None:
+            return running.result()
+        try:
+            result = run_recommendation_agent(body)
+            mine.set_result(result)
+            return result
+        except BaseException as exc:
+            mine.set_exception(exc)
+            raise
+        finally:
+            with inflight_lock:
+                inflight.pop(key, None)
+
+    def run_recommendation_agent(body: RecommendationAgentRequest):
         from .forecast import ForecastAgent, ForecastRequest
         adapter = spec_only()
         from .recommendation_agent import HedgeLab, RecommendationAgent, event_digest, select_events
@@ -340,6 +365,7 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
             raise HTTPException(422, "news_to must not be after as_of (no look-ahead)")
         forecaster = ForecastAgent(intelligence, news)
         notes = []
+        news_run_id = None  # the news pool this advice is based on; a newer pool makes the saved advice outdated
         if body.forecast_id:
             forecast = forecaster.get(body.forecast_id)
             if forecast is None:
@@ -350,12 +376,14 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
             if body.news_to and body.news_to > day:
                 raise HTTPException(422, "news_to must not be after as_of (no look-ahead)")
             payload = news.saved_run(forecast.get("source_run_id", ""))
+            news_run_id = (payload or {}).get("run_id")
             if payload is None:
                 raise HTTPException(409, "The saved forecast's news snapshot is unavailable")
             events, notes = select_events(payload, None, None,
                                           forecast.get("selected_event_ids") or forecast.get("event_ids") or [])
         else:
             payload, _ = news.cumulative()
+            news_run_id = (payload or {}).get("run_id")  # the same ID the dashboard reports as news.run_id
             events, notes = select_events(payload, body.news_from, body.news_to, body.event_ids)
             if not events:
                 raise HTTPException(422, "No v8 Events were published in the selected window. " + " ".join(notes))
@@ -364,12 +392,14 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
                             "label": "Selected dashboard scenario", "scenario": body.scenario}
             else:
                 try:
-                    forecast = forecaster.predict(ForecastRequest(event_ids=[e["event_id"] for e in events], as_of=day,
+                    with cost_stage("advice"):
+                        forecast = forecaster.predict(ForecastRequest(event_ids=[e["event_id"] for e in events], as_of=day,
                                                                   horizon_days=body.horizon_days, mode=body.forecast_mode))
                 except ValueError as exc:
                     raise HTTPException(422, str(exc)) from None
                 except RuntimeError as exc:
                     raise HTTPException(409, str(exc)) from None
+        # Advice on news: the baseline (today's prices) plus the news forecast and any included slider moves.
         params, _, _ = page_scenario(day, body.shocks, body.scenario, forecast["forecast_id"], body.overrides)
         adjustments = [a for a in intelligence.adjustments() if a['status'] == 'approved' and a['review_date'] > day.isoformat()]
         try:
@@ -387,7 +417,8 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
                                                                    "freight", "bunker", "rates", "fx", "direct")}}
         agent = RecommendationAgent(assistant.config, transport=assistant.transport)
         result = agent.run(lab, context, body.mode)
-        return sessions.save({**result, "as_of": day.isoformat(), "news_window": window,
+        return sessions.save({**result, "as_of": day.isoformat(), "news_window": window, "horizon_days": body.horizon_days, "news_run_id": news_run_id,
+                              "custom_inputs": bool(body.shocks or body.overrides or body.scenario is not None or body.forecast_id),
                               "event_ids": [e["event_id"] for e in events], "events": context["events"],
                               "forecast_id": forecast["forecast_id"], "forecast": context["forecast"],
                               "page_shocks": context["page_shocks"], "page_overrides": context["page_overrides"],
@@ -461,7 +492,9 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
 
         @app.get("/", include_in_schema=False)
         def index():
-            return FileResponse(fe / "index.html")
+            # Revalidate the page on every load: asset names change with each build, so a cached page would keep
+            # loading the previous build's styles and scripts.
+            return FileResponse(fe / "index.html", headers={"Cache-Control": "no-cache"})
     return app
 
 

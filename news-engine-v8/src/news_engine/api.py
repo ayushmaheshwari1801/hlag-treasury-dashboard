@@ -24,7 +24,7 @@ class RunRequest(StrictModel):
     articles: list[ArticleInput] | None = None
     workers: int = Field(default=4, strict=True, ge=1, le=8)
     max_queries: int = Field(default=7, strict=True, ge=1, le=12)
-    max_articles: int = Field(default=10, strict=True, ge=1)
+    max_articles: int = Field(default=30, strict=True, ge=1)
     analysis_batch_size: int = Field(default=3, strict=True, ge=1, le=4)
     analysis_workers: int = Field(default=2, strict=True, ge=1, le=8)
 

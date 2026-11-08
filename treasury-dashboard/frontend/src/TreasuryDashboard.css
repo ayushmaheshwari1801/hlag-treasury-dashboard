@@ -222,3 +222,22 @@
 .news-category .category-dot{background:var(--category-color)}
 
 .agent-bullets{padding-left:20px;margin:10px 0;line-height:1.75;font-size:14px;overflow-wrap:break-word}.agent-bullets li+li{margin-top:9px}.agent-bullets.a-text{white-space:normal}.rec-takeaways{font-size:13px;text-align:left}.ha-summary .agent-bullets{max-width:85ch}
+/* Treasury advice: one verdict first, actions next, detail on demand */
+.ha-advice{display:flex;flex-direction:column;gap:4px;border-radius:8px;padding:14px 16px;margin:10px 0 14px;border-left:4px solid var(--green);background:var(--greenbg)}
+.ha-advice b{font-size:16px;color:var(--navy);line-height:1.4}.ha-advice span{font-size:13.5px;color:var(--text)}
+.ha-advice.warn{border-left-color:var(--orange);background:var(--orangebg)}.ha-advice.bad{border-left-color:var(--red);background:var(--redbg)}
+.ha-h{font-size:13px;color:var(--navy);margin:0 0 8px}
+.ha-stale{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;background:var(--orangebg)}.ha-stale .primary{margin-top:0}
+.ha-settings .ha-controls{margin-top:8px}.ha-settings .ha-controls input{font:inherit;font-size:12.5px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text);width:9.5em}
+.hedge-agent>.hd .primary{margin-top:0;flex:none}
+.ha-rec .atitle .chip{white-space:nowrap}
+.rec-grid .action.ha-rec{grid-template-columns:minmax(0,1fr) 14px;align-items:start}.ha-rec>div{min-width:0}
+/* Total estimated impact: one full-width strip, headline left and supporting figures laid out flat */
+.total.total-wide{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:8px 32px;margin-top:0;padding:12px 16px}
+.total-wide .tmain .tl{font-size:12.5px;font-weight:700;color:var(--navy)}.total-wide .tmain .tv{line-height:1.1}
+.total-wide .tstat{display:flex;flex-direction:column;gap:2px;text-align:right;white-space:nowrap}.total-wide .tstat b{font-size:16px;color:var(--navy);font-variant-numeric:tabular-nums}
+@media(max-width:600px){.total.total-wide{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.total-wide .tmain{grid-column:1/-1}.total-wide .tstat{text-align:left}}
+/* Manually pinned News: chip on the tracker row (click to remove), toggle in See all */
+.pin-chip{margin-left:6px;cursor:pointer;color:var(--navy);border-color:var(--navy);background:var(--card)}.pin-chip:hover{background:var(--navy);color:#fff}
+.pin-btn.on{background:var(--blue);color:#fff}.tracker-event>.pin-btn{margin-left:18px}.tracker-event>.pin-btn+.testbtn{margin-left:6px}
+.dx-period .granularity{margin:0 0 8px}.dx-period .cf-table{margin:0 0 6px}

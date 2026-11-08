@@ -17,13 +17,13 @@ export default function WhatIf({ scenario, cashImpacts, shocks, preset, busy, on
         <button className="wi-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
           <h2 id="wi">What-if scenario</h2><span className="chev2">{open ? "▴" : "▾"}</span>
         </button>
-        {eventScenarios !== undefined ? <label className="event-scenario-select"><span>Scenario</span><select aria-label="Scenario" disabled={forecasting} value={forecastActive && selectedEventId ? selectedEventId : activePresetId ? presetOptionValue(activePresetId) : Object.keys(shocks).length || preset === "custom" ? "__manual__" : "__observed__"} onChange={e => onSelectEvent?.(e.target.value)}><option value="__observed__">Observed moves</option><option value="__manual__">Manual scenario</option>{(enginePresetGroups ?? []).map(group => <optgroup key={group.id} label={`Standard scenarios · ${group.label}`}>{group.presets.map(p => <option key={p.id} value={presetOptionValue(p.id)} title={p.description}>{p.name}</option>)}</optgroup>)}</select></label> : <div className="presets" role="group" aria-label="Preset scenarios">
+        {eventScenarios !== undefined ? <label className="event-scenario-select"><span>Scenario</span><select aria-label="Scenario" disabled={forecasting} value={forecastActive && selectedEventId ? selectedEventId : activePresetId ? presetOptionValue(activePresetId) : Object.keys(shocks).length || preset === "custom" ? "__manual__" : "__observed__"} onChange={e => onSelectEvent?.(e.target.value)}><option value="__observed__" title="Today's prices are already in the baseline; this scenario applies last week's market moves once more.">Last week's moves repeated</option><option value="__manual__">Manual scenario</option>{(enginePresetGroups ?? []).map(group => <optgroup key={group.id} label={`Standard scenarios · ${group.label}`}>{group.presets.map(p => <option key={p.id} value={presetOptionValue(p.id)} title={p.description}>{p.name}</option>)}</optgroup>)}</select></label> : <div className="presets" role="group" aria-label="Preset scenarios">
           {scenario.presets.map((p: any) => (
             <button key={p.id} className={`preset ${preset === p.id ? "on" : ""}`} title={p.description} onClick={() => onPreset(p)}>{p.label}</button>))}
         </div>}
         <div className="wi-status">
           {forecasting && <span className="muted small">Preparing Event scenario…</span>}
-          {busy ? <span className="muted small">Recalculating{"…"}</span> : custom ? <span className="chip warn">SCENARIO</span> : <span className="chip">Observed moves</span>}
+          {busy ? <span className="muted small">Recalculating{"…"}</span> : custom ? <span className="chip warn">SCENARIO</span> : <span className="chip" title="Today's prices are already in the baseline; this scenario applies last week's market moves once more.">Last week's moves repeated</span>}
           {custom && <button className="link small" onClick={onReset}>Reset</button>}
         </div>
       </div>

@@ -313,7 +313,7 @@ def main():
     parser.add_argument('--database',type=Path,default=Path('data/news-mvp-v8-issue-identity-v2.sqlite'))
     parser.add_argument('--output',type=Path)
     parser.add_argument('--max-queries',type=int,default=7)
-    parser.add_argument('--max-articles',type=int,default=10,help='Maximum new/resumed Articles per run (default: 10)')
+    parser.add_argument('--max-articles',type=int,default=30,help='Maximum new/resumed Articles per run (default: 30)')
     parser.add_argument('--geography',action='append')
     parser.add_argument('--workers',type=int,default=4)
     parser.add_argument('--analysis-batch-size',type=int,choices=range(1,5),default=3)

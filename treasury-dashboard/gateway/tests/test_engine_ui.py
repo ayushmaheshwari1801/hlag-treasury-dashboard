@@ -256,6 +256,13 @@ def test_collection_delay_slider_moves_cash_to_later_periods(client):
     rows = client.get(f"/api/v1/engine/runs/{fin['calculation']['run_id']}/cashflows").json()['by_driver_month']
     assert any(r['driver'] == 'freight' and r['delta_usd_m'] < -1 for r in rows)
     assert client.post('/api/v1/dashboard', json={'shocks': {'collection_delay': 61}}).status_code in (400, 422)
+    # daily rows (for daily/weekly/monthly columns) add up exactly to the monthly rows
+    flows = client.get(f"/api/v1/engine/runs/{fin['calculation']['run_id']}/cashflows").json()
+    by_month = {}
+    for d in flows['by_driver_day']:
+        key = (d['driver'], d['date'][:7])
+        by_month[key] = by_month.get(key, 0.) + d['delta_usd_m']
+    assert by_month and all(abs(by_month[(r['driver'], r['month'])] - r['delta_usd_m']) < 1e-6 for r in rows)
 
 
 def test_direct_cash_flow_reaches_path_totals_and_its_own_bar(client):

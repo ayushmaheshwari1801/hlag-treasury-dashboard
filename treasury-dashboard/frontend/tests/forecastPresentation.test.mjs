@@ -48,3 +48,17 @@ test("forecast preserves human values and hides internal identifiers", () => {
   assert.match(html, /210/);
   assert.deepEqual(forecast.predictions[0].event_ids, ["E_PRIVATE_INTERNAL_HASH"]);
 });
+
+test("quantified forecasts explain why the inputs were chosen in one short line", async () => {
+  const { forecastWhy, ForecastSummary } = await import(summary);
+  const preds = [
+    { param_key: "freight.volume_shock_pct.ASIA_AMERICA", change: 3, unit: "pct", effective_date: "2026-11-08", rationale: "Assumed +3% Asia-America volume as new standalone services add capacity" },
+    { param_key: "freight.rate_shock_pct.ASIA_AMERICA", change: -2, unit: "pct", effective_date: "2026-11-08", rationale: "Assumed -2% Asia-America rates from incremental capacity on the corridor." },
+  ];
+  assert.equal(forecastWhy(preds), "Assumed +3% Asia-America volume as new standalone services add capacity. Assumed -2% Asia-America rates from incremental capacity on the corridor.");
+  assert.equal(forecastWhy([{ rationale: "One. ".repeat(50) }, { rationale: "Two." }], 45).includes("Two"), false);  // stays one short line
+  assert.equal(forecastWhy([{}]), "");
+  const html = renderToStaticMarkup(React.createElement(ForecastSummary, { forecast: { predictions: preds } }));
+  assert.ok(html.indexOf("Why: Assumed +3%") > 0 && html.indexOf("Why:") < html.indexOf("Action:"));
+  assert.equal(renderToStaticMarkup(React.createElement(ForecastSummary, { forecast: { predictions: [{ ...preds[0], rationale: "" }] } })).includes("Why:"), false);
+});

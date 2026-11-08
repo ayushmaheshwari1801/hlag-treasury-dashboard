@@ -19,10 +19,10 @@ export function savedEventForecast(list: any[], eventId: string, asOf: string, h
 export const EVENT_CATEGORIES = ["regulatory", "macroeconomics", "industry"];
 
 export const NEWS_CATEGORY_LABEL: Record<string, string> = {regulatory: "Regulatory", macroeconomics: "Macro", industry: "Industry", other: "Other"};
-export function groupNewsCategories<T extends {category?: string; score?: number | null; published_at?: string; title: string}>(rows: T[]) {
+export function groupNewsCategories<T extends {category?: string; score?: number | null; published_at?: string; title: string; pinned?: boolean}>(rows: T[]) {
   return [...EVENT_CATEGORIES, "other"].map(category => ({category, label: NEWS_CATEGORY_LABEL[category],
     rows: rows.filter(row => (EVENT_CATEGORIES.includes(row.category ?? "") ? row.category : "other") === category)
-      .sort((a,b) => (b.score ?? -1) - (a.score ?? -1) || (b.published_at ?? "").localeCompare(a.published_at ?? "") || a.title.localeCompare(b.title))
+      .sort((a,b) => Number(!!b.pinned) - Number(!!a.pinned) || (b.score ?? -1) - (a.score ?? -1) || (b.published_at ?? "").localeCompare(a.published_at ?? "") || a.title.localeCompare(b.title))
   })).filter(group => group.category !== "other" || group.rows.length);
 }
 

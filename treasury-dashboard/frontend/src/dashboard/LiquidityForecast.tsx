@@ -3,7 +3,8 @@
 // point is a saved run's liquidity path (cash + undrawn credit lines), converted to EUR at the analysis-date exchange rate for display.
 import { useEffect, useState, type MouseEvent } from "react";
 import { api } from "../api";
-import { RunStatus } from "../EnginePanels";
+import { GranularityToggle, RunStatus } from "../EnginePanels";
+import { monthlyOnlyFrom, resamplePath, type Granularity } from "../engineUi";
 import { eur, num, when } from "../format";
 import { liquidityPath, type PathPoint } from "./useEventImpact";
 import type { MarketRisk } from "./useMarketRisk";
@@ -29,19 +30,24 @@ export function useRunPaths(runId: string | undefined, rate: number | undefined,
   return state;
 }
 
-export function LiquidityForecastCard({ r, v, paths, selectedLabel, lines, onOpenDetail, onOpenLine }:
-  { r: MarketRisk; v: RiskView; paths: ReturnType<typeof useRunPaths>; selectedLabel: string; lines: LiquidityLine[]; onOpenDetail: () => void; onOpenLine: (id: string) => void }) {
+export function LiquidityForecastCard({ r, v, paths, selectedLabel, lines, onOpenDetail, onOpenLine, granularity = "daily", onGranularity }:
+  { r: MarketRisk; v: RiskView; paths: ReturnType<typeof useRunPaths>; selectedLabel: string; lines: LiquidityLine[]; onOpenDetail: () => void; onOpenLine: (id: string) => void; granularity?: Granularity; onGranularity?: (g: Granularity) => void }) {
   const f = v.f, calc = f.calculation;
   const ready = paths && paths.baseline.length > 1;
+  // Liquidity is a balance: each period shows its closing value. Every line is resampled the same way so dates align.
+  const rs = <T extends { date: string }>(pts: T[]) => resamplePath(pts, granularity);
+  const coarseFrom = ready && granularity !== "monthly" ? monthlyOnlyFrom(paths!.baseline) : null;
   return <section className="card liquidity-forecast" aria-labelledby="lf-title">
     <div className="hd"><div><h2 id="lf-title">Liquidity Forecast</h2>
       <p className="sub">Baseline, the selected scenario and each News Event on its own · {when(f.as_of, false)} to {when(calc?.horizon_end, false)} · EUR million</p></div>
-      {calc?.run_id && <div className="lf-actions"><button className="preset" onClick={onOpenDetail}>Cash-flow detail</button></div>}</div>
+      <div className="lf-actions">{onGranularity && <GranularityToggle value={granularity} onChange={onGranularity} />}
+        {calc?.run_id && <button className="preset" onClick={onOpenDetail}>Cash-flow detail</button>}</div></div>
     <RunStatus calc={calc} rate={v.rate} months={r.months} rows={v.ci.rows} />
     {!paths && calc?.run_id && <p className="muted small" role="status">Loading the liquidity path…</p>}
     {paths && !ready && <p className="lf-note small">The liquidity forecast is unavailable for this assessment. The figures on the rest of the page still apply.</p>}
-    {ready && <LiquidityLinesChart baseline={paths!.baseline} reserve={paths!.reserve} lines={[{ id: "__selected__", label: `Selected scenario · ${selectedLabel}`, color: "var(--navy)", points: paths!.scenario, dashed: true }, ...lines]}
+    {ready && <LiquidityLinesChart baseline={rs(paths!.baseline)} reserve={paths!.reserve} lines={[{ id: "__selected__", label: `Selected scenario · ${selectedLabel}`, color: "var(--navy)", points: rs(paths!.scenario), dashed: true }, ...lines.map(l => ({ ...l, points: rs(l.points) }))]}
       onOpenLine={id => (id === "__selected__" ? onOpenDetail() : onOpenLine(id))} onSelect={onOpenDetail} />}
+    {coarseFrom && <p className="lf-note small">{granularity === "daily" ? "Daily" : "Weekly"} detail runs to {when(coarseFrom, false)}; after that the forecast has month-end points only.</p>}
     <p className="foot">Liquidity = cash + undrawn credit lines (+ special fund when counted); the gap to the reserve line is headroom. Original amounts are in USD, shown in EUR at the analysis-date exchange rate (USD {v.rate} per EUR). News Event lines are separate what-if runs and do not add up.</p>
   </section>;
 }

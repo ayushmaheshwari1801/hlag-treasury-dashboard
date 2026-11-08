@@ -49,6 +49,9 @@ def test_grade_rules():
     assert grade_effect(30, 100, None, None, ok)[0] == 'material'
     assert grade_effect(10, 100, None, None, ok)[0] == 'marginal'
     assert grade_effect(0, 100, None, None, ok)[0] == 'no_effect'
+    # A shortfall the scenario causes on its own is not the hedge's fault when the hedge posts no margin.
+    assert grade_effect(0, 100, '2027-02-28', '2027-02-28', {'passed': False, 'hedge_posts_margin': False})[0] == 'no_effect'
+    assert grade_effect(0, 100, None, None, {'passed': False, 'hedge_posts_margin': True})[0] == 'counterproductive'
 
 
 # ---------------------------------------------------------------- engine tools
@@ -269,6 +272,9 @@ def test_api_session_is_saved_and_has_no_look_ahead(client):
     assert s['diagnosis']['adverse_modules'] == ['bunker'] and s['candidates']
     assert c.get(f"/api/v1/recommendations/agent/{s['session_id']}").json()['recommendations'] == s['recommendations']
     assert c.get('/api/v1/recommendations/agent').json()['sessions'][0]['session_id'] == s['session_id']
+    assert s['news_run_id'] and c.get('/api/v1/recommendations/agent').json()['sessions'][0]['news_run_id'] == s['news_run_id']
+    # the page reuses saved advice only when this equals the dashboard's news.run_id
+    assert s['news_run_id'] == c.post('/api/v1/dashboard', json={}).json()['news']['run_id']
     with sqlite3.connect(state) as db:
         assert db.execute("SELECT COUNT(*) FROM intelligence_audit WHERE action='recommendation_session'").fetchone()[0] == 1
 
@@ -379,3 +385,57 @@ def test_fully_hedged_operating_costs_are_not_ranked_as_residual_losses(adapter)
     assert not any(r['line_code'] == 'FX_OPERATING_COST' for r in result['largest_adverse_lines'])
     assert any(r['line_code'] == 'DIVIDEND' for r in result['largest_adverse_lines'])
     assert 'Residual cash' in result['cash_basis']
+
+
+@spec
+def test_consumption_only_fuel_scenario_does_not_test_price_hedges(adapter):
+    from treasury_gateway.recommendation_agent import HedgeLab, RecommendationAgent, ToolError
+    scenario = {'bunker': {'consumption_uplift_pct': .2}, 'name': 'More fuel burn', 'start_date': AS_OF.isoformat()}
+    lab = HedgeLab(adapter, AS_OF, scenario, max_runs=20)
+    assert lab.diagnose()['bunker_driver'] == 'consumption'
+    with pytest.raises(ToolError, match='consumption'):
+        lab.test_hedge('bunker', 'swap', 'fuel_all', 25, 12)
+    assert lab.runs_used == 2  # only the shared base pair
+    out = RecommendationAgent(None).run(HedgeLab(adapter, AS_OF, scenario, max_runs=20), {'events': []})
+    assert not [c for c in out['candidates'] if c['module'] == 'bunker']
+    assert any(r['kind'] == 'operations' for r in out['recommendations'])
+    assert HedgeLab(adapter, AS_OF, FUEL_UP).bunker_driver() == 'price'
+
+
+@spec
+def test_identical_requests_in_flight_share_one_run(client, monkeypatch):
+    """Two open pages preparing the same advice must not start two paid runs."""
+    import threading, time
+    from treasury_gateway import recommendation_agent as ra
+    calls, original = [], ra.RecommendationAgent.run
+    def slow_run(self, *args, **kwargs):
+        calls.append(1)
+        time.sleep(1.5)
+        return original(self, *args, **kwargs)
+    monkeypatch.setattr(ra.RecommendationAgent, 'run', slow_run)
+    c, _ = client
+    body = {'news_from': '2026-10-25', 'news_to': '2026-10-31', 'as_of': '2026-11-03'}
+    out = []
+    threads = [threading.Thread(target=lambda: out.append(c.post('/api/v1/recommendations/agent', json=body).json())) for _ in range(2)]
+    for t in threads:
+        t.start(); time.sleep(0.2)
+    for t in threads:
+        t.join()
+    assert len(calls) == 1
+    assert out[0]['session_id'] == out[1]['session_id']
+    assert len(c.get('/api/v1/recommendations/agent').json()['sessions']) == 1
+
+
+@spec
+def test_tracker_events_request_uses_exactly_those_events(client):
+    """The advice card sends the News Tracker Events (top six plus pins) without a start date."""
+    c, _ = client
+    window = c.post('/api/v1/recommendations/agent', json={'news_from': '2026-10-25', 'news_to': '2026-10-31', 'as_of': '2026-11-03'})
+    assert window.status_code == 200, window.text
+    chosen = window.json()['event_ids'][:1]
+    r = c.post('/api/v1/recommendations/agent', json={'news_to': '2026-11-03', 'as_of': '2026-11-03', 'event_ids': chosen})
+    assert r.status_code == 200, r.text
+    s = r.json()
+    assert s['event_ids'] == chosen and s['news_window'] == {'from': None, 'to': '2026-11-03'}
+    listed = c.get('/api/v1/recommendations/agent').json()['sessions'][0]
+    assert listed['event_ids'] == chosen and listed['news_run_id'] == s['news_run_id']

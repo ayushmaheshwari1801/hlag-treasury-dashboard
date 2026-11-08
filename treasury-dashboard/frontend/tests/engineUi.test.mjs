@@ -124,3 +124,26 @@ test("desk exceptions read in plain language, EUR with USD in the tooltip", () =
   assert.match(m.headroomAtRiskTip(6, "2027-05-31"), /within the selected horizon \(next 6 months, to 31 May 2027\) ÷ the cash cushion/);
   assert.deepEqual(m.eurWithUsd(null, 1.1216), { text: "—", tip: "" });
 });
+
+test("daily, weekly and monthly periods: flows are summed, balances keep each period's closing value", () => {
+  assert.equal(m.periodKey("2026-11-11", "weekly"), "2026-11-09");          // Monday of that week
+  assert.equal(m.periodKey("2026-11-09", "weekly"), "2026-11-09");
+  assert.equal(m.periodKey("2026-11-15", "weekly"), "2026-11-09");          // Sunday stays in the same week
+  assert.equal(m.periodKey("2026-11-11", "monthly"), "2026-11");
+  assert.equal(m.periodLabel("2026-11-09", "weekly"), "Wk 9 Nov");
+  assert.equal(m.periodLabel("2026-11", "monthly"), "2026-11");
+  const days = [{ driver: "freight", date: "2026-11-10", delta_usd_m: -11 }, { driver: "freight", date: "2026-11-12", delta_usd_m: -11 },
+                { driver: "freight", date: "2026-11-17", delta_usd_m: 22 }, { driver: "bunker", date: "2027-01-05", delta_usd_m: 5.5 }];
+  const wk = m.pivotCashflowsBy(days, "delta_usd_m", 1.1, "weekly", "2026-12-31");
+  assert.deepEqual(wk.months.slice(0, 3), ["2026-11-09", "2026-11-16", "2026-11-23"]);   // every week, no gaps
+  assert.equal(wk.months[wk.months.length - 1], "2026-12-28");               // to the horizon; January is past it
+  assert.equal(wk.cells.freight["2026-11-23"], undefined);                    // an empty week stays blank
+  assert.equal(wk.cells.freight["2026-11-09"], -20);
+  assert.equal(m.pivotCashflowsBy(days, "delta_usd_m", 1.1, "daily").months.length, 4);
+  assert.deepEqual(m.pivotCashflowsBy(days, "delta_usd_m", 1, "monthly").months, ["2026-11", "2026-12", "2027-01"]);
+  const path = ["2026-11-08", "2026-11-09", "2026-11-10", "2026-11-16", "2026-12-31", "2027-01-31"].map((date, i) => ({ date, value: i }));
+  assert.deepEqual(m.resamplePath(path, "monthly").map(p => p.date), ["2026-11-08", "2026-11-16", "2026-12-31", "2027-01-31"]);
+  assert.deepEqual(m.resamplePath(path, "weekly").map(p => p.date), ["2026-11-08", "2026-11-10", "2026-11-16", "2026-12-31", "2027-01-31"]);
+  assert.equal(m.resamplePath(path, "daily"), path);
+  assert.equal(m.monthlyOnlyFrom(path), "2026-11-16");
+});
