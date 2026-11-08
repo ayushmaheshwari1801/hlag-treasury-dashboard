@@ -83,16 +83,16 @@ function DirectCashRow({ d, maxAbs }: { d: any; maxAbs: number }) {
 
 function ImpactTotal({ v }: { v: RiskView }) {
   const ci = v.ci;
-  return <div className="total" data-tip={ci.note}>
-    <div><div className="tl">Total Estimated Impact</div><div className="tv">{num(ci.adverse_total_eur_m, 1)}</div><small>EUR million, adverse rows</small></div>
-    <div className="tnet"><small>Net of favourable</small><div>{eur(ci.net_eur_m)}</div>
-      <small>{ci.overlap_adjustment_eur_m ? `incl. surcharge overlap ${eur(ci.overlap_adjustment_eur_m)}` : ""}</small>
-      <small>{pctOfHeadroom(ci.adverse_pct_of_headroom)}</small></div>
+  return <div className="total total-wide" data-tip={ci.note}>
+    <div className="tmain"><div className="tl">Total Estimated Impact</div><div><span className="tv">{num(ci.adverse_total_eur_m, 1)}</span> <small>EUR million, adverse rows</small></div></div>
+    <div className="tstat"><small>Net of favourable</small><b>{eur(ci.net_eur_m)}</b></div>
+    {ci.adverse_pct_of_headroom != null && <div className="tstat"><small>Headroom at risk</small><b>{pctOfHeadroom(ci.adverse_pct_of_headroom).replace(" of headroom", "")}</b></div>}
+    {ci.overlap_adjustment_eur_m ? <div className="tstat"><small>Includes surcharge overlap</small><b>{eur(ci.overlap_adjustment_eur_m)}</b></div> : null}
   </div>;
 }
 
 /** Market metrics and their estimated cash-flow impact on one aligned row each; every cell opens the metric's
- *  explanation with its model assumptions. Drivers without a market metric (e.g. CAD) follow below. */
+ *  explanation with its model assumptions. Drivers without a market metric follow below. */
 export function MarketImpactCard({ r, v, onDetails, onCashDetails, rowTitle }: { r: MarketRisk; v: RiskView; onDetails: (id: string) => void; onCashDetails: (id: string) => void; rowTitle?: string }) {
   const { f, ci } = v, months = r.months;
   const direct = ci.direct?.flows?.length ? ci.direct : null;
@@ -116,7 +116,7 @@ export function MarketImpactCard({ r, v, onDetails, onCashDetails, rowTitle }: {
         <ImpactCell x={x} r={r} v={v} maxAbs={maxAbs} onDetails={onCashDetails} rowTitle={rowTitle} /></div>)}
       {direct && <DirectCashRow d={direct} maxAbs={maxAbs} />}
     </div>
-    <div className="mi-row mi-total"><span /><ImpactTotal v={v} /></div>
+    <div className="mi-total"><ImpactTotal v={v} /></div>
     <p className="foot">Click a metric for its explanation and the model assumptions behind it; click a cash-flow row for original-currency amounts, supporting assumptions and missing information.</p>
   </section>;
 }

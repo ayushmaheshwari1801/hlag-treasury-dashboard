@@ -167,6 +167,65 @@ export function pivotCashflows(rows: any[], field: string, rate: number, horizon
   return { months, drivers, cells, monthTotals, driverTotals, total };
 }
 
+// ---------------------------------------------------------------- daily / weekly / monthly views
+export type Granularity = "daily" | "weekly" | "monthly";
+export const GRANULARITIES: [Granularity, string][] = [["daily", "Daily"], ["weekly", "Weekly"], ["monthly", "Monthly"]];
+
+/** Period a date belongs to: the day, the Monday of its week, or its month (YYYY-MM). */
+export function periodKey(date: string, g: Granularity): string {
+  const day = date.slice(0, 10);
+  if (g === "monthly") return day.slice(0, 7);
+  if (g === "daily") return day;
+  const t = new Date(`${day}T00:00:00Z`);
+  t.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7));
+  return t.toISOString().slice(0, 10);
+}
+
+/** Column heading for a period key: "9 Nov", "Wk 9 Nov" or the month as before. */
+export function periodLabel(key: string, g: Granularity): string {
+  if (g === "monthly") return key;
+  const t = new Date(`${key}T00:00:00Z`);
+  const d = t.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  return g === "weekly" ? `Wk ${d}` : d;
+}
+
+/** Cash flows (amounts) summed per driver and period from the per-day rows, within the horizon, in EUR. */
+export function pivotCashflowsBy(dayRows: any[], field: string, rate: number, g: Granularity, horizonEnd?: string) {
+  const rows = (dayRows ?? []).filter(r => !horizonEnd || r.date <= horizonEnd.slice(0, 10))
+    .map(r => ({ ...r, month: periodKey(r.date, g) }));
+  const p = pivotCashflows(rows, field, rate);
+  // Weekly and monthly columns run without gaps, so a missing column never hides an empty period. Daily lists only
+  // days with cash flows (six months of days would be mostly empty columns).
+  if (g !== "daily" && rows.length) {
+    const first = rows.reduce((a, r) => (r.date < a ? r.date : a), rows[0].date);
+    const last = horizonEnd ? horizonEnd.slice(0, 10) : rows.reduce((a, r) => (r.date > a ? r.date : a), rows[0].date);
+    const all: string[] = [];
+    for (let t = new Date(`${periodKey(first, "daily")}T00:00:00Z`); t.toISOString().slice(0, 10) <= last; t.setUTCDate(t.getUTCDate() + 1)) {
+      const k = periodKey(t.toISOString(), g);
+      if (all[all.length - 1] !== k) all.push(k);
+    }
+    p.months = [...new Set([...all, ...p.months])].sort();
+  }
+  return p;
+}
+
+/** Liquidity (a balance) per period: the last point of each period, after the first point (T0). */
+export function resamplePath<T extends { date: string }>(points: T[], g: Granularity): T[] {
+  if (g === "daily" || points.length < 2) return points;
+  const last = new Map<string, T>();
+  for (const p of points.slice(1)) last.set(periodKey(p.date, g), p);
+  return [points[0], ...last.values()];
+}
+
+/** First date after which the path has only month-end points (the engine is daily for the first 91 days). */
+export function monthlyOnlyFrom(points: { date: string }[]): string | null {
+  for (let i = 1; i < points.length; i++) {
+    const gap = (Date.parse(points[i].date) - Date.parse(points[i - 1].date)) / 86_400_000;
+    if (gap > 7) return points[i - 1].date;
+  }
+  return null;
+}
+
 /** Market series grouped for the card grid. */
 export function groupSeries(series: any[]) {
   const group = (id: string) => id.startsWith("FX_") ? "FX" : id.startsWith("WCI_") ? "Freight" : /^(VLSFO|HSFO|BRENT)/.test(id) ? "Fuel and oil" : "Rates and credit";

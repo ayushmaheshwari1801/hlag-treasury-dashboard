@@ -19,7 +19,7 @@ from treasury_sensitivity.audit import AuditStore
 from treasury_sensitivity.models import StrictModel, ValidationProblem
 from treasury_sensitivity.service import SensitivityService
 
-from .assistant import Assistant, build_context, provider_config
+from .assistant import Assistant, build_context, cost_stage, provider_config
 from .integrations import registry
 from .news_v8 import NewsV8Reader
 from .market_data import create_router as market_router, read_snapshot
@@ -201,8 +201,8 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
 
     # ------------------------------------------------------------------ composite
     def page_scenario(day, shocks=None, scenario=None, forecast_id=None, overrides=None):
-        """The scenario the page shows: moved sliders on top of the preset or saved news forecast (observed weekly
-        moves when neither is selected), plus per-run overrides. Used by the dashboard and the hedge tool."""
+        """The scenario the page shows: moved sliders on top of the preset or saved news forecast (last week's moves
+        repeated when neither is selected), plus per-run overrides. Used by the dashboard and the hedge tool."""
         import sqlite3
         from .dashboard_adapter import slider_scenario
         from .forecast import ForecastAgent
@@ -686,7 +686,9 @@ def create_app(*, service: SensitivityService | None = None, news_dir: Path | st
 
         @app.get("/", include_in_schema=False)
         def index():
-            return FileResponse(fe / "index.html")
+            # Revalidate the page on every load: asset names change with each build, so a cached page would keep
+            # loading the previous build's styles and scripts.
+            return FileResponse(fe / "index.html", headers={"Cache-Control": "no-cache"})
     return app
 
 

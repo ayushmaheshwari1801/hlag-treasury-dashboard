@@ -11,13 +11,13 @@ export const STEPS = [
   { id: "signals", label: "Market · News · Impact · Actions" },
 ] as const;
 
-/** Name of the scenario the page is showing: the applied News forecast, engine preset, manual sliders or observed moves. */
+/** Name of the scenario the page is showing: the applied News forecast, engine preset, manual sliders or last week's moves repeated. */
 export function scenarioLabel(r: MarketRisk) {
   // Sliders moved on top of a News forecast or preset override those drivers only (see the What-if note).
   const adjusted = Object.keys(r.shocks).length ? " · sliders adjusted" : "";
   if (r.forecastActive && r.forecast) return (r.forecast.scenario?.name ?? "News Event scenario") + adjusted;
   if (r.activePreset) return (r.activePreset.name ?? "Engine preset") + adjusted;
-  return adjusted ? "Manual scenario" : "Observed moves";
+  return adjusted ? "Manual scenario" : "Last week's moves repeated";
 }
 
 export function ContextBar({ r, v, onSources }: { r: MarketRisk; v: RiskView | null; onSources: () => void }) {

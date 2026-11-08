@@ -6,6 +6,7 @@ export const METRIC_EXPLAIN: Record<string, string> = {
   fx_eur: "Converts EUR-denominated operating costs, debt service and dividends into USD after hedging; a weaker EUR lowers the USD cost of EUR payments.",
   fx_gbp: "Translates GBP cash flows into USD. The model has no material GBP cash exposure, so the effect is mainly balance-sheet revaluation.",
   fx_cny: "Translates CNY-invoiced freight receipts (mainly Asia–America) into USD.",
+  fx_cad: "Converts weekly CAD operating costs into USD after the rolling CAD forward programme; a stronger CAD raises the USD cost of the unhedged share.",
   interest: "Reprices floating-rate debt and interest-bearing cash; higher rates raise net interest paid after the fixed-rate share.",
   bunker: "Sets the cost of fuel purchases, paid after a supplier lag and partly recovered later through the Marine Fuel Recovery surcharge.",
   freight: "Moves realised freight revenue through spot and contract repricing (pass-through and lags), then collected after the receivables lag.",
@@ -13,9 +14,10 @@ export const METRIC_EXPLAIN: Record<string, string> = {
 
 /** Which engine parameters belong to each metric. */
 const GROUPS: Record<string, { match: (key: string) => boolean; title: string }> = {
-  fx_eur: { title: "EUR exposure and hedging", match: k => k.startsWith("fx.") || /^freight\.non_usd_share\.(ASIA_EUROPE|EUROPE_AMERICA|AFRICA_INTRA)$/.test(k) },
+  fx_eur: { title: "EUR exposure and hedging", match: k => (k.startsWith("fx.") && !/cad/.test(k)) || /^freight\.non_usd_share\.(ASIA_EUROPE|EUROPE_AMERICA|AFRICA_INTRA)$/.test(k) },
   fx_gbp: { title: "GBP exposure", match: () => false },
   fx_cny: { title: "CNY exposure", match: k => k === "freight.non_usd_share.ASIA_AMERICA" },
+  fx_cad: { title: "CAD costs and forward programme", match: k => k.startsWith("fx.") && /cad/.test(k) },
   interest: { title: "Debt, deposits and spreads", match: k => k.startsWith("rates.") },
   bunker: { title: "Fuel purchasing and surcharge recovery", match: k => k.startsWith("bunker.") },
   freight: { title: "Contracts, pass-through and collection", match: k => k.startsWith("freight.") && !k.startsWith("freight.non_usd_share.") },

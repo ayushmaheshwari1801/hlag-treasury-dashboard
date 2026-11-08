@@ -26,3 +26,8 @@ test('agent rendering is a safe list and empty answers explain gaps',()=>{
 test('initials and abbreviations remain intact while clauses become short bullets',()=>{
  assert.deepEqual(agentPoints('C.H. Robinson reports softer rates; Review collections. U.S. demand is uncertain.'), ['C.H. Robinson reports softer rates','Review collections.','U.S. demand is uncertain.']);
 });
+
+test('clauses split at a semicolon start as their own capitalised bullet', () => {
+ assert.deepEqual(agentPoints('Fuel cost rises with consumption; more tonnes on longer routings raise cash cost.'),
+  ['Fuel cost rises with consumption', 'More tonnes on longer routings raise cash cost.']);
+});

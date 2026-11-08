@@ -8,14 +8,15 @@ import { eur, MODULE_NAME, num, ROW_LABEL, shockText, when } from "../format";
 import { riskStatus } from "../Insights";
 import { groupNewsCategories } from "../eventScenario";
 import NewsRefreshProgress from "../NewsRefreshProgress";
-import { pctOfHeadroom } from "../engineUi";
+import { pctOfHeadroom, type Granularity } from "../engineUi";
+import { PeriodImpactTable } from "../EnginePanels";
 import { inputChange, inputLabel } from "./metricAssumptions";
 import { LiquidityLinesChart } from "./LiquidityForecast";
 import { type RiskView } from "./MarketCards";
 import type { EventImpact, EventImpacts, PathPoint } from "./useEventImpact";
 import type { MarketRisk } from "./useMarketRisk";
 
-export interface NewsRow { id: string; event_id: string; title: string; published_at?: string; source?: string; category?: string; score?: number | null; article_ids: string[]; modules: string[]; scenario_tests?: any[] }
+export interface NewsRow { id: string; event_id: string; title: string; published_at?: string; source?: string; category?: string; score?: number | null; article_ids: string[]; modules: string[]; scenario_tests?: any[]; pinned?: boolean }
 
 const keyAct = (fn: () => void) => (e: KeyboardEvent) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); } };
 const tone = (v: number | null | undefined) => (v == null ? "" : v < -0.05 ? "neg" : v > 0.05 ? "pos" : "");
@@ -23,8 +24,8 @@ const inputsText = (forecast: any) => (forecast?.predictions ?? []).map((p: any)
 const noInputsText = (_forecast: any) => "Monitor · cash impact not quantified";
 
 /** One row per News Event: the News on the left, its own cash impact on the right, always at the same height. */
-export function NewsImpactCard({ rows, r, impacts, colors, onOpenNews, onOpenImpact, onSeeAll }:
-  { rows: NewsRow[]; r: MarketRisk; impacts: EventImpacts; colors: Record<string, string>; onOpenNews: (row: NewsRow) => void; onOpenImpact: (row: NewsRow) => void; onSeeAll: () => void }) {
+export function NewsImpactCard({ rows, r, impacts, colors, onOpenNews, onOpenImpact, onSeeAll, onUnpin }:
+  { rows: NewsRow[]; r: MarketRisk; impacts: EventImpacts; colors: Record<string, string>; onOpenNews: (row: NewsRow) => void; onOpenImpact: (row: NewsRow) => void; onSeeAll: () => void; onUnpin?: (eventId: string) => void }) {
   const { data, collecting, collectionStatus, collectionMessage } = r;
   const running = collecting || collectionStatus?.running;
   return <section className="card news-impact" aria-labelledby="ni-news ni-impact">
@@ -32,7 +33,7 @@ export function NewsImpactCard({ rows, r, impacts, colors, onOpenNews, onOpenImp
       <div><div className="hd"><h2 id="ni-news">News Tracker</h2><div className="news-tools">
         <button className="link" disabled={running} onClick={r.collectNews} title="Fetch and review the latest news">{running ? "Collecting…" : "Refresh news"}</button>
         <button className="link" onClick={onSeeAll}>See all</button></div></div>
-        <p className="sub">Top Events per category · click a row for its evidence</p>
+        <p className="sub">Top Events per category · pin more from See all · click a row for its evidence</p>
         <div className="colhead"><span>NEWS EVENT · SOURCE · PRIORITY</span></div></div>
       <div><div className="hd"><h2 id="ni-impact">Event impact on cash</h2></div><p className="sub">If only this News happened · next {r.months} months (EUR million)</p>
         {impacts.failed > 0 && <button className="link" disabled={impacts.running} onClick={impacts.retry}>Retry unavailable estimates ({impacts.failed})</button>}
@@ -47,7 +48,7 @@ export function NewsImpactCard({ rows, r, impacts, colors, onOpenNews, onOpenImp
       return <div className="ni-row" key={row.event_id}>
         <div className="ni-news news" role="button" tabIndex={0} onClick={() => onOpenNews(row)} onKeyDown={keyAct(() => onOpenNews(row))} aria-label={`Open ${row.title}`}>
           <i className="dot category-dot" title={group.label} />
-          <div><div className="ntitle">{row.title}</div><div className="nmeta">{row.published_at ? when(row.published_at, false) : ""}{row.source ? ` · ${row.source}` : ""}<span className="chip">Priority {row.score ?? "—"}</span><span className="muted"> · {row.article_ids.length} sources</span></div></div>
+          <div><div className="ntitle">{row.title}</div><div className="nmeta">{row.published_at ? when(row.published_at, false) : ""}{row.source ? ` · ${row.source}` : ""}<span className="chip">Priority {row.score ?? "—"}</span><span className="muted"> · {row.article_ids.length} sources</span>{row.pinned && <button className="chip pin-chip" title="Remove from the tracker" aria-label={`Unpin ${row.title}`} onClick={e => { e.stopPropagation(); onUnpin?.(row.event_id); }}>Pinned ✕</button>}</div></div>
           <span className="chev" aria-hidden>›</span>
         </div>
         <div className="ni-impact" style={item?.status === "ready" ? { borderLeftColor: colors[row.event_id] } : undefined} role="button" tabIndex={0} aria-label={`Impact of ${row.title}`}
@@ -91,8 +92,8 @@ const Box = ({ title, children, className = "" }: { title: string; children: Rea
   <section className={`dx-box ${className}`}><h3>{title}</h3>{children}</section>;
 
 /** Detail for one News Event: everything here is the what-if run with only this News Event's forecast inputs. */
-export function NewsImpactDetail({ row, item, color, r, v, baseline, reserve, onClose, onOpenArticle, onApply }:
-  { row: NewsRow; item?: EventImpact; color?: string; r: MarketRisk; v: RiskView; baseline: PathPoint[]; reserve: number | null; onClose: () => void; onOpenArticle: (id: string) => void; onApply: () => void }) {
+export function NewsImpactDetail({ row, item, color, r, v, baseline, reserve, onClose, onOpenArticle, onApply, granularity = "monthly", onGranularity }:
+  { row: NewsRow; item?: EventImpact; color?: string; r: MarketRisk; v: RiskView; baseline: PathPoint[]; reserve: number | null; onClose: () => void; onOpenArticle: (id: string) => void; onApply: () => void; granularity?: Granularity; onGranularity?: (g: Granularity) => void }) {
   const forecast = item?.forecast, fin = item?.finance, ci = fin?.cash_impact, lq = fin?.liquidity, calc = fin?.calculation;
   const predictions: any[] = forecast?.predictions ?? [];
   const status = fin ? riskStatus(lq, calc) : null;
@@ -122,6 +123,10 @@ export function NewsImpactDetail({ row, item, color, r, v, baseline, reserve, on
           {ci && <Box title="Cash impact by driver"><table className="t dx-table"><tbody>
             {ci.rows.map((x: any) => <tr key={x.id}><th>{x.label ?? ROW_LABEL[x.id]}</th><td className={`r ${tone(x.impact_eur_m)}`}>{x.impact_eur_m == null ? "—" : eur(x.impact_eur_m)}</td></tr>)}
           </tbody></table></Box>}
+          {item?.flows && <Box title="Cash impact by period" className="dx-period">
+            <PeriodImpactTable dayRows={item.flows} rate={rate} granularity={granularity} onGranularity={onGranularity} horizonEnd={calc?.horizon_end} />
+            <p className="small muted">When the cash moves if only this News happens: change against the baseline, EUR million. Rows group cash lines by where they arise (e.g. EUR freight receipts under Freight); the driver table above books currency effects to FX, so rows can differ while the totals match. Each News Event is a separate scenario; these timings do not add up across Events.</p>
+          </Box>}
           {ci && <div className={`dx-impact ${tone(ci.net_eur_m)}`}><div>
             <span>Estimated net cash impact · next {r.months} months</span>{ci.net_eur_m != null ? <b className={`dx-big ${tone(ci.net_eur_m)}`}>{eur(ci.net_eur_m)}</b> : <b>Incomplete</b>}
             <small>Adverse rows {eur(ci.adverse_total_eur_m)}{ci.adverse_pct_of_headroom != null ? ` · ${pctOfHeadroom(ci.adverse_pct_of_headroom)}` : ""}</small></div></div>}

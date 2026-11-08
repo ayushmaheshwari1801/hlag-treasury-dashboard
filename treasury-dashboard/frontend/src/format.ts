@@ -22,7 +22,7 @@ export function when(iso: string | null | undefined, withTime = true): string {
   return `${date}, ${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Singapore" })} SGT`;
 }
 export const METRIC_LABEL: Record<string, string> = {
-  fx_eur: "EUR / USD", fx_gbp: "GBP / USD", fx_cny: "CNY / USD", interest: "Euro short-term rate",
+  fx_eur: "EUR / USD", fx_gbp: "GBP / USD", fx_cny: "CNY / USD", fx_cad: "CAD / USD", interest: "Euro short-term rate",
   bunker: "Bunker fuel price", freight: "Freight rate (WCI)",
 };
 export const METRIC_SUB: Record<string, string> = {

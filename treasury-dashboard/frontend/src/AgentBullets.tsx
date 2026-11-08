@@ -10,7 +10,8 @@ export function agentPoints(value: string | string[] | null | undefined): string
         else parts.push(part);
         return parts;
       }, []).flatMap(sentence => sentence.split(/;\s+/)))
-      .filter(Boolean));
+      .filter(Boolean)
+      .map(point => point.charAt(0).toUpperCase() + point.slice(1)));  // clause splits start a new bullet
 }
 
 export function AgentBullets({ text, className = '' }: {text: string | string[] | null | undefined; className?: string}) {

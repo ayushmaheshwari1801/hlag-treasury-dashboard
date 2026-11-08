@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "./api";
 import { PathChart } from "./charts";
 import { eur, num, when } from "./format";
-import { assumptionName, assumptionText, changedOverrides, clampTo, deskExceptionText, eurWithUsd, hedgeMonths, groupAssumptions, groupSeries, notFetchedLive, pivotCashflows, sliderSpec, toEur } from "./engineUi";
+import { assumptionName, assumptionText, changedOverrides, clampTo, deskExceptionText, eurWithUsd, hedgeMonths, groupAssumptions, groupSeries, GRANULARITIES, notFetchedLive, periodLabel, pivotCashflows, pivotCashflowsBy, resamplePath, sliderSpec, toEur, type Granularity } from "./engineUi";
 
 const DRIVER: Record<string, string> = { freight: "Freight", bunker: "Bunker", rates: "Rates", fx: "FX", direct: "Direct cash" };
 const FLAG: Record<string, string> = { synthetic_register: "Illustrative exposures", proxy_based: "proxy-based", uses_unconfirmed_data: "unconfirmed data",
@@ -137,7 +137,29 @@ function RefreshReport({ r, onClose }: { r: any; onClose: () => void }) {
 
 const VIEWS = [["baseline_usd_m", "Baseline"], ["scenario_usd_m", "Scenario"], ["delta_usd_m", "Difference"]] as const;
 
-export function CashFlows({ runId, rate, horizonEnd, scenarioName }: { runId?: string; rate: number; horizonEnd?: string; scenarioName?: string }) {
+/** When the cash moves: the change against the baseline by driver and period (one News Event, or any one run). */
+export function PeriodImpactTable({ dayRows, rate, granularity, onGranularity, horizonEnd }: { dayRows: any[]; rate: number; granularity: Granularity; onGranularity?: (g: Granularity) => void; horizonEnd?: string }) {
+  const p = pivotCashflowsBy(dayRows, "delta_usd_m", rate, granularity, horizonEnd);
+  const cls = (v: number | undefined) => (v == null ? "" : v < -0.05 ? "neg" : v > 0.05 ? "pos" : "");
+  return <>
+    {onGranularity && <GranularityToggle value={granularity} onChange={onGranularity} />}
+    {p.drivers.length === 0 ? <p className="small muted">No cash moves against the baseline in this horizon.</p>
+      : <div className="cash-detail-table cf-table"><table>
+        <thead><tr><th>Driver</th>{p.months.map(m => <th key={m} className="r">{periodLabel(m, granularity)}</th>)}<th className="r">Total</th></tr></thead>
+        <tbody>{p.drivers.map(dr => <tr key={dr}><td>{DRIVER[dr] ?? dr}</td>{p.months.map(m => { const v = p.cells[dr]?.[m];
+          return <td key={m} className={`r ${cls(v)}`}>{v == null ? "" : num(v, 1)}</td>; })}<td className={`r b ${cls(p.driverTotals[dr])}`}>{num(p.driverTotals[dr], 1)}</td></tr>)}</tbody>
+        <tfoot><tr><td>Total</td>{p.months.map(m => <td key={m} className={`r ${cls(p.monthTotals[m])}`}>{p.monthTotals[m] == null ? "" : num(p.monthTotals[m], 1)}</td>)}<td className="r b">{num(p.total, 1)}</td></tr></tfoot>
+      </table></div>}
+  </>;
+}
+
+/** Daily / Weekly / Monthly switch shared by the liquidity chart and the cash-flow table. */
+export function GranularityToggle({ value, onChange }: { value: Granularity; onChange: (g: Granularity) => void }) {
+  return <div className="presets granularity" role="tablist" aria-label="Time period">{GRANULARITIES.map(([k, label]) =>
+    <button key={k} role="tab" aria-selected={value === k} className={`preset ${value === k ? "on" : ""}`} onClick={() => onChange(k)}>{label}</button>)}</div>;
+}
+
+export function CashFlows({ runId, rate, horizonEnd, scenarioName, granularity = "monthly", onGranularity }: { runId?: string; rate: number; horizonEnd?: string; scenarioName?: string; granularity?: Granularity; onGranularity?: (g: Granularity) => void }) {
   const [d, setD] = useState<any>(null), [err, setErr] = useState("");
   const [view, setView] = useState<string>("delta_usd_m");
   useEffect(() => {
@@ -147,21 +169,24 @@ export function CashFlows({ runId, rate, horizonEnd, scenarioName }: { runId?: s
     return () => { live = false; };
   }, [runId]);
   if (!runId) return null;
-  const p = d ? pivotCashflows(d.by_driver_month, view, rate, horizonEnd) : null;
+  // Each cash line has its own date, so the table can be daily, weekly or monthly over the whole horizon.
+  const g: Granularity = d?.by_driver_day ? granularity : "monthly";
+  const p = d ? (d.by_driver_day ? pivotCashflowsBy(d.by_driver_day, view, rate, g, horizonEnd) : pivotCashflows(d.by_driver_month, view, rate, horizonEnd)) : null;
   const liq = d?.liquidity;
   const end = horizonEnd ?? "9999";
-  const conv = (pts: any[]) => (pts ?? []).filter(x => x.date <= end).map(x => ({ date: x.date, value: x.liquidity_usd_m / rate }));
+  const conv = (pts: any[]) => resamplePath((pts ?? []).filter(x => x.date <= end).map(x => ({ date: x.date, value: x.liquidity_usd_m / rate })), g);
   const fmt = (v: number | undefined) => v == null ? "" : num(v, 1);
   return (
     <section className="card wide-card" aria-labelledby="cfv">
       <div className="hd"><div><h2 id="cfv">Cash flows: baseline and scenario</h2>
-        <p className="sub">By driver and month{scenarioName ? ` · ${scenarioName}` : ""} · EUR million</p></div>
+        <p className="sub">By driver and {g === "daily" ? "day" : g === "weekly" ? "week (Monday start)" : "month"}{scenarioName ? ` · ${scenarioName}` : ""} · EUR million</p></div>
+        {onGranularity && <GranularityToggle value={granularity} onChange={onGranularity} />}
         <div className="presets" role="tablist" aria-label="Cash flow view" style={{ flex: "none" }}>{VIEWS.map(([k, label]) =>
           <button key={k} role="tab" aria-selected={view === k} className={`preset ${view === k ? "on" : ""}`} onClick={() => setView(k)}>{label}</button>)}</div></div>
       {err && <p className="err small">{err}</p>}
       {!d && !err && <p className="muted small">Loading…</p>}
       {p && <div className="cash-detail-table cf-table"><table>
-        <thead><tr><th>Driver</th>{p.months.map(m => <th key={m} className="r">{m}</th>)}<th className="r">Total</th></tr></thead>
+        <thead><tr><th>Driver</th>{p.months.map(m => <th key={m} className="r">{periodLabel(m, g)}</th>)}<th className="r">Total</th></tr></thead>
         <tbody>{p.drivers.map(dr => <tr key={dr}><td>{DRIVER[dr] ?? dr}</td>{p.months.map(m => { const v = p.cells[dr]?.[m];
           return <td key={m} className={`r ${view === "delta_usd_m" && v ? (v < 0 ? "neg" : "pos") : ""}`}>{fmt(v)}</td>; })}
           <td className={`r b ${view === "delta_usd_m" ? (p.driverTotals[dr] < 0 ? "neg" : "pos") : ""}`}>{fmt(p.driverTotals[dr])}</td></tr>)}</tbody>

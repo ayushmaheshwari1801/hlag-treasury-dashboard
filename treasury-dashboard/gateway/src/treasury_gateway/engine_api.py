@@ -17,10 +17,12 @@ def cashflows(run: dict) -> dict:
     keys = ('baseline', 'scenario', 'delta')
     by_line = defaultdict(lambda: dict.fromkeys(keys, 0.))
     by_driver = defaultdict(lambda: dict.fromkeys(keys, 0.))
+    by_driver_day = defaultdict(lambda: dict.fromkeys(keys, 0.))   # every cash line has its own date
     for line in run.get('lines', []):
         month = line['date'][:7]
         amounts = (line['amount_usd_base_m'], line['amount_usd_scenario_m'], line['delta_usd_m'])
-        for bucket in (by_line[(line['owner'], month, line['line_code'], line.get('treatment'))], by_driver[(line['owner'], month)]):
+        for bucket in (by_line[(line['owner'], month, line['line_code'], line.get('treatment'))], by_driver[(line['owner'], month)],
+                       by_driver_day[(line['owner'], line['date'][:10])]):
             for k, v in zip(keys, amounts):
                 bucket[k] += v
 
@@ -37,6 +39,9 @@ def cashflows(run: dict) -> dict:
             'deltas': rows(by_line, names, 'delta'),
             'by_driver_month': [{'driver': d, 'month': m, 'baseline_usd_m': v['baseline'], 'scenario_usd_m': v['scenario'],
                                  'delta_usd_m': v['delta']} for (d, m), v in sorted(by_driver.items())],
+            # the same amounts by driver and day, so the page can show daily, weekly or monthly columns
+            'by_driver_day': [{'driver': d, 'date': day, 'baseline_usd_m': v['baseline'], 'scenario_usd_m': v['scenario'],
+                               'delta_usd_m': v['delta']} for (d, day), v in sorted(by_driver_day.items())],
             'path_items': [{'month': m, **v} for m, v in sorted(path.items())],
             'totals': {k: sum(v[k] for v in by_driver.values()) for k in keys}, 'note': NOTE,
             'liquidity': liquidity_paths(run)}
