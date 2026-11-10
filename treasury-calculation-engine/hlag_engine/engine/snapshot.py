@@ -2,7 +2,7 @@
 
 The snapshot holds, per series, the latest value dated on or before T0 with the date of the last real
 print, days_since_print, unit, label, confirmed, filled, and the stale flag from the staleness limits in
-thresholds.yaml (daily 5 days, weekly 10; P45). Modules never query the store; they read the snapshot.
+thresholds.yaml (daily 5 days, weekly 14; P45). Modules never query the store; they read the snapshot.
 """
 
 from datetime import date, timedelta

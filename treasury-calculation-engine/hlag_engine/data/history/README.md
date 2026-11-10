@@ -15,7 +15,7 @@ collected by hand, once, into a CSV in exactly this format (start from
 
 Example row: `WCI_SHA_RTM,2026-01-08,2150.5,USD/FEU,https://example.com/wci-2026-01-08,`
 
-The history must cover the anchor period (1 Jan – 30 Jun 2026) with no gap over 10 days, so
+The history must cover the anchor period (1 Jan – 30 Jun 2026) with no gap over 14 days, so
 the anchor averages can be computed (spec 3.7).
 
 Load it into a database:

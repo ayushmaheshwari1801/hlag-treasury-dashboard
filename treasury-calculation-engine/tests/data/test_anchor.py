@@ -84,7 +84,7 @@ def test_compute_writes_nothing(store, real):
         (lambda s: None, "SOFR", "no loaded history"),
         (lambda s: s.conn.execute("DELETE FROM market_data WHERE series_id='ESTR' AND date < '2026-01-20'"), "ESTR", "history starts"),
         (lambda s: s.conn.execute("DELETE FROM market_data WHERE series_id='ESTR' AND date > '2026-06-20'"), "ESTR", "history ends"),
-        (lambda s: s.conn.execute("DELETE FROM market_data WHERE series_id='WCI_SHA_LAX' AND date BETWEEN '2026-03-01' AND '2026-03-10'"), "WCI_SHA_LAX", "gap of"),
+        (lambda s: s.conn.execute("DELETE FROM market_data WHERE series_id='WCI_SHA_LAX' AND date BETWEEN '2026-03-01' AND '2026-03-17'"), "WCI_SHA_LAX", "gap of"),
         (lambda s: s.conn.execute("UPDATE market_data SET confirmed=0 WHERE series_id='VLSFO_SIN' AND date='2026-02-05'"), "VLSFO_SIN", "unconfirmed"),
         (lambda s: s.conn.execute("UPDATE market_data SET filled=1, days_since_print=1 WHERE series_id='FX_USD_PER_BRL' AND date='2025-12-31'"), "fx.lock_rate_usd_per_unit.BRL", "no published"),
     ],

@@ -128,9 +128,9 @@ def test_same_value_confirms_unconfirmed_retrieved_value(store, tmp_path):
 
 
 def test_stale_series_reported_with_as_of(store, tmp_path):
-    path = write(tmp_path, f"WCI_SHA_RTM,2026-01-08,2000,USD/FEU,{URL},", f"VLSFO_SIN,2026-01-15,500,USD/t,{URL},")
+    path = write(tmp_path, f"WCI_SHA_RTM,2026-01-04,2000,USD/FEU,{URL},", f"VLSFO_SIN,2026-01-15,500,USD/t,{URL},")
     report = load_history_csv(store, path, as_of=date(2026, 1, 19))
-    assert report.stale_series == ["WCI_SHA_RTM"]  # 11 days > 10; VLSFO_SIN 4 days
+    assert report.stale_series == ["WCI_SHA_RTM"]  # 15 days > 14; VLSFO_SIN 4 days
 
 
 # ---------------------------------------------------------------- Bloomberg Terminal references (P89)

@@ -11,7 +11,7 @@ Targets are the profile's pending_history items:
 - anchor_snapshot series: the anchor-period (H1 2026) average of real, confirmed prints
   (carry-forward rows are not averaged), labelled DERIVED as in the profile. History must cover
   the period: first print within the staleness limit of the start, last print within it of the
-  end, and no gap between prints longer than the limit (daily 5 days, weekly 10).
+  end, and no gap between prints longer than the limit (daily 5 days, weekly 14).
 - fx.lock_rate_usd_per_unit.INR and .BRL: the ECB reference rate on 31 Dec 2025 converted to USD
   per unit, labelled MARKET (9B.4); a real print on that date is required.
 

@@ -28,7 +28,7 @@ market_data:
   label: ASSUMPTION
   staleness_days:            # stale when days_since_print exceeds this
     daily: 5
-    weekly: 10
+    weekly: 14
   plausibility_band_pct:     # week-on-week move that sends an agent-retrieved value to the confirm queue
     fuel: 40
     wci: 80
